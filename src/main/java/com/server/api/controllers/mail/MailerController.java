@@ -1,4 +1,4 @@
-package com.server.rest;
+package com.server.api.controllers.mail;
 
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.services.mailer.MailerHOCs;
 import com.server.services.mailer.MailerService;
-// import com.server.services.openai.OpenAIServices;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController

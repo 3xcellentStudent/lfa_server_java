@@ -8,7 +8,8 @@ import java.io.FileInputStream;
 public class FirebaseInitialize {
   
   public void initialize(){
-    final String jsonKey = "C:/Users/alina/Desktop/AndriiJob/projects/lfa_server_java/lamps-for-all-41ec3-firebase-adminsdk-o538x-253ab3d29b.json";
+    final String keyName = "lamps-for-all-41ec3-firebase-adminsdk-o538x-253ab3d29b.json";
+    final String jsonKey = this.getClass().getResource("/static/" + keyName).getPath();
     try {
       FileInputStream inputStream = new FileInputStream(jsonKey);
       FirebaseOptions options = new FirebaseOptions.Builder()
@@ -23,6 +24,3 @@ public class FirebaseInitialize {
     }
   }
 }
-// final String path = "C:/Users/alina/Desktop/AndriiJob/projects/lfa_server_java/src/main/java/com/server/firebase/my.json";
-// BufferedReader reader = new BufferedReader(new FileReader(path));
-// System.out.println(reader.readLine());

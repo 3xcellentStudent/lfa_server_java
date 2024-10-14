@@ -1,4 +1,4 @@
-package com.server.services.heplers;
+package com.server.heplers;
 
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;

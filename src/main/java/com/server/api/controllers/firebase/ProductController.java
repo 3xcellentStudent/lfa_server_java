@@ -1,4 +1,4 @@
-package com.server.rest;
+package com.server.api.controllers.firebase;
 
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
