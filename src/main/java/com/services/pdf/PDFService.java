@@ -1,8 +1,13 @@
 package com.services.pdf;
 
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.util.Date;
 
 import com.lowagie.text.Document;
@@ -25,30 +30,27 @@ public class PDFService {
 
   public void create(CaptureResponseObject data){
     String fileName = "HelloWorld_" + System.currentTimeMillis() + ".pdf";
-    String filePath = "C:\\Users\\alina\\Desktop\\pdfTests\\" + fileName;
 
-    // String[] content = {"Company Name", "My name", 
-    // "My email"};
-    // int[] alighment = {0, 2, 0, 2, 0, 2};
-
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
-        final PdfWriter instance = PdfWriter
-        .getInstance(document, new FileOutputStream(filePath));
+      final PdfWriter instance = PdfWriter
+      .getInstance(document, outputStream);
 
-        metadata(instance);
+      metadata(instance);
 
-        document.open();
+      document.open();
 
-        document.newPage();
-        instance.setPageEmpty(false);
+      document.newPage();
+      instance.setPageEmpty(false);
 
-        mainInfoTable(data, document);
-        
-        billToInfoTable(data, document);
+      mainInfoTable(data, document);
+      
+      billToInfoTable(data, document);
 
-        descriptionFieldsTable(data, document);
+      descriptionFieldsTable(data, document);
 
-    } catch(DocumentException | IOException error){
+      uploadPdfFile(outputStream.toByteArray(), fileName);
+    } catch(DocumentException error){
       System.err.println(error.getMessage());
     }
   }
@@ -141,7 +143,23 @@ public class PDFService {
     document.add(table);
   }
 
-  // private void descriptionItemsTable(CaptureResponseObject data, Document document){
+  private void uploadPdfFile(byte[] fileBytes, String fileName){
+    try {
+      URL url = new URI("").toURL();
+      
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setDoOutput(true);
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Content-Type", "application/octet-stream");
+      connection.setRequestProperty("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
-  // }
+      connection.connect();
+
+      OutputStream outputStream = connection.getOutputStream();
+      
+
+    } catch(Exception error){
+      error.printStackTrace();
+    }
+  }
 }
