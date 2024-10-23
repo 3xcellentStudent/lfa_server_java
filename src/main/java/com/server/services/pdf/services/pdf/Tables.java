@@ -1,4 +1,4 @@
-package com.services.pdf.services;
+package com.server.services.pdf.services.pdf;
 
 import java.awt.Color;
 

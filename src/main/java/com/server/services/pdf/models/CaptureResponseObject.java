@@ -1,9 +1,9 @@
-package com.services.pdf.helpers.json;
+package com.server.services.pdf.models;
 
 import org.json.JSONObject;
-import org.springframework.stereotype.Service;
+// import org.springframework.stereotype.Service;
 
-@Service
+// @Service
 public class CaptureResponseObject {
   public String orderId;
   public String status;

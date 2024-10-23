@@ -1,4 +1,4 @@
-package com.services.redis.service;
+package com.server.services.redis.service;
 
 import org.json.JSONObject;
 

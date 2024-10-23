@@ -24,7 +24,7 @@ public class MailerService {
 
   public static boolean send(String emailTo, String emailFrom, byte[] attachmentData, String attachmentName, String subject, String text){
 		try {
-			Properties properties = MailerConfig.createConfig();
+			Properties properties = MailerConfig.getProperties();
 			// Properties props = new Properties();
 			// props.setProperty("mail.transport.protocol", "smtp");
 			// props.setProperty("mail.host", "smtp.gmail.com");
@@ -35,7 +35,7 @@ public class MailerService {
 	
 			Session session = Session.getInstance(properties, new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication("lamps.for.all00@gmail.com", "slgifhmoptjpqkpu");
+					return new PasswordAuthentication(MailerConfig.getUsername(), MailerConfig.getPassword());
 				}
 			});
 	
@@ -46,25 +46,20 @@ public class MailerService {
 
 			String htmlContent = "<h2>Hello, this letter from Andrew to Andrew :)</h2>";
 	
-			// Создание части для HTML-контента
 			MimeBodyPart htmlPart = new MimeBodyPart();
-			htmlPart.setContent(htmlContent, "text/html"); // Указываем, что это HTML
+			htmlPart.setContent(htmlContent, "text/html");
 	
-			// Создание части для вложения
 			MimeBodyPart attachmentPart = new MimeBodyPart();
 			DataSource dataSource = new ByteArrayDataSource(attachmentData, "application/octet-stream");
 			attachmentPart.setDataHandler(new DataHandler(dataSource));
 			attachmentPart.setFileName(attachmentName);
 	
-			// Создание объекта Multipart и добавление частей
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(htmlPart);
 			multipart.addBodyPart(attachmentPart);
 	
-			// Устанавливаем содержимое сообщения
 			message.setContent(multipart);
 	
-			// Отправляем сообщение
 			Transport.send(message);
 			return true;
 		} catch (Exception error) {

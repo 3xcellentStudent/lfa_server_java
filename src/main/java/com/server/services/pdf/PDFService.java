@@ -1,14 +1,11 @@
-package com.services.pdf;
+package com.server.services.pdf;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.Date;
+
+import org.json.JSONObject;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -20,21 +17,18 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
-import com.services.pdf.helpers.json.Address;
-import com.services.pdf.helpers.json.CaptureResponseObject;
-import com.services.pdf.helpers.json.Payer;
-import com.services.pdf.services.Cells;
-import com.services.pdf.services.Tables;
+import com.server.services.pdf.models.Address;
+import com.server.services.pdf.models.CaptureResponseObject;
+import com.server.services.pdf.models.Payer;
+import com.server.services.pdf.services.pdf.Cells;
+import com.server.services.pdf.services.pdf.Tables;
 
 public class PDFService {
 
-  public void create(CaptureResponseObject data){
-    String fileName = "HelloWorld_" + System.currentTimeMillis() + ".pdf";
-
+  public JSONObject create(CaptureResponseObject data){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
-      final PdfWriter instance = PdfWriter
-      .getInstance(document, outputStream);
+      final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
 
       metadata(instance);
 
@@ -49,9 +43,13 @@ public class PDFService {
 
       descriptionFieldsTable(data, document);
 
-      uploadPdfFile(outputStream.toByteArray(), fileName);
+      document.close();
+
+      return new JSONObject().put("status", HttpURLConnection.HTTP_OK).put("data", outputStream.toByteArray());
     } catch(DocumentException error){
       System.err.println(error.getMessage());
+      return null;
+      // return new JSONObject().put("status", HttpURLConnection.HTTP_BAD_REQUEST).put("data", outputStream.toByteArray());
     }
   }
   
@@ -143,23 +141,4 @@ public class PDFService {
     document.add(table);
   }
 
-  private void uploadPdfFile(byte[] fileBytes, String fileName){
-    try {
-      URL url = new URI("").toURL();
-      
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setDoOutput(true);
-      connection.setRequestMethod("POST");
-      connection.setRequestProperty("Content-Type", "application/octet-stream");
-      connection.setRequestProperty("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-
-      connection.connect();
-
-      OutputStream outputStream = connection.getOutputStream();
-      
-
-    } catch(Exception error){
-      error.printStackTrace();
-    }
-  }
 }

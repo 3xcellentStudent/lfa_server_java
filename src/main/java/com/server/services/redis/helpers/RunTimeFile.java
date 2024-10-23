@@ -1,4 +1,4 @@
-package com.services.redis.helpers;
+package com.server.services.redis.helpers;
 
 import java.io.BufferedReader;
 import java.io.IOException;

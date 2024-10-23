@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
-import com.services.redis.helpers.RunTimeFile;
+import com.server.services.redis.helpers.RunTimeFile;
 
 // @Component
 // public class CloseEventsClass implements ApplicationListener<ContextClosedEvent>{

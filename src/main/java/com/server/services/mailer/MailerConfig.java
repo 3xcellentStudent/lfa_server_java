@@ -4,7 +4,7 @@ import java.util.Properties;
 
 public class MailerConfig {
   
-  public static Properties createConfig(){
+  public static Properties getProperties(){
     Properties properties = new Properties();
     properties.setProperty("mail.transport.protocol", "smtp");
     properties.setProperty("mail.host", "smtp.gmail.com");
@@ -15,4 +15,8 @@ public class MailerConfig {
     
     return properties;
   }
+
+  public static String getUsername(){return "lamps.for.all00@gmail.com";}
+
+  public static String getPassword(){return "slgifhmoptjpqkpu";}
 }

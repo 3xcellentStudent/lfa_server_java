@@ -1,4 +1,4 @@
-package com.services.pdf.services;
+package com.server.services.pdf.services.pdf;
 
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
