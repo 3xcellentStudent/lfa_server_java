@@ -25,13 +25,6 @@ public class MailerService {
   public static boolean send(String emailTo, String emailFrom, byte[] attachmentData, String attachmentName, String subject, String text){
 		try {
 			Properties properties = MailerConfig.getProperties();
-			// Properties props = new Properties();
-			// props.setProperty("mail.transport.protocol", "smtp");
-			// props.setProperty("mail.host", "smtp.gmail.com");
-			// props.put("mail.smtp.auth", "true");
-			// props.put("mail.smtp.port", "587");
-			// props.put("mail.smtp.starttls.enable", "true");
-			// props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 	
 			Session session = Session.getInstance(properties, new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {

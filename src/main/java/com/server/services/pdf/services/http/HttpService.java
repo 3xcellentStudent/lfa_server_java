@@ -7,7 +7,7 @@ import java.net.URL;
 
 public class HttpService {
   
-  public void uploadPdfFile(byte[] fileBytes, String fileName){
+  public static void uploadPdfFile(byte[] fileBytes, String fileName){
     try {
       URL url = new URI("http://localhost:5000/files/write-pdf").toURL();
       
@@ -27,8 +27,10 @@ public class HttpService {
       else System.err.println("Failed to upload file. Response code: " + connection.getResponseCode());
 
       connection.disconnect();
+
     } catch(Exception error){
       error.printStackTrace();
+      return;
     }
   }
 }
