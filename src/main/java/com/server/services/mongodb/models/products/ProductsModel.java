@@ -19,6 +19,7 @@ public class ProductsModel {
   public StockInfo stockInfo;
   public List<ProductOption> productOptions;
   public MediaContent mediaContent;
+  public Specifications specifications;
 
   public ProductsModel(){}
   
@@ -32,6 +33,8 @@ public class ProductsModel {
     this.stockInfo = product.stockInfo;
     this.productOptions = product.productOptions;
     this.mediaContent = product.mediaContent;
+    this.specifications = product.specifications;
+
   }
 
   public String setId(String id){
@@ -70,21 +73,22 @@ public class ProductsModel {
     public int countOfReviews;
     public ReviewsSnapshot reviewsSnapshot;
     public List<Review> reviewsList;
-  }
 
-  public static class ReviewsSnapshot {
-    public int five;
-    public int four;
-    public int three;
-    public int two;
-    public int one;
-  }
+    public static class ReviewsSnapshot {
+      public int five;
+      public int four;
+      public int three;
+      public int two;
+      public int one;
+    }
 
-  public static class Review {
-    public String name;
-    public String text;
-    public String rating;
-    public List<String> attachments;
+    public static class Review {
+      public String name;
+      public String text;
+      public String title;
+      public String rating;
+      public List<String> attachments;
+    }
   }
 
   public static class Category {
@@ -117,14 +121,35 @@ public class ProductsModel {
   public static class MediaContent {
     public TitleContent titleContent;
     public List<List<Image>> images;
+
+    public static class TitleContent {
+      public String productLogo;
+      public String descriptionVideo;
+    }
+
+    public static class Image {
+      public String media;
+      public String src;
+    }
   }
 
-  public static class TitleContent {
-    public String productLogo;
+  public static class Specifications {
+      public List<SpecificationsTitles> titles;
+      public List<Properties> properties;
+
+    public static class SpecificationsTitles {
+      public String name;
+    }
+
+    public static class PropertiesArrayObject {
+      public String name;
+      public String value;
+    }
+
+    public static class Properties {
+      public String name;
+      public List<PropertiesArrayObject> array;
+    }
   }
 
-  public static class Image {
-    public String media;
-    public String src;
-  }
 }
