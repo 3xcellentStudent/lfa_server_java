@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.server.services.pdf.models.CaptureResponseObject;
 
 
-@Document
+@Document(collection = "invoices")
 public class InvoicesModel {
   
   @Id

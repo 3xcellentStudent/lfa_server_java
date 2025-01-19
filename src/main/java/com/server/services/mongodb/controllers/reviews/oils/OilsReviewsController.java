@@ -1,34 +1,32 @@
-package com.server.services.mongodb.controllers.products;
+package com.server.services.mongodb.controllers.reviews.oils;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.services.mongodb.models.products.ProductsModel;
-import com.server.services.mongodb.repositories.products.ProductsRepository;
+import com.server.services.mongodb.models.products.oils.OilsProductsModel;
+import com.server.services.mongodb.repositories.products.oils.OilsProductRepository;
 
 @RestController
-@RequestMapping("/mongodb-products")
+@RequestMapping("/api/mongodb/reviews/diffusers")
 @CrossOrigin("*")
-public class ProductsController {
+public class OilsReviewsController {
   
-  @Autowired
-  private ProductsRepository repository;
+  private OilsProductRepository repository;
 
-  @PostMapping("/add")
-  public ResponseEntity<Object> add(@RequestBody ProductsModel product){
+  @PostMapping("/create")
+  public ResponseEntity<Object> create(@RequestBody OilsProductsModel product){
     try {
-      ProductsModel savedProduct = repository.save(product);
+      OilsProductsModel savedProduct = repository.save(product);
       return ResponseEntity.ok().body(savedProduct);
     } catch(Exception error){
       error.printStackTrace();
@@ -36,13 +34,13 @@ public class ProductsController {
     }
   }
 
-  @PutMapping("/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable String id, @RequestBody ProductsModel product){
+  @PatchMapping("/update/{id}")
+  public ResponseEntity<Object> updateById(@PathVariable String id, @RequestBody OilsProductsModel product){
     try {
       boolean existingDocument = repository.existsById(id);
       if(existingDocument){
         product.setId(id);
-        ProductsModel updatedProduct = repository.save(product);
+        OilsProductsModel updatedProduct = repository.save(product);
         return ResponseEntity.ok().body(updatedProduct);
       } else return ResponseEntity.status(404).body("Unable to update because this product does not exist !");
     } catch(Exception error){
@@ -54,7 +52,7 @@ public class ProductsController {
   @GetMapping("/get/{id}")
   public ResponseEntity<Object> getById(@PathVariable String id){
     try {
-      Optional<ProductsModel> product = repository.findById(id);
+      Optional<OilsProductsModel> product = repository.findById(id);
       if(product.isPresent()){
         return ResponseEntity.ok().body(product.get()); 
       } else {
@@ -69,7 +67,7 @@ public class ProductsController {
   @GetMapping("/get")
   public ResponseEntity<Object> get(){
     try {
-      List<ProductsModel> products = repository.findAll();
+      List<OilsProductsModel> products = repository.findAll();
       if(products.isEmpty() == false){
         return ResponseEntity.ok().body(products); 
       } else {
@@ -84,7 +82,7 @@ public class ProductsController {
   @GetMapping("/delete/{id}")
   public ResponseEntity<Object> deleteById(@PathVariable String id){
     try {
-      Optional<ProductsModel> existingDocument = repository.findById(id);
+      Optional<OilsProductsModel> existingDocument = repository.findById(id);
       if(existingDocument.isPresent()){
         repository.deleteById(id);
         return ResponseEntity.ok().body(existingDocument.get());
