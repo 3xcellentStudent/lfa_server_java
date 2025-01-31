@@ -2,16 +2,16 @@ package com.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 // import com.resources.redis.services.PortChecker;
-import com.server.services.firebase.FirebaseInitialize;
-import com.server.services.mongodb.config.MongoClientConnection;
+// import com.server.services.firebase.FirebaseInitialize;
 @SpringBootApplication
+@EnableMongoRepositories
 public class Application {
 
 	public static void main(String[] args){
 		SpringApplication.run(Application.class, args);
-		MongoClientConnection.start();		
 		// new FirebaseInitialize().initialize();
 		// PortChecker.checkPort();
 	}

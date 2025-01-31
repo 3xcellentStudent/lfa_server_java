@@ -19,7 +19,7 @@ import com.server.services.mongodb.repositories.products.oils.OilsProductReposit
 @RestController
 @RequestMapping("/api/mongodb/products/oils")
 @CrossOrigin("*")
-public class OilsController {
+public class OilsProductsController {
   
   private OilsProductRepository repository;
 

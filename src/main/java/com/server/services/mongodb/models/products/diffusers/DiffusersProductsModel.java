@@ -2,227 +2,108 @@ package com.server.services.mongodb.models.products.diffusers;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Component;
 
-import com.server.services.mongodb.models.products.ProductsModel.Category;
+import com.server.services.mongodb.models.media.diffusers.DiffusersMediaModel;
 import com.server.services.mongodb.models.products.ProductsModel.Descriptions;
-import com.server.services.mongodb.models.products.ProductsModel.MediaContent;
 import com.server.services.mongodb.models.products.ProductsModel.ProductOption;
 import com.server.services.mongodb.models.products.ProductsModel.Specifications;
 import com.server.services.mongodb.models.products.ProductsModel.StockInfo;
-import com.server.services.mongodb.models.reviews.ReviewsModel.Reviews;
+import com.server.services.mongodb.models.products.ProductsModel.Theme;
+import com.server.services.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
 
 import java.util.List;
 
-@Document(collection = "diffusers")
+@Component
+@Document(collection = "products_diffusers")
 public class DiffusersProductsModel {
 
   @Id
-  private String _id;
+  private String id;
   private String reviews_id;
-  public String media_id;
-  public double rating;
-  public Reviews reviews;
-  public Category category;
+  private String media_id;
+  public String rating;
   public String title;
   public Descriptions descriptions;
   public StockInfo stockInfo;
   public List<ProductOption> productOptions;
-  public MediaContent mediaContent;
   public Specifications specifications;
-  private long created_at;
-  private long updated_at;
+  public Theme theme;
+  private DiffusersMediaModel mediaContent;
+  private DiffusersReviewsModel reviews;
+  private long createdAt;
+  private long updatedAt;
 
   public DiffusersProductsModel(){}
 
-  public DiffusersProductsModel(DiffusersProductsModel product){
-    this.rating = product.rating;
-    this.reviews = product.reviews;
-    this.category = product.category;
-    this.title = product.title;
-    this.descriptions = product.descriptions;
-    this.stockInfo = product.stockInfo;
-    this.productOptions = product.productOptions;
-    this.mediaContent = product.mediaContent;
-    this.specifications = product.specifications;
+  public DiffusersProductsModel(DiffusersProductsModel requestBody){
+    this.rating = requestBody.rating;
+    this.title = requestBody.title;
+    this.descriptions = requestBody.descriptions;
+    this.stockInfo = requestBody.stockInfo;
+    this.theme = requestBody.theme;
+    this.productOptions = requestBody.productOptions;
+    this.specifications = requestBody.specifications;
   }
 
-  public void setId(String _id){
-    this._id = _id;
+  public void setId(String id){
+    this.id = id;
+  }
+
+  public String getId(){
+    return this.id;
   }
 
   public void setReviewsId(String reviews_id){
     this.reviews_id = reviews_id;
   }
 
-  public String getId(){
-    return this._id;
-  }
-
   public String getReviewsId(){
     return this.reviews_id;
   }
 
-  public long getCreationTime(){
-    return this.created_at;
+  public void setMediaId(String media_id){
+    this.media_id = media_id;
   }
 
-  public void setCreationTime(long newTime){
-    this.created_at = newTime;
+  public String getMediaId(){
+    return this.media_id;
+  }
+
+  public long getCreateTime(){
+    return this.createdAt;
+  }
+
+  public void setCreateTime(long newTime){
+    this.createdAt = newTime;
   }
 
   public long getUpdateTime(){
-    return this.updated_at;
+    return this.updatedAt;
   }
 
   public void setUpdateTime(long newTime){
-    this.updated_at = newTime;
+    this.updatedAt = newTime;
   }
+
+  public DiffusersReviewsModel getReviews(){
+    return this.reviews;
+  }
+
+  public void setReviews(DiffusersReviewsModel reviews){
+    this.reviews = reviews;
+  }
+
+  public DiffusersMediaModel getMediaContent(){
+    return this.mediaContent;
+  }
+
+  public void setMediaContent(DiffusersMediaModel mediaContent){
+    this.mediaContent = mediaContent;
+  }
+
+  public String getCollectionName(){
+    return "products_diffusers";
+  }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// package com.server.services.mongodb.models.products.diffusers;
-
-// import org.springframework.data.annotation.Id;
-// import org.springframework.data.mongodb.core.mapping.Document;
-
-// import java.util.List;
-
-// @Document(collection = "diffusers")
-// public class ProductsModel {
-
-//   @Id
-//   public String id;
-//   public double rating;
-//   public Reviews reviews;
-//   public Category category;
-//   public String title;
-//   public Descriptions descriptions;
-//   public StockInfo stockInfo;
-//   public List<ProductOption> productOptions;
-//   public MediaContent mediaContent;
-//   public Specifications specifications;
-
-//   public ProductsModel(){}
-  
-//   public ProductsModel(ProductsModel product){
-//     this.rating = product.rating;
-//     this.reviews = product.reviews;
-//     this.category = product.category;
-//     this.title = product.title;
-//     this.descriptions = product.descriptions;
-//     this.stockInfo = product.stockInfo;
-//     this.productOptions = product.productOptions;
-//     this.mediaContent = product.mediaContent;
-//     this.specifications = product.specifications;
-//   }
-
-//   public String setId(String id){
-//     this.id = id;
-//     return id;
-//   }
-
-//   public static class Reviews {
-//     public int countOfReviews;
-//     public ReviewsSnapshot reviewsSnapshot;
-//     public List<Review> reviewsList;
-
-//     public static class ReviewsSnapshot {
-//       public int five;
-//       public int four;
-//       public int three;
-//       public int two;
-//       public int one;
-//     }
-
-//     public static class Review {
-//       public String name;
-//       public String text;
-//       public String title;
-//       public String rating;
-//       public List<String> attachments;
-//     }
-//   }
-
-//   public static class Category {
-//     public String name;
-//   }
-
-//   public static class Descriptions {
-//     public String summary;
-//     public String[] presentable;
-//   }
-
-//   public static class StockInfo {
-//     public int quantityMax;
-//     public double price;
-//   }
-
-//   public static class ProductOption {
-//     public String name;
-//     public String type;
-//     public List<Item> items;
-//   }
-
-//   public static class Item {
-//     public String value;
-//     public String fill;
-//     public String stroke;
-//     public boolean stockStatus;
-//   }
-
-//   public static class MediaContent {
-//     public TitleContent titleContent;
-//     public List<List<Image>> images;
-
-//     public static class TitleContent {
-//       public String productLogo;
-//       public String descriptionVideo;
-//     }
-
-//     public static class Image {
-//       public String media;
-//       public String src;
-//     }
-//   }
-
-//   public static class Specifications {
-//       public List<SpecificationsTitles> titles;
-//       public List<Properties> properties;
-
-//     public static class SpecificationsTitles {
-//       public String name;
-//     }
-
-//     public static class PropertiesArrayObject {
-//       public String name;
-//       public String value;
-//     }
-
-//     public static class Properties {
-//       public String name;
-//       public List<PropertiesArrayObject> array;
-//     }
-//   }
-
-// }

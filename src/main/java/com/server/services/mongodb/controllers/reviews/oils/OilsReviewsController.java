@@ -17,7 +17,7 @@ import com.server.services.mongodb.models.products.oils.OilsProductsModel;
 import com.server.services.mongodb.repositories.products.oils.OilsProductRepository;
 
 @RestController
-@RequestMapping("/api/mongodb/reviews/diffusers")
+@RequestMapping("/api/mongodb/reviews/oils")
 @CrossOrigin("*")
 public class OilsReviewsController {
   

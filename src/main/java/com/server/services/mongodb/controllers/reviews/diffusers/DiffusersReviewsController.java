@@ -3,6 +3,7 @@ package com.server.services.mongodb.controllers.reviews.diffusers;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,19 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.services.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
 import com.server.services.mongodb.repositories.reviews.diffusers.DiffusersReviewsRepository;
+import com.server.services.mongodb.services.reviews.diffusers.DiffusersReviewsService;
 
 @RestController
 @RequestMapping("/api/mongodb/reviews/diffusers")
 @CrossOrigin("*")
 public class DiffusersReviewsController {
   
+  @Autowired
   private DiffusersReviewsRepository repository;
 
+  private DiffusersReviewsService service = new DiffusersReviewsService();
+
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody DiffusersReviewsModel reviewsModel){
+  public ResponseEntity<Object> create(@RequestBody DiffusersReviewsModel requestBody){
     try {
-      DiffusersReviewsModel savedProduct = repository.save(reviewsModel);
-      return ResponseEntity.ok().body(savedProduct);
+      ResponseEntity<Object> response = service.createOne(requestBody);
+
+      return ResponseEntity.ok().body(response);
     } catch(Exception error){
       error.printStackTrace();
       return ResponseEntity.internalServerError().body("Can't add new product to database !");
@@ -35,11 +41,11 @@ public class DiffusersReviewsController {
   }
 
   @PatchMapping("/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable String id, @RequestBody DiffusersReviewsModel reviewsModel){
+  public ResponseEntity<Object> updateById(@PathVariable String id, @RequestBody DiffusersReviewsModel dataModel){
     try {
       boolean existingDocument = repository.existsById(id);
       if(existingDocument){
-        DiffusersReviewsModel updatedProduct = repository.save(reviewsModel);
+        DiffusersReviewsModel updatedProduct = repository.save(dataModel);
         return ResponseEntity.ok().body(updatedProduct);
       } else return ResponseEntity.status(404).body("Unable to update because this product does not exist !");
     } catch(Exception error){

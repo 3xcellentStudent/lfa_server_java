@@ -3,11 +3,6 @@ package com.server.services.mongodb.models.reviews;
 import java.util.List;
 
 public class ReviewsModel {
-  public static class Reviews {
-    public int countOfReviews;
-    public ReviewsSnapshot reviewsSnapshot;
-    public List<Review> reviewsList;
-  }
 
   public static class ReviewsSnapshot {
     public int five;

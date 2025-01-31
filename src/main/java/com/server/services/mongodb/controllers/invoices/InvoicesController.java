@@ -10,7 +10,7 @@ import com.server.services.mongodb.repositories.invoices.InvoicesRepository;
 import com.server.services.pdf.models.CaptureResponseObject;
 
 @RestController
-@RequestMapping("/mongodb-invoices")
+@RequestMapping("/api/mongodb/invoices")
 public class InvoicesController {
   
   private InvoicesRepository repository;

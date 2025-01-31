@@ -1,13 +1,13 @@
 package com.server.services.mongodb.models.reviews.oils;
 
-import com.server.services.mongodb.models.reviews.ReviewsModel.Reviews;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "reviewsOils")
 public class OilsReviewsModel {
-  public Reviews reviews;
 
   public OilsReviewsModel(){}
 
   public OilsReviewsModel(OilsReviewsModel reviewsModel){
-    this.reviews = reviewsModel.reviews;
+    // this.reviews = reviewsModel.reviews;
   }
 }
