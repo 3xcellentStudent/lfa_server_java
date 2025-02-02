@@ -23,7 +23,7 @@ public class QueriesHelper {
     return new Query(Criteria.where(objectName).is(id)).fields().slice("reviewsList", fromIndex, limit);
   }
 
-  public static Update getUpdateForObject(List<String> fields, List<String> newData){
+  public static Update getUpdateForObject(List<String> fields, List<Object> newData){
     Update updates = new Update();
 
     int index = 0;

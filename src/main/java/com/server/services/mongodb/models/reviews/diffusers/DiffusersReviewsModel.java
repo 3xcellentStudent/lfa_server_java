@@ -14,7 +14,7 @@ import com.server.services.mongodb.models.reviews.ReviewsModel.ReviewsSnapshot;
 public class DiffusersReviewsModel {
 
   @Id
-  private String _id;
+  private String id;
   private String parent_id;
   private String media_id;
   public int countOfReviews;
@@ -32,11 +32,11 @@ public class DiffusersReviewsModel {
   }
 
   public void setId(String _id){
-    this._id = _id;
+    this.id = _id;
   }
 
   public String getId(){
-    return this._id;
+    return this.id;
   }
 
   public void setParentId(String parent_id){

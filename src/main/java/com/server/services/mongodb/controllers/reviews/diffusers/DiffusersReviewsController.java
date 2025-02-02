@@ -1,21 +1,22 @@
 package com.server.services.mongodb.controllers.reviews.diffusers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.services.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.services.mongodb.repositories.reviews.diffusers.DiffusersReviewsRepository;
+import com.server.services.mongodb.services.MainService;
 import com.server.services.mongodb.services.reviews.diffusers.DiffusersReviewsService;
 
 @RestController
@@ -24,14 +25,16 @@ import com.server.services.mongodb.services.reviews.diffusers.DiffusersReviewsSe
 public class DiffusersReviewsController {
   
   @Autowired
-  private DiffusersReviewsRepository repository;
+  private DiffusersReviewsService reviewsService;
+  @Autowired
+  private MainService mainService;
+  @Autowired
+  private MongoTemplate mongoTemplate;
 
-  private DiffusersReviewsService service = new DiffusersReviewsService();
-
-  @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody DiffusersReviewsModel requestBody){
+  @PostMapping("/create/empty")
+  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     try {
-      ResponseEntity<Object> response = service.createOne(requestBody);
+      ResponseEntity<Object> response = reviewsService.createOne(requestBodyString);
 
       return ResponseEntity.ok().body(response);
     } catch(Exception error){
@@ -40,74 +43,62 @@ public class DiffusersReviewsController {
     }
   }
 
-  @PatchMapping("/update/{id}")
-  public ResponseEntity<Object> updateById(@PathVariable String id, @RequestBody DiffusersReviewsModel dataModel){
+  @PatchMapping("/update")
+  public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
     try {
-      boolean existingDocument = repository.existsById(id);
-      if(existingDocument){
-        DiffusersReviewsModel updatedProduct = repository.save(dataModel);
-        return ResponseEntity.ok().body(updatedProduct);
-      } else return ResponseEntity.status(404).body("Unable to update because this product does not exist !");
+      ResponseEntity<Object> response = mainService.updateOneById(requestBodyString, DiffusersReviewsModel.class);
+
+      return response;
     } catch(Exception error){
       error.printStackTrace();
+      System.out.println(error.getMessage());
       return ResponseEntity.internalServerError().body("Unable to update this product at database !");
     }
   }
   
-  @GetMapping("/get/{id}")
-  public ResponseEntity<Object> getById(@PathVariable String id){
-    try {
-      Optional<DiffusersReviewsModel> product = repository.findById(id);
-      if(product.isPresent()){
-        return ResponseEntity.ok().body(product.get()); 
-      } else {
-        return ResponseEntity.notFound().build();
-      }
-    } catch(Exception error){
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().body("Unable get product by ID from database !");
-    }
-  }
-
   @GetMapping("/get")
-  public ResponseEntity<Object> get(){
+  public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
     try {
-      List<DiffusersReviewsModel> products = repository.findAll();
-      if(products.isEmpty() == false){
-        return ResponseEntity.ok().body(products); 
-      } else {
-        return ResponseEntity.notFound().build();
-      }
-    } catch(Exception error){
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().body("Can't get all products from database !");
-    }
-  }
+      if(id == null || id.isEmpty()){
+        ResponseEntity<Object> response = mainService.findAll(DiffusersReviewsModel.class);
 
-  @GetMapping("/delete/{id}")
-  public ResponseEntity<Object> deleteById(@PathVariable String id){
-    try {
-      Optional<DiffusersReviewsModel> existingDocument = repository.findById(id);
-      if(existingDocument.isPresent()){
-        repository.deleteById(id);
-        return ResponseEntity.ok().body(existingDocument.get());
+        return response;
       } else {
-        return ResponseEntity.notFound().build();
+        ResponseEntity<Object> response = mainService.findAllById(id, DiffusersReviewsModel.class);
+  
+        return response;
       }
     } catch(Exception error){
       error.printStackTrace();
-      return ResponseEntity.internalServerError().body("Can't delete product by ID from database !");
+      System.out.println(error.getMessage());
+      return ResponseEntity.internalServerError().body("Internal server error: " + error.getMessage());
     }
   }
 
   @GetMapping("/delete")
-  public ResponseEntity<String> delete(){
+  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id){
     try {
-      repository.deleteAll();
-      return ResponseEntity.ok().body("Products have been removed from database !");
+      ResponseEntity<Object> response =  mainService.deleteAllById(id, DiffusersReviewsModel.class);
+      
+      return response;
     } catch(Exception error){
       error.printStackTrace();
+      System.out.println(error.getMessage());
+      return ResponseEntity.internalServerError().body("Can't delete product by ID from database !");
+    }
+  }
+
+  @GetMapping("/clear-col")
+  public ResponseEntity<String> clearCollection(){
+    try {
+      mongoTemplate.remove(new Query(), DiffusersReviewsModel.class);
+
+      return ResponseEntity.ok("All products have been removed from database !");
+    } catch(Exception error){
+      error.printStackTrace();
+      System.out.println(error.getMessage());
       return ResponseEntity.internalServerError().body("Can't delete products from database !");
     }
   }
+
 }

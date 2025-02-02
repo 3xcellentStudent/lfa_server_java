@@ -3,7 +3,7 @@ package com.server.services.mongodb.models.global;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "globalData")
+@Document(collection = "global_data")
 public class GlobalDataModel {
 
   @Id

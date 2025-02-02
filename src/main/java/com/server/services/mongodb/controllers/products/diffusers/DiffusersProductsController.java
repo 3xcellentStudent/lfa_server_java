@@ -3,6 +3,8 @@ package com.server.services.mongodb.controllers.products.diffusers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.services.mongodb.helpers.bodies.RequestBodies.UpdateOneById;
-import com.server.services.mongodb.repositories.products.diffusers.DiffusersProductsRepository;
+import com.server.services.mongodb.models.products.diffusers.DiffusersProductsModel;
+import com.server.services.mongodb.services.MainService;
 import com.server.services.mongodb.services.products.diffusers.DiffusersProductsService;
 
 @RestController
@@ -23,14 +25,16 @@ import com.server.services.mongodb.services.products.diffusers.DiffusersProducts
 public class DiffusersProductsController {
   
   @Autowired
-  private DiffusersProductsRepository productsRepository;
+  private DiffusersProductsService productsService;
   @Autowired
-  private DiffusersProductsService service;
+  private MainService mainService;
+  @Autowired
+  private MongoTemplate mongoTemplate;
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     try {
-      ResponseEntity<Object> response = service.createOne(requestBodyString);
+      ResponseEntity<Object> response = productsService.createOne(requestBodyString);
 
       return response;
     } catch(Exception error){
@@ -43,7 +47,7 @@ public class DiffusersProductsController {
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
     try {
-      ResponseEntity<Object> response = service.updateOneById(requestBodyString);
+      ResponseEntity<Object> response = mainService.updateOneById(requestBodyString, DiffusersProductsModel.class);
 
       return response;
     } catch(Exception error){
@@ -52,16 +56,16 @@ public class DiffusersProductsController {
       return ResponseEntity.internalServerError().body("Unable to update this product at database !");
     }
   }
-  
+
   @GetMapping("/get")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
     try {
       if(id == null || id.isEmpty()){
-        ResponseEntity<Object> response = service.findAll();
+        ResponseEntity<Object> response = mainService.findAll(DiffusersProductsModel.class);
 
         return response;
       } else {
-        ResponseEntity<Object> response = service.findAllById(id);
+        ResponseEntity<Object> response = mainService.findAllById(id, DiffusersProductsModel.class);
   
         return response;
       }
@@ -77,7 +81,7 @@ public class DiffusersProductsController {
     @RequestParam List<String> id, @RequestParam int fromIndex, @RequestParam int toIndex
   ){
     try {
-      ResponseEntity<Object> response = service.findAllRecursive(id, fromIndex, toIndex);
+      ResponseEntity<Object> response = productsService.findAllRecursive(id, fromIndex, toIndex);
 
       return response;
     } catch(Exception error){
@@ -88,10 +92,9 @@ public class DiffusersProductsController {
   }
 
   @GetMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = false) List<String> id){
-    System.out.println(id);
+  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id){
     try {
-      ResponseEntity<Object> response = service.deleteAllById(id);
+      ResponseEntity<Object> response =  mainService.deleteAllById(id, DiffusersProductsModel.class);
       
       return response;
     } catch(Exception error){
@@ -104,7 +107,7 @@ public class DiffusersProductsController {
   @GetMapping("/delete/recursive")
   public ResponseEntity<Object> deleteAllByIdRecursive(@RequestParam(name = "id", required = false) List<String> id){
     try {
-      ResponseEntity<Object> response = service.deleteRecursiveById(id);
+      ResponseEntity<Object> response = productsService.deleteRecursiveById(id);
       
       return response;
     } catch(Exception error){
@@ -117,7 +120,7 @@ public class DiffusersProductsController {
   @GetMapping("/clear-col")
   public ResponseEntity<String> clearCollection(){
     try {
-      productsRepository.deleteAll();
+      mongoTemplate.remove(new Query(), DiffusersProductsModel.class);
 
       return ResponseEntity.ok("All products have been removed from database !");
     } catch(Exception error){

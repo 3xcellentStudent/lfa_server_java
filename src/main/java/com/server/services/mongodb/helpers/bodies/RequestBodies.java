@@ -7,7 +7,7 @@ public class RequestBodies {
   public static class UpdateOneById {
     public String id;
     public List<String> fields;
-    public List<String> newData;
+    public List<Object> newData;
 
     public UpdateOneById(){}
 
