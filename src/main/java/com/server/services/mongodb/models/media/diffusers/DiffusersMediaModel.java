@@ -1,32 +1,38 @@
 package com.server.services.mongodb.models.media.diffusers;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
+import com.server.services.mongodb.models.media.diffusers.DiffusersMediaModel.MediaContent.Image;
+import com.server.services.mongodb.models.media.diffusers.DiffusersMediaModel.MediaContent.TitleContent;
+
 @Component
-@Document(collection = "mediaDiffusers")
+@Document(collection = "media_diffusers")
 public class DiffusersMediaModel {
 
   @Id
-  private String _id;
-  private String parent_id;
-  private String reviews_id;
+  private String id;
+  private String parentId;
+  private String reviewsId;
   private long createdAt;
   private long updatedAt;
-  public MediaContent mediaContent;
+  public TitleContent titleContent;
+  public ArrayList<ArrayList<Image>> images = new ArrayList<>();
+
 
   public DiffusersMediaModel(){}
 
   public DiffusersMediaModel(DiffusersMediaModel dataModel){
-    this.mediaContent = dataModel.mediaContent;
+    this.titleContent = dataModel.titleContent;
+    this.images = dataModel.images;
   }
   
   public static class MediaContent {
     public TitleContent titleContent;
-    public List<List<Image>> images;
+    public ArrayList<ArrayList<Image>> images;
 
     public static class TitleContent {
       public String productLogo;
@@ -39,43 +45,43 @@ public class DiffusersMediaModel {
     }
   }
 
-  public void setId(String _id){
-    this._id = _id;
+  public void setId(String id){
+    this.id = id;
   }
 
-  public void setReviewsId(String reviews_id){
-    this.reviews_id = reviews_id;
+  public void setReviewsId(String reviewsId){
+    this.reviewsId = reviewsId;
   }
 
   public String getId(){
-    return this._id;
+    return this.id;
   }
 
-  public void setParentId(String parent_id){
-    this.parent_id = parent_id;
+  public void setParentId(String parentId){
+    this.parentId = parentId;
   }
 
   public String getParentId(){
-    return this.parent_id;
+    return this.parentId;
   }
 
   public String getReviewsId(){
-    return this.reviews_id;
+    return this.reviewsId;
   }
 
-  public long getCreateTime(){
+  public long getCreateAt(){
     return this.createdAt;
   }
 
-  public void setCreateTime(long newTime){
+  public void setCreateAt(long newTime){
     this.createdAt = newTime;
   }
 
-  public long getUpdateTime(){
+  public long getUpdateAt(){
     return this.updatedAt;
   }
 
-  public void setUpdateTime(long newTime){
+  public void setUpdateAt(long newTime){
     this.updatedAt = newTime;
   }
 }

@@ -6,14 +6,14 @@ public class RequestBodies {
   
   public static class UpdateOneById {
     public String id;
-    public List<String> fields;
-    public List<Object> newData;
+    public String field;
+    public Object newData;
 
     public UpdateOneById(){}
 
     public UpdateOneById(UpdateOneById requestBody){
       this.id = requestBody.id;
-      this.fields = requestBody.fields;
+      this.field = requestBody.field;
       this.newData = requestBody.newData;
     }
   }

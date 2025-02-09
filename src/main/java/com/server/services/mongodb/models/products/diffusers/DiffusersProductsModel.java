@@ -20,8 +20,8 @@ public class DiffusersProductsModel {
 
   @Id
   private String id;
-  private String reviews_id;
-  private String media_id;
+  private String reviewsId;
+  private String mediaId;
   public String rating;
   public String title;
   public Descriptions descriptions;
@@ -54,20 +54,20 @@ public class DiffusersProductsModel {
     return this.id;
   }
 
-  public void setReviewsId(String reviews_id){
-    this.reviews_id = reviews_id;
+  public void setReviewsId(String reviewsId){
+    this.reviewsId = reviewsId;
   }
 
   public String getReviewsId(){
-    return this.reviews_id;
+    return this.reviewsId;
   }
 
-  public void setMediaId(String media_id){
-    this.media_id = media_id;
+  public void setMediaId(String mediaId){
+    this.mediaId = mediaId;
   }
 
   public String getMediaId(){
-    return this.media_id;
+    return this.mediaId;
   }
 
   public long getCreateTime(){

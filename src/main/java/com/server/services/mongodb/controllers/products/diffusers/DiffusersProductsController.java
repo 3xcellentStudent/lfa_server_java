@@ -47,7 +47,7 @@ public class DiffusersProductsController {
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
     try {
-      ResponseEntity<Object> response = mainService.updateOneById(requestBodyString, DiffusersProductsModel.class);
+      ResponseEntity<Object> response = mainService.updateNewOneById(requestBodyString, DiffusersProductsModel.class);
 
       return response;
     } catch(Exception error){
@@ -105,7 +105,7 @@ public class DiffusersProductsController {
   }
 
   @GetMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteAllByIdRecursive(@RequestParam(name = "id", required = false) List<String> id){
+  public ResponseEntity<Object> deleteAllByIdRecursive(@RequestParam List<String> id){
     try {
       ResponseEntity<Object> response = productsService.deleteRecursiveById(id);
       

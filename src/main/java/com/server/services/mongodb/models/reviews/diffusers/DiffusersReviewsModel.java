@@ -15,8 +15,8 @@ public class DiffusersReviewsModel {
 
   @Id
   private String id;
-  private String parent_id;
-  private String media_id;
+  private String parentId;
+  private String mediaId;
   public int countOfReviews;
   public ReviewsSnapshot reviewsSnapshot;
   public List<Review> reviewsList;
@@ -31,43 +31,43 @@ public class DiffusersReviewsModel {
     this.reviewsSnapshot = dataModel.reviewsSnapshot;
   }
 
-  public void setId(String _id){
-    this.id = _id;
+  public void setId(String id){
+    this.id = id;
   }
 
   public String getId(){
     return this.id;
   }
 
-  public void setParentId(String parent_id){
-    this.parent_id = parent_id;
+  public void setParentId(String parentId){
+    this.parentId = parentId;
   }
 
   public String getParentId(){
-    return this.parent_id;
+    return this.parentId;
   }
 
-  public void setMediaId(String media_id){
-    this.media_id = media_id;
+  public void setMediaId(String mediaId){
+    this.mediaId = mediaId;
   }
 
   public String getMediaId(){
-    return this.media_id;
+    return this.mediaId;
   }
 
-  public long getCreateTime(){
+  public long getCreateAt(){
     return this.createdAt;
   }
 
-  public void setCreateTime(long newTime){
+  public void setCreateAt(long newTime){
     this.createdAt = newTime;
   }
 
-  public long getUpdateTime(){
+  public long getUpdateAt(){
     return this.updatedAt;
   }
 
-  public void setUpdateTime(long newTime){
+  public void setUpdateAt(long newTime){
     this.updatedAt = newTime;
   }
 

@@ -31,7 +31,7 @@ public class DiffusersReviewsController {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @PostMapping("/create/empty")
+  @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     try {
       ResponseEntity<Object> response = reviewsService.createOne(requestBodyString);
@@ -46,7 +46,7 @@ public class DiffusersReviewsController {
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
     try {
-      ResponseEntity<Object> response = mainService.updateOneById(requestBodyString, DiffusersReviewsModel.class);
+      ResponseEntity<Object> response = mainService.updateNewOneById(requestBodyString, DiffusersReviewsModel.class);
 
       return response;
     } catch(Exception error){

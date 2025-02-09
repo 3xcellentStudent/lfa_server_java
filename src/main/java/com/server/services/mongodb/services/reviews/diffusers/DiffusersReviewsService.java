@@ -1,7 +1,6 @@
 package com.server.services.mongodb.services.reviews.diffusers;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,6 @@ import com.server.services.mongodb.models.reviews.diffusers.DiffusersReviewsMode
 public class DiffusersReviewsService {
   
   @Autowired
-  private DiffusersReviewsModel reviewsModel;
-  @Autowired
   private MongoTemplate mongoTemplate;
   @Autowired
   private ObjectMapper objectMapper;
@@ -27,16 +24,16 @@ public class DiffusersReviewsService {
     try {
       DiffusersReviewsModel newObject = new DiffusersReviewsModel();
 
+      newObject.setId(id);
       newObject.setParentId(parent_id);
       newObject.setMediaId(media_id);
-      newObject.setId(id);
-      newObject.setCreateTime(timestamp);
-      newObject.setUpdateTime(timestamp);
+      newObject.setCreateAt(timestamp);
+      newObject.setUpdateAt(timestamp);
       newObject.reviewsList = new ArrayList<>();
 
-      DiffusersReviewsModel savedObject = mongoTemplate.save(newObject);
+      DiffusersReviewsModel response = mongoTemplate.save(newObject);
 
-      return ResponseEntity.ok(savedObject);
+      return ResponseEntity.ok(response);
     } catch(Exception error){
       System.err.println("internal server error: " + error.getMessage());
       error.printStackTrace();
@@ -47,18 +44,17 @@ public class DiffusersReviewsService {
   public ResponseEntity<Object> createOne(String requestBodyString){
     String id = UUID.randomUUID().toString();
     long timestamp = System.currentTimeMillis();
-    
+
     try {
       DiffusersReviewsModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersReviewsModel.class);
 
       requestBodyObject.setId(id);
-      requestBodyObject.setCreateTime(timestamp);
-      requestBodyObject.setUpdateTime(timestamp);
+      requestBodyObject.setCreateAt(timestamp);
+      requestBodyObject.setUpdateAt(timestamp);
 
       DiffusersReviewsModel savedObject = mongoTemplate.save(requestBodyObject);
 
       String response = objectMapper.writeValueAsString(savedObject);
-
       return ResponseEntity.ok(response);
     } catch(Exception error){
       System.err.println("internal server error: " + error.getMessage());
@@ -67,28 +63,16 @@ public class DiffusersReviewsService {
     }
   }
 
-  public ResponseEntity<Object> findAllById(List<String> id){
+  public DiffusersReviewsModel findOneAndSliceReviewsList(String id, int fromIndex, int toIndex){
     try {
-      List<DiffusersReviewsModel> foundReviews = mongoTemplate.find(QueriesHelper.getId("id", id), DiffusersReviewsModel.class);
+      DiffusersReviewsModel slicedReview = mongoTemplate
+      .findOne(QueriesHelper.getSliceOfReviewsList("id", id, fromIndex, toIndex), DiffusersReviewsModel.class);
 
-      String response = objectMapper.writeValueAsString(foundReviews);
+      // String response = objectMapper.writeValueAsString(slicedReviews);
 
-      return ResponseEntity.ok(response);
-    } catch(Exception error){
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return null;
-    }
-  }
+      // System.out.println("findOneAndSliceReviewsList method in class DiffusersReviewsService: " + response);
 
-  public ResponseEntity<Object> findOneAndSliceReviewsList(String id, int fromIndex, int toIndex){
-    try {
-      DiffusersReviewsModel slicedReviews = mongoTemplate
-      .findById(QueriesHelper.getSliceOfReviewsList("reviewsList", id, fromIndex, toIndex), DiffusersReviewsModel.class);
-
-      String response = objectMapper.writeValueAsString(slicedReviews);
-
-      return ResponseEntity.ok(response);
+      return slicedReview;
     } catch(Exception error){
       System.err.println(error.getMessage());
       error.printStackTrace();

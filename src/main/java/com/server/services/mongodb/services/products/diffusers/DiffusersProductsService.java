@@ -1,10 +1,10 @@
 package com.server.services.mongodb.services.products.diffusers;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
@@ -34,44 +34,32 @@ public class DiffusersProductsService {
   public ResponseEntity<Object> createOne(String requestBodyString){
     try {
       DiffusersProductsModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersProductsModel.class);
-
       String id = CustomUUID.fromString(new String[] {requestBodyObject.title, requestBodyObject.stockInfo.category});
-
       boolean isExists = mongoTemplate.exists(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
       
       if(isExists == false){
-        String reviews_id = CustomUUID.fromString(id);
-        String media_id = CustomUUID.fromString(id);
+        String reviewsId = CustomUUID.fromString(id);
+        String mediaId = CustomUUID.fromString(id);
 
         long timestamp = System.currentTimeMillis();
   
-        Object reviewsServiceEntity = reviewsService.createOne(reviews_id, id, media_id, timestamp).getBody();
-        Object mediaServiceEntity = mediaService.createOne(media_id, id, reviews_id, timestamp).getBody();
+        Object reviewsServiceEntity = reviewsService.createOne(reviewsId, id, mediaId, timestamp).getBody();
+        Object mediaServiceEntity = mediaService.createOne(mediaId, id, reviewsId, timestamp).getBody();
+      
+        requestBodyObject.setId(id);
+        requestBodyObject.setReviewsId(reviewsId);
+        requestBodyObject.setMediaId(mediaId);
+        requestBodyObject.setCreateTime(timestamp);
+        requestBodyObject.setUpdateTime(timestamp);
+
+        DiffusersProductsModel savedProduct = mongoTemplate.save(requestBodyObject);
         
-        if(reviewsServiceEntity != null && mediaServiceEntity != null){
-          try {
-            requestBodyObject.setId(id);
-            requestBodyObject.setReviewsId(reviews_id);
-            requestBodyObject.setMediaId(media_id);
-            requestBodyObject.setCreateTime(timestamp);
-            requestBodyObject.setUpdateTime(timestamp);
+        savedProduct.setReviews((DiffusersReviewsModel) reviewsServiceEntity);
+        savedProduct.setMediaContent((DiffusersMediaModel) mediaServiceEntity);
 
-            requestBodyObject.setReviews((DiffusersReviewsModel) reviewsServiceEntity);
-            requestBodyObject.setMediaContent((DiffusersMediaModel) mediaServiceEntity);
+        String response = objectMapper.writeValueAsString(savedProduct);
 
-            DiffusersProductsModel savedProduct = mongoTemplate.save(requestBodyObject);
-
-            String stringResponse = objectMapper.writeValueAsString(savedProduct);
-
-            return ResponseEntity.ok(stringResponse);
-          } catch (Exception error) {
-            error.printStackTrace();
-            System.err.println("Internal server error in class: " + this.getClass().getName() + "\n with error: " + error.getMessage());
-            return null;
-          }
-        } else {
-          return ResponseEntity.status(404).body(new ArrayList<>());
-        }
+        return ResponseEntity.ok(response);
       } else {
         return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
       }
@@ -86,7 +74,7 @@ public class DiffusersProductsService {
     try {
       List<DiffusersProductsModel> foundProducts = mongoTemplate
       .find(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
-      List<DiffusersProductsModel> modifiedProducts = modifyProducts(foundProducts);
+      List<DiffusersProductsModel> modifiedProducts = modifyProducts(foundProducts, fromIndex, toIndex);
 
       String response = objectMapper.writeValueAsString(modifiedProducts);
 
@@ -103,16 +91,18 @@ public class DiffusersProductsService {
       List<DiffusersProductsModel> removedProducts = mongoTemplate
       .findAllAndRemove(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
       List<DiffusersReviewsModel> removedReviews = mongoTemplate
-      .findAllAndRemove(QueriesHelper.getId("parent_id", id), DiffusersReviewsModel.class);
+      .findAllAndRemove(QueriesHelper.getId("parentId", id), DiffusersReviewsModel.class);
       List<DiffusersMediaModel> removedMedia = mongoTemplate
-      .findAllAndRemove(QueriesHelper.getId("parent_id", id), DiffusersMediaModel.class);
+      .findAllAndRemove(QueriesHelper.getId("parentId", id), DiffusersMediaModel.class);
 
-      JSONObject jsonBody = new JSONObject()
-      .put("products", objectMapper.writeValueAsString(removedProducts))
-      .put("reviews", objectMapper.writeValueAsString(removedReviews))
-      .put("media", objectMapper.writeValueAsString(removedMedia));
+      Map<String, Object> jsonBody = new HashMap<>();
+      jsonBody.put("products", removedProducts);
+      jsonBody.put("reviews", removedReviews);
+      jsonBody.put("media", removedMedia);
 
-      return ResponseEntity.ok(jsonBody);
+      String response = objectMapper.writeValueAsString(jsonBody);
+
+      return ResponseEntity.ok(response);
     } catch(Exception error){
       System.err.println(error.getMessage());
       error.printStackTrace();
@@ -120,16 +110,18 @@ public class DiffusersProductsService {
     }
   }
 
-  private List<DiffusersProductsModel> modifyProducts(List<DiffusersProductsModel> productsList){
+  private List<DiffusersProductsModel> modifyProducts(List<DiffusersProductsModel> productsList, int fromIndex, int toIndex){
     try {
       List<DiffusersProductsModel> modifiedProductsList = productsList.stream()
       .map(oneObject -> {
-        Object reviewsModifiedEntity = reviewsService.findOneAndSliceReviewsList(oneObject.getReviewsId(), 0, 9).getBody();
-        DiffusersReviewsModel reviewsModifiedObject = objectMapper
-        .convertValue(reviewsModifiedEntity, DiffusersReviewsModel.class);
+        DiffusersReviewsModel reviewsModifiedEntity = reviewsService.findOneAndSliceReviewsList(oneObject.getReviewsId(), fromIndex, toIndex);
+        // DiffusersReviewsModel reviewsModifiedObject = objectMapper
+        // .convertValue(reviewsModifiedEntity, DiffusersReviewsModel.class);
 
-        oneObject.setReviews(reviewsModifiedObject);
-        oneObject.setMediaContent(mongoTemplate.findById(oneObject.getMediaId(), DiffusersMediaModel.class));
+        DiffusersMediaModel mediaObject = mongoTemplate.findById(oneObject.getMediaId(), DiffusersMediaModel.class);
+
+        oneObject.setReviews(reviewsModifiedEntity);
+        oneObject.setMediaContent(mediaObject);
         return oneObject;
       }).filter(Objects::nonNull).toList();
 
