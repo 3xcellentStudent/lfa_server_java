@@ -16,7 +16,7 @@ public class DiffusersReviewsModel {
   public String content;
   public String firstName;
   public String lastName;
-  public String productName;
+  public String title;
   public int rating;
   public List<String> attachments;
   private long createdAt;
@@ -28,7 +28,7 @@ public class DiffusersReviewsModel {
     this.content = dataModel.content;
     this.firstName = dataModel.firstName;
     this.lastName = dataModel.lastName;
-    this.productName = dataModel.productName;
+    this.title = dataModel.title;
     this.rating = dataModel.rating;
     this.attachments = dataModel.attachments;
   }

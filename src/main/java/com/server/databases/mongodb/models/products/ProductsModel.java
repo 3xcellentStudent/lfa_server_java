@@ -41,6 +41,7 @@ public class ProductsModel {
     public String fill;
     public String stroke;
     public boolean stockStatus;
+    public int mediaIndex;
   }
 
   public static class MediaContent {

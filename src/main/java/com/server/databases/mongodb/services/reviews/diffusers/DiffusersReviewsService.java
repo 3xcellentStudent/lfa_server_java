@@ -52,11 +52,6 @@ public class DiffusersReviewsService {
       DiffusersReviewsModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersReviewsModel.class);
 
       String parentId = requestBodyObject.getParentId();
-      // int countOfReviews = mongoTemplate.findById(parentId, DiffusersProductsModel.class).stockInfo.countOfReviews;
-      // UpdateOneById updateCountOfReviewsById = new UpdateOneById(parentId, "stockInfo.countOfReviews", countOfReviews + 1);
-      // mainService.updateNewOneById(updateCountOfReviewsById, DiffusersProductsModel.class);
-      // UpdateOneById updateReviewsSnapshotById = new UpdateOneById(parentId, "stockInfo.reviewsSnapshot", countOfReviews + 1);
-      // mainService.updateNewOneById(updateCountOfReviewsById, DiffusersProductsModel.class);
       updateReviewsArrayByParentId(parentId, id);
       increaseStockInfoFields(parentId, requestBodyObject.rating);
 

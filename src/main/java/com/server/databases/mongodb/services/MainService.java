@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.result.UpdateResult;
+import com.server.databases.mongodb.helpers.bodies.DeleteManyFromArray;
 import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 
@@ -116,21 +118,58 @@ public class MainService {
     }
   }
 
-  public <T> ResponseEntity<Object> deleteManyFromArrayById(List<Integer> indexes, String selector, Class<T> someClass){
+  // public <T> ResponseEntity<Object> deleteManyFromArrayById(String requestBodyString, Class<T> someClass){
+  //   try {
+  //     DeleteManyFromArray requestBodyObject = objectMapper.readValue(requestBodyString, DeleteManyFromArray.class);
+  //     List<Integer> indexes = requestBodyObject.getIndexes();
+  //     String selector = requestBodyObject.getSelector();
+  //     String id = requestBodyObject.getId();
+
+  //     System.out.println(indexes.get(0));
+  //     System.out.println(selector);
+  //     System.out.println(id);
+
+  //     Update update = QueriesHelper.doUnsetForArray(indexes, selector);
+
+  //     System.out.println(update.toString());
+
+  //     mongoTemplate.updateMulti(QueriesHelper.getId("id", id), update, selector);
+
+  //     update = new Update().pull(selector, null);
+
+  //     UpdateResult updatedObject = mongoTemplate.updateMulti(QueriesHelper.getId("id", id), update, someClass);
+
+  //     String response = objectMapper.writeValueAsString(updatedObject);
+
+  //     return ResponseEntity.ok(response);
+  //   } catch(Exception error){
+  //     error.printStackTrace();
+  //     System.err.println(error.getMessage());
+  //     return ResponseEntity.internalServerError().body("Internal server error in class " + this.getClass().getName());
+  //   }
+  // }
+
+  public <T> ResponseEntity<Object> deleteManyFromArrayById(String requestBodyString, Class<T> someClass) {
     try {
-      Update update = QueriesHelper.doUnsetForArray(indexes, selector);
+        DeleteManyFromArray requestBodyObject = objectMapper.readValue(requestBodyString, DeleteManyFromArray.class);
+        List<Integer> indexes = requestBodyObject.getIndexes();
+        String selector = requestBodyObject.getSelector();
+        String id = requestBodyObject.getId();
 
-      mongoTemplate.updateMulti(QueriesHelper.getId("index", indexes), update, selector);
+        // 1. Обнуляем указанные индексы (заменяем на null)
+        Update update = QueriesHelper.doUnsetForArray(indexes, selector);
+        mongoTemplate.updateMulti(QueriesHelper.getId("id", id), update, someClass);
 
-      update = new Update().pull(selector, null);
+        // 2. Удаляем все null из массива
+        update = new Update().pull(selector, null);
+        UpdateResult updatedObject = mongoTemplate.updateMulti(QueriesHelper.getId("id", id), update, someClass);
 
-      mongoTemplate.updateMulti(QueriesHelper.getId("index", indexes), update, someClass);
+        String response = objectMapper.writeValueAsString(updatedObject);
+        return ResponseEntity.ok(response);
 
-      return ResponseEntity.ok().build();
-    } catch(Exception error){
-      error.printStackTrace();
-      System.err.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Internal server error in class " + this.getClass().getName());
+    } catch (Exception error) {
+        error.printStackTrace();
+        return ResponseEntity.internalServerError().body("Internal server error in class " + this.getClass().getName());
     }
   }
 

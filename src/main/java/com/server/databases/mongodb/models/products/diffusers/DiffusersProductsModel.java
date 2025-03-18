@@ -91,8 +91,6 @@ public class DiffusersProductsModel {
   }
 
   public int getReviewsSnapshotByFieldName(String field){
-    // String[] fieldsName = new String[] {"five", "four", "three", "two", "one"};
-
     switch(field){
       case "five": return stockInfo.reviewsSnapshot.five;
       case "four": return stockInfo.reviewsSnapshot.four;
