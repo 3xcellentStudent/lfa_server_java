@@ -1,4 +1,4 @@
-package com.server.payments.paypal.controllers;
+package com.server.paypal.controllers;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.server.api.helpers.paypal.CreateResponse;
 import com.server.api.helpers.paypal.PayPalRoutes;
 import com.server.databases.redis.service.RedisService;
-import com.server.payments.paypal.services.PayPalCaptureOrder;
-import com.server.payments.paypal.services.PayPalCreateOrder;
+import com.server.paypal.services.PayPalCaptureOrder;
+import com.server.paypal.services.PayPalCreateOrder;
 import com.server.services.pdf.PDFService;
 import com.server.services.pdf.models.CaptureResponseObject;
 

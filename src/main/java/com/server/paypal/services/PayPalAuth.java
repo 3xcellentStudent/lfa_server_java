@@ -1,4 +1,4 @@
-package com.server.payments.paypal.services;
+package com.server.paypal.services;
 
 import java.net.URI;
 import java.net.http.HttpClient;

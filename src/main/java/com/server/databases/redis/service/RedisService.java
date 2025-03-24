@@ -3,7 +3,7 @@ package com.server.databases.redis.service;
 import org.json.JSONObject;
 
 import com.server.api.helpers.paypal.CreateResponse;
-import com.server.payments.paypal.services.PayPalAuth;
+import com.server.paypal.services.PayPalAuth;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
