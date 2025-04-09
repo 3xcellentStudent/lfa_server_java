@@ -19,7 +19,7 @@ public class MailerController {
   @PostMapping("/send")
   // public void send(@RequestBody String requestBodyString){
   public void send(){
-    mailerService.send("andrii.prokuda00@gmail.com", null, null, 
+    mailerService.send("lamps.for.all00@gmail.com", null, null, 
     "Something from me", "HAHAHAHAHA it's me !!!");
   }
 
