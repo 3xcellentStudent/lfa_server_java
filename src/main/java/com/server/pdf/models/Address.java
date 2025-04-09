@@ -1,4 +1,4 @@
-package com.server.services.pdf.models;
+package com.server.pdf.models;
 
 import java.lang.reflect.Field;
 

@@ -7,15 +7,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.stripe.helpers.dto.checkout.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.helpers.dto.checkout.CheckoutCreateSessionServerResponseDto;
-import com.server.stripe.helpers.dto.checkout.CheckoutCreateSessionStripeResponseDto;
+import com.server.stripe.models.checkout.classess.CheckoutCreateSessionClientRequestDto;
+import com.server.stripe.models.checkout.classess.CheckoutCreateSessionServerResponseDto;
+import com.server.stripe.models.checkout.classess.CheckoutSessionsDataModel;
 
 @Service
 public class CheckoutCreateSession {
@@ -24,7 +23,7 @@ public class CheckoutCreateSession {
   
   public CheckoutCreateSession(){}
   
-  public ResponseEntity<Object> createSession(HttpURLConnection connection, String requestBodyString){
+  public ResponseEntity<Object> create(HttpURLConnection connection, String requestBodyString){
     try {
       CheckoutCreateSessionClientRequestDto requestBodyObject = objectMapper.readValue(requestBodyString, CheckoutCreateSessionClientRequestDto.class);
       StringBuilder requestBody = new StringBuilder();
@@ -37,8 +36,9 @@ public class CheckoutCreateSession {
       requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
       requestBody.append("&mode=payment");
       requestBody.append("&ui_mode=embedded");
+      requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
       // requestBody.append("&success_url=").append(URLEncoder.encode("https://www.google.com/", "UTF-8"));
-      requestBody.append("&return_url=").append(URLEncoder.encode("http://localhost:5000/api/stripe/checkout/sessions/capture", "UTF-8"));
+      requestBody.append("&return_url=").append(URLEncoder.encode("https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg", "UTF-8"));
       // requestBody.append("&cancel_url=").append(URLEncoder.encode("http://localhost:5000/api/stripe/checkout/sessions/cancel", "UTF-8"));
 
       OutputStream outputStream = connection.getOutputStream();
@@ -46,7 +46,7 @@ public class CheckoutCreateSession {
       outputStream.write(bytes);
       outputStream.close();
 
-      String response = readResponse(connection, requestBodyString);
+      String response = readResponse(connection);
 
       return ResponseEntity.ok(response);
     } catch(Exception error){
@@ -56,7 +56,7 @@ public class CheckoutCreateSession {
     }
   }
 
-  private String readResponse(HttpURLConnection connection, String requestBody){
+  private String readResponse(HttpURLConnection connection){
     try {
       InputStream inputStream = connection.getInputStream();
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
@@ -72,13 +72,15 @@ public class CheckoutCreateSession {
 
       // System.out.println(responseStringData.toString());
 
-      CheckoutCreateSessionStripeResponseDto stripeResponseDto = objectMapper
-      .readValue(responseStringData.toString(), CheckoutCreateSessionStripeResponseDto.class);
+      CheckoutSessionsDataModel stripeResponseModel = objectMapper
+      .readValue(responseStringData.toString(), CheckoutSessionsDataModel.class);
 
-      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseDto);
+      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel);
 
       String responseString = objectMapper.writeValueAsString(serverResponseDto);
-      
+
+      // System.out.println("RESPONSE NAHYU");
+      // System.out.println(responseString);
       return responseString;
     } catch(Exception error){
       error.printStackTrace();

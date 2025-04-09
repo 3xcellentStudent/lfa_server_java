@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.services.pdf.PDFService;
-import com.server.services.pdf.models.CaptureResponseObject;
+import com.server.pdf.PDFService;
+import com.server.pdf.models.CaptureResponseObject;
 
 import jakarta.servlet.http.HttpServletRequest;
 

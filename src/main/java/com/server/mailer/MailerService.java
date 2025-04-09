@@ -1,9 +1,8 @@
-package com.server.services.mailer;
+package com.server.mailer;
 
-import java.util.Properties;
-
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -19,21 +18,22 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.util.ByteArrayDataSource;
 
+@Service
 public class MailerService {
-  // private JavaMailSender mailSender = MailerSender.mailSender();
 
-  public static boolean send(String emailTo, String emailFrom, byte[] attachmentData, String attachmentName, String subject, String text){
+	@Autowired
+	private MailerConfig mailerConfig;
+
+  public boolean send(String emailTo, byte[] attachmentData, String attachmentName, String subject, String text){
 		try {
-			Properties properties = MailerConfig.getProperties();
-	
-			Session session = Session.getInstance(properties, new Authenticator() {
+			Session session = Session.getInstance(mailerConfig.getProperties(), new Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(MailerConfig.getUsername(), MailerConfig.getPassword());
+					return new PasswordAuthentication(mailerConfig.getUsername(), mailerConfig.getPassword());
 				}
 			});
-	
+
 			MimeMessage message = new MimeMessage(session);
-			message.setFrom(new InternetAddress("lamps.for.all00@gmail.com"));
+			message.setFrom(new InternetAddress(mailerConfig.getUsername()));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
 			message.setSubject(subject);
 
@@ -42,28 +42,26 @@ public class MailerService {
 			MimeBodyPart htmlPart = new MimeBodyPart();
 			htmlPart.setContent(htmlContent, "text/html");
 	
-			MimeBodyPart attachmentPart = new MimeBodyPart();
-			DataSource dataSource = new ByteArrayDataSource(attachmentData, "application/octet-stream");
-			attachmentPart.setDataHandler(new DataHandler(dataSource));
-			attachmentPart.setFileName(attachmentName);
-	
 			Multipart multipart = new MimeMultipart();
+
+			MimeBodyPart attachmentPart = new MimeBodyPart();
+			if(attachmentData != null && attachmentName != null){
+				DataSource dataSource = new ByteArrayDataSource(attachmentData, "application/octet-stream");
+				attachmentPart.setDataHandler(new DataHandler(dataSource));
+				attachmentPart.setFileName(attachmentName);
+				multipart.addBodyPart(attachmentPart);
+			}
+
 			multipart.addBodyPart(htmlPart);
-			multipart.addBodyPart(attachmentPart);
 	
 			message.setContent(multipart);
 	
 			Transport.send(message);
 			return true;
 		} catch (Exception error) {
-			System.out.println(error);
+			System.out.println(error.getMessage());
 			error.printStackTrace();
 			return false;
 		}
-	}
-
-	public static ResponseEntity<String> statusHOC(boolean sendStatus, String email){
-    if(sendStatus) return ResponseEntity.status(202).body("Letter was sent to: " + email);
-    else return ResponseEntity.status(500).body("Failed to send mail!");
 	}
 }

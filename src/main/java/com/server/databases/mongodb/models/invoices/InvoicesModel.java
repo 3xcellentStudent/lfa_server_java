@@ -3,7 +3,7 @@ package com.server.databases.mongodb.models.invoices;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.server.services.pdf.models.CaptureResponseObject;
+import com.server.pdf.models.CaptureResponseObject;
 
 
 @Document(collection = "invoices")

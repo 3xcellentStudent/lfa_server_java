@@ -1,4 +1,4 @@
-package com.server.services.pdf;
+package com.server.pdf;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -17,11 +17,11 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
-import com.server.services.pdf.models.Address;
-import com.server.services.pdf.models.CaptureResponseObject;
-import com.server.services.pdf.models.Payer;
-import com.server.services.pdf.services.pdf.Cells;
-import com.server.services.pdf.services.pdf.Tables;
+import com.server.pdf.models.Address;
+import com.server.pdf.models.CaptureResponseObject;
+import com.server.pdf.models.Payer;
+import com.server.pdf.services.pdf.Cells;
+import com.server.pdf.services.pdf.Tables;
 
 public class PDFService {
 

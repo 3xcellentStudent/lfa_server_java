@@ -1,4 +1,4 @@
-package com.server.stripe.helpers.dto.checkout;
+package com.server.stripe.models.checkout.classess;
 
 public class CheckoutCreateSessionClientRequestDto {
 

@@ -12,8 +12,8 @@ import com.server.api.helpers.paypal.PayPalRoutes;
 import com.server.databases.redis.service.RedisService;
 import com.server.paypal.services.PayPalCaptureOrder;
 import com.server.paypal.services.PayPalCreateOrder;
-import com.server.services.pdf.PDFService;
-import com.server.services.pdf.models.CaptureResponseObject;
+import com.server.pdf.PDFService;
+import com.server.pdf.models.CaptureResponseObject;
 
 import org.springframework.http.ResponseEntity;
 

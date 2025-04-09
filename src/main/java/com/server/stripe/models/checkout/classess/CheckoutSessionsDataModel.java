@@ -1,11 +1,13 @@
-package com.server.stripe.helpers.dto.checkout;
+package com.server.stripe.models.checkout.classess;
 
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.stripe.models.checkout.classess.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
 
-public class CheckoutCreateSessionStripeResponseDto {
+public class CheckoutSessionsDataModel {
+
   private String id;
   private String object;
   
@@ -13,10 +15,10 @@ public class CheckoutCreateSessionStripeResponseDto {
   private AdaptivePricing adaptivePricing;
   
   @JsonProperty("after_expiration")
-  private Object afterExpiration;
+  private AfterExpiration afterExpiration;
   
   @JsonProperty("allow_promotion_codes")
-  private Object allowPromotionCodes;
+  private Boolean allowPromotionCodes;
   
   @JsonProperty("amount_subtotal")
   private Integer amountSubtotal;
@@ -28,13 +30,13 @@ public class CheckoutCreateSessionStripeResponseDto {
   private AutomaticTax automaticTax;
   
   @JsonProperty("billing_address_collection")
-  private Object billingAddressCollection;
+  private String billingAddressCollection;
   
   @JsonProperty("cancel_url")
-  private Object cancelUrl;
+  private String cancelUrl;
   
   @JsonProperty("client_reference_id")
-  private Object clientReferenceId;
+  private String clientReferenceId;
   
   @JsonProperty("client_secret")
   private String clientSecret;
@@ -65,31 +67,31 @@ public class CheckoutCreateSessionStripeResponseDto {
   private String customerCreation;
   
   @JsonProperty("customer_details")
-  private Object customerDetails;
+  private CustomerDetails customerDetails;
   
   @JsonProperty("customer_email")
-  private Object customerEmail;
+  private String customerEmail;
   
   private List<Object> discounts;
   
   @JsonProperty("expires_at")
   private Long expiresAt;
   
-  private Object invoice;
+  private String invoice;
   
   @JsonProperty("invoice_creation")
   private InvoiceCreation invoiceCreation;
   
   private Boolean livemode;
-  private Object locale;
+  private String locale;
   private Map<String, Object> metadata;
   private String mode;
   
   @JsonProperty("payment_intent")
-  private Object paymentIntent;
+  private String paymentIntent;
   
   @JsonProperty("payment_link")
-  private Object paymentLink;
+  private String paymentLink;
   
   @JsonProperty("payment_method_collection")
   private String paymentMethodCollection;
@@ -112,7 +114,7 @@ public class CheckoutCreateSessionStripeResponseDto {
   private PhoneNumberCollection phoneNumberCollection;
   
   @JsonProperty("recovered_from")
-  private Object recoveredFrom;
+  private String recoveredFrom;
   
   @JsonProperty("redirect_on_completion")
   private String redirectOnCompletion;
@@ -124,13 +126,13 @@ public class CheckoutCreateSessionStripeResponseDto {
   private Object savedPaymentMethodOptions;
   
   @JsonProperty("setup_intent")
-  private Object setupIntent;
+  private String setupIntent;
   
   @JsonProperty("shipping_address_collection")
   private ShippingAddressCollection shippingAddressCollection;
   
   @JsonProperty("shipping_cost")
-  private Object shippingCost;
+  private ShippingCost shippingCost;
   
   @JsonProperty("shipping_details")
   private Object shippingDetails;
@@ -157,15 +159,65 @@ public class CheckoutCreateSessionStripeResponseDto {
   private Object url;
 
   public static class AdaptivePricing {
-    public boolean enabled;
+    public Boolean enabled;
+  }
+
+  public static class AfterExpiration {
+    @JsonProperty("recovery")
+    private Recovery recovery;
+
+    public static class Recovery {
+      @JsonProperty("allow_promotion_codes")
+      public Boolean allowPromotionCodes;
+
+      public Boolean enabled;
+
+      @JsonProperty("expires_at")
+      public Long expiresAt;
+
+      public String url;
+    }
   }
 
   public static class AutomaticTax {
-    public boolean enabled;
-    public Object liability;
-    public Object status;
+    public Boolean enabled;
+    public Liability liability;
+    public String status;
+
+    public static class Liability {
+      public String type;
+      public String account;
+    }
+  }
+  
+  public static class Consent {
+    public String promotions;
+    @JsonProperty("terms_of_service")
+    public String terms_of_service;
   }
 
+  public static class CollectedInformation {
+    @JsonProperty("shipping_details")
+    public ShippingDetails shippingDetails;
+
+    public static class ShippingDetails {
+      public Address address;
+      public String name;
+
+      public static class Address {
+        public String city;
+        public String country;
+        public String line1;
+        public String line2;
+
+        @JsonProperty("postal_code")
+        public String postal_code;
+
+        public String state;
+      }
+    }
+  }
+  
   public static class CustomText {
     @JsonProperty("after_submit")
     public Object afterSubmit;
@@ -177,6 +229,19 @@ public class CheckoutCreateSessionStripeResponseDto {
 
     @JsonProperty("terms_of_service_acceptance")
     public Object termsOfServiceAcceptance;
+  }
+
+  public static class CustomerDetails {
+    public Address address;
+    public String email;
+    public String name;
+    public String phone;
+
+    @JsonProperty("tax_exempt")
+    public String taxExempt;
+
+    @JsonProperty("tax_ids")
+    public Object taxIds;
   }
 
   public static class InvoiceCreation {
@@ -211,28 +276,51 @@ public class CheckoutCreateSessionStripeResponseDto {
   }
 
   public static class PhoneNumberCollection {
-    public boolean enabled;
+    public Boolean enabled;
   }
 
   public static class ShippingAddressCollection {
     @JsonProperty("allowed_countries")
     public List<String> allowedCountries;
   }
+  
+  public static class ShippingCost {
+    @JsonProperty("amount_subtotal")
+    public Integer amountSubtotal;
+
+    @JsonProperty("amount_tax")
+    public Integer amountTax;
+
+    @JsonProperty("amount_total")
+    public Integer amountTotal;
+
+    @JsonProperty("shipping_rate")
+    public String shippingRate;
+
+    public Integer taxes;
+
+    public static class Taxes {
+      public Integer amount;
+      public Object rate;
+    }
+  }
 
   public static class TotalDetails {
     @JsonProperty("amount_discount")
-    public int amountDiscount;
+    public Integer amountDiscount;
 
     @JsonProperty("amount_shipping")
-    public int amountShipping;
+    public Integer amountShipping;
 
     @JsonProperty("amount_tax")
-    public int amountTax;
+    public Integer amountTax;
+
+    public Object breakdown;
   }
 
-  public CheckoutCreateSessionStripeResponseDto(){}
+  public CheckoutSessionsDataModel(){}
 
-  public CheckoutCreateSessionStripeResponseDto(CheckoutCreateSessionStripeResponseDto requestBody){
+  public CheckoutSessionsDataModel(CheckoutSessionsDataModel requestBody){
     this.metadata = requestBody.metadata;
     this.livemode = requestBody.livemode;
     this.amountTotal = requestBody.amountTotal;
@@ -321,5 +409,11 @@ public class CheckoutCreateSessionStripeResponseDto {
   }
   public String getPaymentStatus(){
     return this.paymentStatus;
+  }
+  public String getPaymentIntentId(){
+    return this.paymentIntent;
+  }
+  public CustomerDetails getCustomerDetails(){
+    return this.customerDetails;
   }
 }

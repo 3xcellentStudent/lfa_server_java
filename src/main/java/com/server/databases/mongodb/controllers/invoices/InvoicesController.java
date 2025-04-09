@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// import com.server.databases.mongodb.repositories.invoices.InvoicesRepository;
-import com.server.services.pdf.models.CaptureResponseObject;
+import com.server.pdf.models.CaptureResponseObject;
 
 @RestController
 @RequestMapping("/api/mongodb/invoices")

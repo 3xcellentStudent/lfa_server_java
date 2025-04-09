@@ -1,4 +1,4 @@
-package com.server.services.pdf.controller;
+package com.server.pdf.controller;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.services.mailer.MailerService;
-import com.server.services.pdf.PDFService;
-import com.server.services.pdf.models.CaptureResponseObject;
-import com.server.services.pdf.services.http.HttpService;
+import com.server.mailer.MailerService;
+import com.server.pdf.PDFService;
+import com.server.pdf.models.CaptureResponseObject;
+import com.server.pdf.services.http.HttpService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -23,21 +23,20 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/service-pdf")
 public class PdfController {
   
-  @PostMapping(value = "/create")
-  public void createPdfFile(@RequestBody String body){
-    JSONObject jsonBody = new JSONObject(body);
-    JSONObject jsonResponse = new PDFService().create(new CaptureResponseObject(jsonBody));
-    if(jsonResponse != null){
-      byte[] fileBytes = (byte[]) jsonResponse.get("data");
-      System.out.println(fileBytes.length);
-      String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
-      HttpService.uploadPdfFile(fileBytes, fileName);
-      MailerService.send("lamps.for.all00@gmail.com", 
-      "lamps.for.all00@gmail.com", fileBytes, fileName, "Invoice on Your email.", "Thank You for purchasing in our store !");
-    } else {
-      // Send request from gcp to my server, saving data about error for creating pdf and send mail later. 
-    }
-  }
+  // @PostMapping(value = "/create")
+  // public void createPdfFile(@RequestBody String body){
+  //   JSONObject jsonBody = new JSONObject(body);
+  //   JSONObject jsonResponse = new PDFService().create(new CaptureResponseObject(jsonBody));
+  //   if(jsonResponse != null){
+  //     byte[] fileBytes = (byte[]) jsonResponse.get("data");
+  //     System.out.println(fileBytes.length);
+  //     String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
+  //     HttpService.uploadPdfFile(fileBytes, fileName);
+  //     MailerService.send("lamps.for.all00@gmail.com", fileBytes, fileName, "Invoice on Your email.", "Thank You for purchasing in our store !");
+  //   } else {
+  //     // Send request from gcp to my server, saving data about error for creating pdf and send mail later. 
+  //   }
+  // }
 
   @PostMapping(value = "/write")
   public String writePdfFile(HttpServletRequest request, @RequestHeader("Content-Disposition") String contentDisposition){

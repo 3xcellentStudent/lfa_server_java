@@ -1,4 +1,4 @@
-package com.server.stripe.helpers.dto.checkout;
+package com.server.stripe.models.checkout.classess;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ public class CheckoutCreateSessionServerResponseDto {
 
   public CheckoutCreateSessionServerResponseDto(){}
 
-  public CheckoutCreateSessionServerResponseDto(CheckoutCreateSessionStripeResponseDto requestBody){
+  public CheckoutCreateSessionServerResponseDto(CheckoutSessionsDataModel requestBody){
     this.id = requestBody.getId();
     this.clientSecret = requestBody.getClientSecret();
     this.metadata = requestBody.getMetadata();
@@ -57,5 +57,13 @@ public class CheckoutCreateSessionServerResponseDto {
     this.returnUrl = requestBody.returnUrl;
     this.currency = requestBody.currency;
     this.paymentStatus = requestBody.paymentStatus;
+  }
+
+  public String getId(){
+    return this.id;
+  }
+
+  public String getClientSecret(){
+    return this.clientSecret;
   }
 }

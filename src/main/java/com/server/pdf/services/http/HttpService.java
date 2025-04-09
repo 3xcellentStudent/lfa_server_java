@@ -1,4 +1,4 @@
-package com.server.services.pdf.services.http;
+package com.server.pdf.services.http;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
