@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,21 +20,43 @@ import com.server.stripe.services.checkout.CheckoutCreateSession;
 @CrossOrigin("*")
 public class CheckoutSessionsController {
 
-  private final String token = "sk_test_51PxA1M04u95jjINWE9b9kEZlthF6QK20oiRoUYcs36vK3PeHyZtmQT6skXhLSZkX6nHiXGVaZ6V60PrDbKtrnFNw00vNOnvitG";
+  private final String stripeCheckoutPath = "https://api.stripe.com/v1/checkout/sessions";
+  private final String mongodbSaveDataPath = "http://localhost:5000/api/mongodb/invoices/stripe";
+  private final String mailerSendEmailPath = "http://localhost:5000/api/mailer/";
 
   @Autowired
+  private Environment env;
+  @Autowired
   private CheckoutCreateSession createSessionService;
-  
-  @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
+
+  private HttpURLConnection createConnection(String path, String httpMethodHeader, String contentTypeHeader){
     try {
-      String path = "https://api.stripe.com/v1/checkout/sessions";
       URL url = new URI(path).toURL();
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-      connection.setRequestMethod("POST");
-      connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-      connection.setRequestProperty("Authorization", "Bearer " + token);
+      connection.setRequestMethod(httpMethodHeader);
+      connection.setRequestProperty("Content-Type", contentTypeHeader);
+
+      return connection;
+    } catch (Exception error) {
+      System.out.println("Error while connection to " + path + "\nError message: " + error.getMessage());
+      error.printStackTrace();
+      return null;
+    }
+  }
+  
+  @PostMapping("/create")
+  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
+    String tokenSecret = env.getProperty("stripe.token.secret");
+    try {
+      // String path = "https://api.stripe.com/v1/checkout/sessions";
+      // URL url = new URI(path).toURL();
+      // HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      HttpURLConnection connection = createConnection(stripeCheckoutPath, "POST", "application/x-www-form-urlencoded");
+
+      // connection.setRequestMethod("POST");
+      // connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+      connection.setRequestProperty("Authorization", "Bearer " + tokenSecret);
       connection.setRequestProperty("Stripe-Version", "2025-03-31.basil");
       connection.setDoInput(true);
       connection.setDoOutput(true);
@@ -50,16 +73,33 @@ public class CheckoutSessionsController {
     }
   }
 
-  @PostMapping("/capture")
-  public void capture(@RequestBody String requestBodyString){
+  @PostMapping("save")
+  public ResponseEntity<Object> save(@RequestBody String requestBodyString){
+    try {
+      System.out.println(requestBodyString);
+      HttpURLConnection connectionSaveInDb = createConnection(mongodbSaveDataPath, "POST", "application/json");
+      connectionSaveInDb.setDoInput(true);
+      connectionSaveInDb.setDoOutput(true);
 
-    System.out.println("CAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTUREDCAPTURED");
-    System.out.println(requestBodyString);
-  }
+      // ResponseEntity<Object> response = createSessionService.save(connectionSaveInDb, requestBodyString);
+      createSessionService.save(connectionSaveInDb, requestBodyString);
 
-  @PostMapping("/cancel")
-  public void cancel(){
-    System.out.println("CANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCELCANCEL");
+      connectionSaveInDb.disconnect();
+
+      HttpURLConnection connectionSendEmail = createConnection(mailerSendEmailPath, "POST", "application/json");
+      connectionSendEmail.setDoInput(true);
+      connectionSendEmail.setDoOutput(true);
+
+      createSessionService.sendEmail(connectionSendEmail, requestBodyString);
+
+      connectionSendEmail.disconnect();
+
+      return ResponseEntity.ok("Payment saved in database and sent email letter to customer !");
+    } catch (Exception error) {
+      System.err.println(error.getMessage());
+      error.printStackTrace();
+      return ResponseEntity.internalServerError().body(error.getMessage());
+    }
   }
 
 }

@@ -25,7 +25,8 @@ public class CheckoutCreateSession {
   
   public ResponseEntity<Object> create(HttpURLConnection connection, String requestBodyString){
     try {
-      CheckoutCreateSessionClientRequestDto requestBodyObject = objectMapper.readValue(requestBodyString, CheckoutCreateSessionClientRequestDto.class);
+      CheckoutCreateSessionClientRequestDto requestBodyObject = objectMapper.
+      readValue(requestBodyString, CheckoutCreateSessionClientRequestDto.class);
       StringBuilder requestBody = new StringBuilder();
       
       requestBody.append("payment_method_types[]=card");
@@ -37,9 +38,7 @@ public class CheckoutCreateSession {
       requestBody.append("&mode=payment");
       requestBody.append("&ui_mode=embedded");
       requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
-      // requestBody.append("&success_url=").append(URLEncoder.encode("https://www.google.com/", "UTF-8"));
       requestBody.append("&return_url=").append(URLEncoder.encode("https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg", "UTF-8"));
-      // requestBody.append("&cancel_url=").append(URLEncoder.encode("http://localhost:5000/api/stripe/checkout/sessions/cancel", "UTF-8"));
 
       OutputStream outputStream = connection.getOutputStream();
       byte[] bytes = requestBody.toString().getBytes("utf-8");
@@ -53,6 +52,34 @@ public class CheckoutCreateSession {
       error.printStackTrace();
       System.err.println(error.getMessage());
       return ResponseEntity.internalServerError().body(error.getMessage());
+    }
+  }
+
+  public void save(HttpURLConnection connection, String requestBodyString){
+    try {
+      OutputStream outputStream = connection.getOutputStream();
+      byte[] bytes = requestBodyString.getBytes();
+      outputStream.write(bytes);
+      outputStream.close();
+      // InputStream inputStream = connection.getInputStream();
+      // inputStream.re
+    } catch (Exception error) {
+      System.err.println(error.getMessage());
+      error.printStackTrace();
+    }
+  }
+
+  public void sendEmail(HttpURLConnection connection, String requestBodyString){
+    try {
+      OutputStream outputStream = connection.getOutputStream();
+      byte[] bytes = requestBodyString.getBytes();
+      outputStream.write(bytes);
+      outputStream.close();
+      // InputStream inputStream = connection.getInputStream();
+      // inputStream.re
+    } catch (Exception error) {
+      System.err.println(error.getMessage());
+      error.printStackTrace();
     }
   }
 
@@ -70,17 +97,11 @@ public class CheckoutCreateSession {
       reader.close();
       inputStream.close();
 
-      // System.out.println(responseStringData.toString());
-
       CheckoutSessionsDataModel stripeResponseModel = objectMapper
       .readValue(responseStringData.toString(), CheckoutSessionsDataModel.class);
-
       CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel);
 
       String responseString = objectMapper.writeValueAsString(serverResponseDto);
-
-      // System.out.println("RESPONSE NAHYU");
-      // System.out.println(responseString);
       return responseString;
     } catch(Exception error){
       error.printStackTrace();
