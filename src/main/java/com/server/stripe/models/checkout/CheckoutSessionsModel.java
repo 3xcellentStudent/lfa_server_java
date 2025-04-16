@@ -11,6 +11,7 @@ public class CheckoutSessionsModel {
   private String api_version;
 
   private Long created;
+  private Long updated;
   private Boolean livemode;
 
   @JsonProperty("pending_webhooks")
@@ -36,6 +37,9 @@ public class CheckoutSessionsModel {
   public Long getCreated(){
     return this.created;
   }
+  public Long getUpdated(){
+    return this.updated;
+  }
   public CheckoutSessionsDataModel getData(){
     return this.data.object;
   }
@@ -50,6 +54,10 @@ public class CheckoutSessionsModel {
   }
   public String getType(){
     return this.type;
+  }
+
+  public void setUpdated(long newTime){
+    this.updated = newTime;
   }
   // public void setData(CheckoutSessionsDataModel data){
   //   this.data.object = data;
