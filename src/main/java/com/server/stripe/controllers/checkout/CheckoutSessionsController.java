@@ -4,6 +4,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.stripe.helpers.CreateHttpUrlConnection;
+import com.server.stripe.helpers.services.thirdParty.RequestsToServices;
 import com.server.stripe.services.checkout.CheckoutCreateSession;
 
 @RestController
@@ -20,30 +23,17 @@ import com.server.stripe.services.checkout.CheckoutCreateSession;
 @CrossOrigin("*")
 public class CheckoutSessionsController {
 
-  private final String stripeCheckoutPath = "https://api.stripe.com/v1/checkout/sessions";
-  private final String mongodbSaveDataPath = "http://localhost:5000/api/mongodb/invoices/stripe";
-  private final String mailerSendEmailPath = "http://localhost:5000/api/mailer/";
+  private final String stripeCheckoutEndpoint = "https://api.stripe.com/v1/checkout/sessions";
+  private final String mongodbSaveDataEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save/completed";
+  private final String pdfCreateEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save/completed";
+  // private final String mailerSendEmailEndpoint = "http://localhost:5000/api/mailer/";
 
   @Autowired
   private Environment env;
   @Autowired
   private CheckoutCreateSession createSessionService;
-
-  private HttpURLConnection createConnection(String path, String httpMethodHeader, String contentTypeHeader){
-    try {
-      URL url = new URI(path).toURL();
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-      connection.setRequestMethod(httpMethodHeader);
-      connection.setRequestProperty("Content-Type", contentTypeHeader);
-
-      return connection;
-    } catch (Exception error) {
-      System.out.println("Error while connection to " + path + "\nError message: " + error.getMessage());
-      error.printStackTrace();
-      return null;
-    }
-  }
+  @Autowired
+  private RequestsToServices requestsToServices;
   
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
@@ -52,7 +42,8 @@ public class CheckoutSessionsController {
       // String path = "https://api.stripe.com/v1/checkout/sessions";
       // URL url = new URI(path).toURL();
       // HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      HttpURLConnection connection = createConnection(stripeCheckoutPath, "POST", "application/x-www-form-urlencoded");
+      HttpURLConnection connection = CreateHttpUrlConnection
+      .connect(stripeCheckoutEndpoint, "POST", "application/x-www-form-urlencoded");
 
       // connection.setRequestMethod("POST");
       // connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -73,28 +64,33 @@ public class CheckoutSessionsController {
     }
   }
 
-  @PostMapping("save")
+  @PostMapping("/save/completed")
   public ResponseEntity<Object> save(@RequestBody String requestBodyString){
     try {
       System.out.println(requestBodyString);
-      HttpURLConnection connectionSaveInDb = createConnection(mongodbSaveDataPath, "POST", "application/json");
-      connectionSaveInDb.setDoInput(true);
-      connectionSaveInDb.setDoOutput(true);
+      HttpURLConnection mongodbConnection = CreateHttpUrlConnection
+      .connect(mongodbSaveDataEndpoint, "POST", "application/json");
+      mongodbConnection.setDoInput(true);
+      mongodbConnection.setDoOutput(true);
 
-      // ResponseEntity<Object> response = createSessionService.save(connectionSaveInDb, requestBodyString);
-      createSessionService.save(connectionSaveInDb, requestBodyString);
+      ResponseEntity<Object> mongodbResponse = requestsToServices.saveInDb(mongodbConnection, requestBodyString);
 
-      connectionSaveInDb.disconnect();
+      mongodbConnection.disconnect();
 
-      HttpURLConnection connectionSendEmail = createConnection(mailerSendEmailPath, "POST", "application/json");
-      connectionSendEmail.setDoInput(true);
-      connectionSendEmail.setDoOutput(true);
+      if(mongodbResponse.getStatusCode().value() < 400){
+        HttpURLConnection connectionCreatePdf = CreateHttpUrlConnection
+        .connect(pdfCreateEndpoint, "POST", "application/json");
+        connectionCreatePdf.setDoInput(true);
+        connectionCreatePdf.setDoOutput(true);
+  
+        ResponseEntity<Object> pdfServiceResponse = requestsToServices.createPdf(connectionCreatePdf, requestBodyString);
+  
+        connectionCreatePdf.disconnect();
 
-      createSessionService.sendEmail(connectionSendEmail, requestBodyString);
-
-      connectionSendEmail.disconnect();
-
-      return ResponseEntity.ok("Payment saved in database and sent email letter to customer !");
+        return pdfServiceResponse;
+      } else {
+        return ResponseEntity.internalServerError().body(mongodbResponse.getBody().toString());
+      }
     } catch (Exception error) {
       System.err.println(error.getMessage());
       error.printStackTrace();

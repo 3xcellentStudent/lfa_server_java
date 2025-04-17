@@ -1,10 +1,10 @@
-package com.server.stripe.models.checkout.classess;
+package com.server.stripe.models.checkout.dtos;
 
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.stripe.models.checkout.classess.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
+import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
 
 public class CheckoutSessionsDataModel {
 

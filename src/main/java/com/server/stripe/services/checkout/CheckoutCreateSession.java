@@ -12,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.stripe.models.checkout.classess.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.models.checkout.classess.CheckoutCreateSessionServerResponseDto;
-import com.server.stripe.models.checkout.classess.CheckoutSessionsDataModel;
+import com.server.stripe.models.checkout.dtos.CheckoutCreateSessionClientRequestDto;
+import com.server.stripe.models.checkout.dtos.CheckoutCreateSessionServerResponseDto;
+import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel;
 
 @Service
 public class CheckoutCreateSession {
@@ -52,34 +52,6 @@ public class CheckoutCreateSession {
       error.printStackTrace();
       System.err.println(error.getMessage());
       return ResponseEntity.internalServerError().body(error.getMessage());
-    }
-  }
-
-  public void save(HttpURLConnection connection, String requestBodyString){
-    try {
-      OutputStream outputStream = connection.getOutputStream();
-      byte[] bytes = requestBodyString.getBytes();
-      outputStream.write(bytes);
-      outputStream.close();
-      // InputStream inputStream = connection.getInputStream();
-      // inputStream.re
-    } catch (Exception error) {
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-    }
-  }
-
-  public void sendEmail(HttpURLConnection connection, String requestBodyString){
-    try {
-      OutputStream outputStream = connection.getOutputStream();
-      byte[] bytes = requestBodyString.getBytes();
-      outputStream.write(bytes);
-      outputStream.close();
-      // InputStream inputStream = connection.getInputStream();
-      // inputStream.re
-    } catch (Exception error) {
-      System.err.println(error.getMessage());
-      error.printStackTrace();
     }
   }
 

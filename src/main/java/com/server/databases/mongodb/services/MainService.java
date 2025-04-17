@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoSocketException;
+import com.mongodb.MongoTimeoutException;
 import com.mongodb.client.result.UpdateResult;
 import com.server.databases.mongodb.helpers.bodies.DeleteManyFromArray;
 import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
@@ -258,9 +261,9 @@ public class MainService {
     // }
   }
 
-  public <T> ResponseEntity<Object> getAsResponseEntity(T someObject){
+  public <T> ResponseEntity<Object> getAsResponseEntity(T someClass){
     try {
-      String response = objectMapper.writeValueAsString(someObject);
+      String response = objectMapper.writeValueAsString(someClass);
 
       return ResponseEntity.ok(response);
     } catch(Exception error){
@@ -269,4 +272,21 @@ public class MainService {
       return ResponseEntity.internalServerError().body("Internal server error: " + error.getMessage());
     }
   }
+
+  // public <T> ResponseEntity<Object> createOne(T someClass){
+  //   try {
+  //     T createdObject = mongoTemplate.save(someClass);
+
+  //     String responseString = objectMapper.writeValueAsString(createdObject);
+
+  //     return ResponseEntity.ok(responseString);
+  //   } catch (MongoSocketException | MongoTimeoutException error) {
+  //     return ResponseEntity.status(503).body("Database unavailable");
+  //   } catch (IllegalArgumentException error) {
+  //     return ResponseEntity.status(400).body("Invalid user data");
+  //   } catch (Exception error) {
+  //     return ResponseEntity.status(500).body("Unexpected error");
+  //   }
+  // }
+
 }

@@ -1,4 +1,4 @@
-package com.server.stripe.models.checkout.classess;
+package com.server.stripe.models.checkout.dtos;
 
 import java.util.Map;
 

@@ -57,7 +57,7 @@ public class DiffusersProductsController {
     }
   }
 
-  @GetMapping("/get")
+  @GetMapping("/find")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
     try {
       if(id == null || id.isEmpty()){
@@ -79,7 +79,7 @@ public class DiffusersProductsController {
     }
   }
 
-  @GetMapping("/get/recursive")
+  @GetMapping("/find/recursive")
   public ResponseEntity<Object> findAllByIdRecursive(@RequestParam List<String> id){
     try {
       ResponseEntity<Object> response = productsService.findAllRecursive(id);

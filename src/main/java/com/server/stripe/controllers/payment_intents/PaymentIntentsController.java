@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.stripe.models.checkout.CheckoutSessionsModel;
-import com.server.stripe.models.checkout.classess.CheckoutSessionsDataModel;
+import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel;
 import com.server.stripe.services.payment_intents.PaymentIntentsService;
 
 @RestController
