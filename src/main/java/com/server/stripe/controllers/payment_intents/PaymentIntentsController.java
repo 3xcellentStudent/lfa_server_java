@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
+import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.stripe.models.checkout.CheckoutSessionsModel;
-import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel;
 import com.server.stripe.services.payment_intents.PaymentIntentsService;
 
 @RestController
@@ -62,8 +62,8 @@ public class PaymentIntentsController {
     // System.out.println(requestBodyString);
     try {
       System.out.println(requestBodyString);
-      CheckoutSessionsModel requestBodyObject = objectMapper
-      .readValue(requestBodyString, CheckoutSessionsModel.class);
+      StripeCheckoutSessionsModel requestBodyObject = objectMapper
+      .readValue(requestBodyString, StripeCheckoutSessionsModel.class);
       System.out.println("requestBodyObject: " + requestBodyObject);
 
       CheckoutSessionsDataModel dataObject = requestBodyObject.getData();

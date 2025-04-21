@@ -5,6 +5,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class HttpService {
   
   public static void uploadPdfFile(byte[] fileBytes, String fileName){

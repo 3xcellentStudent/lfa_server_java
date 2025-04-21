@@ -1,11 +1,11 @@
 {
-  "id": "evt_1RA0DH04u95jjINWCRLpqaW1",
+  "id": "evt_1RGBci04u95jjINWI3gOIIAc",
   "object": "event",
-  "api_version": "2025-02-24.acacia",
-  "created": 1743734555,
+  "api_version": "2025-03-31.basil",
+  "created": 1745208384,
   "data": {
     "object": {
-      "id": "cs_test_a1p2wlvcbAQk8jH0nR8qwRyrTSvLMA3qn6BqNuWa5VI6uwouCLXK9zCdMt",
+      "id": "cs_test_a1A9qzyElIZYF6WN9Th3iNeD6l9GNDHa89AVzLTmf71up5mTf1LJ5EEexs",
       "object": "checkout.session",
       "adaptive_pricing": {
         "enabled": true
@@ -17,6 +17,7 @@
       "automatic_tax": {
         "enabled": false,
         "liability": null,
+        "provider": null,
         "status": null
       },
       "billing_address_collection": null,
@@ -38,7 +39,7 @@
       },
       "consent": null,
       "consent_collection": null,
-      "created": 1743734518,
+      "created": 1745208203,
       "currency": "cad",
       "currency_conversion": null,
       "custom_fields": [
@@ -50,7 +51,7 @@
         "submit": null,
         "terms_of_service_acceptance": null
       },
-      "customer": null,
+      "customer": "cus_SAWg6UywdCMnqS",
       "customer_creation": "if_required",
       "customer_details": {
         "address": {
@@ -73,16 +74,18 @@
       "discounts": [
 
       ],
-      "expires_at": 1743820917,
-      "invoice": null,
+      "expires_at": 1745294603,
+      "invoice": "in_1RGBcg04u95jjINW34uek1Uw",
       "invoice_creation": {
-        "enabled": false,
+        "enabled": true,
         "invoice_data": {
           "account_tax_ids": null,
           "custom_fields": null,
           "description": null,
           "footer": null,
-          "issuer": null,
+          "issuer": {
+            "type": "self"
+          },
           "metadata": {
           },
           "rendering_options": null
@@ -93,7 +96,7 @@
       "metadata": {
       },
       "mode": "payment",
-      "payment_intent": "pi_3RA0DG04u95jjINW00tG7XdT",
+      "payment_intent": "pi_3RGBce04u95jjINW1tgHn2Bg",
       "payment_link": null,
       "payment_method_collection": "if_required",
       "payment_method_configuration_details": null,
@@ -113,7 +116,13 @@
       "recovered_from": null,
       "redirect_on_completion": "always",
       "return_url": "https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg",
-      "saved_payment_method_options": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": null,
+        "payment_method_save": null
+      },
       "setup_intent": null,
       "shipping_address_collection": {
         "allowed_countries": [
@@ -122,20 +131,6 @@
         ]
       },
       "shipping_cost": null,
-      "shipping_details": {
-        "address": {
-          "city": "Edmonton",
-          "country": "CA",
-          "line1": "9009 85 Street",
-          "line2": "301",
-          "postal_code": "T6C 3C6",
-          "state": "AB"
-        },
-        "carrier": null,
-        "name": "Andrii Prokuda",
-        "phone": null,
-        "tracking_number": null
-      },
       "shipping_options": [
 
       ],
@@ -160,106 +155,4 @@
     "idempotency_key": null
   },
   "type": "checkout.session.completed"
-}
-
-
-
-
-{
-  "id": "cs_test_a1pY268r6ZB1RzwOEKvx6TyfHURWFWW4kj3FZpb0xIDC57ZpC2BMzSt5WG",
-  "object": "checkout.session",
-  "adaptive_pricing": {
-    "enabled": true
-  },
-  "after_expiration": null,
-  "allow_promotion_codes": null,
-  "amount_subtotal": 10000,
-  "amount_total": 10000,
-  "automatic_tax": {
-    "enabled": false,
-    "liability": null,
-    "status": null
-  },
-  "billing_address_collection": null,
-  "cancel_url": null,
-  "client_reference_id": null,
-  "client_secret": "cs_test_a1pY268r6ZB1RzwOEKvx6TyfHURWFWW4kj3FZpb0xIDC57ZpC2BMzSt5WG_secret_fidwbEhqYWAnPydgaGdgYWFgYScpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ3dgYWx3YGZxSmtGamh1aWBxbGprJz8nZGlyZHx2J3gl",
-  "collected_information": null,
-  "consent": null,
-  "consent_collection": null,
-  "created": 1743735297,
-  "currency": "cad",
-  "currency_conversion": null,
-  "custom_fields": [],
-  "custom_text": {
-    "after_submit": null,
-    "shipping_address": null,
-    "submit": null,
-    "terms_of_service_acceptance": null
-  },
-  "customer": null,
-  "customer_creation": "if_required",
-  "customer_details": null,
-  "customer_email": null,
-  "discounts": [],
-  "expires_at": 1743821697,
-  "invoice": null,
-  "invoice_creation": {
-    "enabled": false,
-    "invoice_data": {
-      "account_tax_ids": null,
-      "custom_fields": null,
-      "description": null,
-      "footer": null,
-      "issuer": null,
-      "metadata": {},
-      "rendering_options": null
-    }
-  },
-  "livemode": false,
-  "locale": null,
-  "metadata": {},
-  "mode": "payment",
-  "payment_intent": null,
-  "payment_link": null,
-  "payment_method_collection": "if_required",
-  "payment_method_configuration_details": null,
-  "payment_method_options": {
-    "card": {
-      "request_three_d_secure": "automatic"
-    }
-  },
-  "payment_method_types": [
-    "card"
-  ],
-  "payment_status": "unpaid",
-  "permissions": null,
-  "phone_number_collection": {
-    "enabled": false
-  },
-  "recovered_from": null,
-  "redirect_on_completion": "always",
-  "return_url": "https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg",
-  "saved_payment_method_options": null,
-  "setup_intent": null,
-  "shipping_address_collection": {
-    "allowed_countries": [
-      "CA",
-      "CA"
-    ]
-  },
-  "shipping_cost": null,
-  "shipping_options": [],
-  "status": "open",
-  "submit_type": null,
-  "subscription": null,
-  "success_url": null,
-  "total_details": {
-    "amount_discount": 0,
-    "amount_shipping": 0,
-    "amount_tax": 0
-  },
-  "ui_mode": "embedded",
-  "url": null,
-  "wallet_options": null
 }

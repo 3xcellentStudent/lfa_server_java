@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
+import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
+import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionServerResponseDto;
+// import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.stripe.models.checkout.dtos.CheckoutCreateSessionServerResponseDto;
-import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel;
 
 public class ResponseReader {
 
@@ -58,9 +59,9 @@ public class ResponseReader {
       reader.close();
       inputStream.close();
 
-      CheckoutSessionsDataModel stripeResponseModel = objectMapper
-      .readValue(responseStringData.toString(), CheckoutSessionsDataModel.class);
-      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel);
+      StripeCheckoutSessionsModel stripeResponseModel = objectMapper
+      .readValue(responseStringData.toString(), StripeCheckoutSessionsModel.class);
+      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel.getData());
 
       String responseString = objectMapper.writeValueAsString(serverResponseDto);
       return responseString;

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.diffusers.DiffusersMediaService;
 
 @RestController
@@ -29,7 +29,7 @@ public class DiffusersMediaController {
   @Autowired
   private DiffusersMediaService mediaService;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
   @Autowired
   private MongoTemplate mongoTemplate;
 

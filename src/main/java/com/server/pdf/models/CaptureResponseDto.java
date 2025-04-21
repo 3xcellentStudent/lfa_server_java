@@ -2,7 +2,7 @@ package com.server.pdf.models;
 
 import org.json.JSONObject;
 
-public class CaptureResponseObject {
+public class CaptureResponseDto {
   public String orderId;
   public String status;
   public Address address;
@@ -12,7 +12,7 @@ public class CaptureResponseObject {
   public String create_time;
   public Payer payer;
 
-  public CaptureResponseObject(JSONObject body){
+  public CaptureResponseDto(JSONObject body){
     JSONObject firstPurchaseUnitObject = firstPurchaseUnit(body);
     JSONObject firstCaptureObject = firstCaptureObject(firstPurchaseUnitObject);
     JSONObject firstSellerReceivableBreakdownObject = sellerReceivableBreakdown(firstCaptureObject);

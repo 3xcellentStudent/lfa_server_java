@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionClientRequestDto;
+import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionServerResponseDto;
+import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.stripe.models.checkout.dtos.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.models.checkout.dtos.CheckoutCreateSessionServerResponseDto;
-import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel;
 
 @Service
 public class CheckoutCreateSession {
@@ -37,6 +37,7 @@ public class CheckoutCreateSession {
       requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
       requestBody.append("&mode=payment");
       requestBody.append("&ui_mode=embedded");
+      requestBody.append("&invoice_creation[enabled]=true");
       requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
       requestBody.append("&return_url=").append(URLEncoder.encode("https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg", "UTF-8"));
 

@@ -3,8 +3,6 @@ package com.server.databases.mongodb.controllers.products.diffusers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.products.diffusers.DiffusersProductsService;
 
 @RestController
@@ -27,9 +25,7 @@ public class DiffusersProductsController {
   @Autowired
   private DiffusersProductsService productsService;
   @Autowired
-  private MainService mainService;
-  @Autowired
-  private MongoTemplate mongoTemplate;
+  private MongoDbMainService mainService;
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
@@ -119,16 +115,17 @@ public class DiffusersProductsController {
   }
 
   @GetMapping("/clear-col")
-  public ResponseEntity<String> clearCollection(){
-    try {
-      mongoTemplate.remove(new Query(), DiffusersProductsModel.class);
+  public ResponseEntity<Object> clearCollection(){
+    return mainService.clearCollection(DiffusersProductsModel.class);
+    // try {
+    //   mongoTemplate.remove(new Query(), DiffusersProductsModel.class);
 
-      return ResponseEntity.ok("All products have been removed from database !");
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't delete products from database !");
-    }
+    //   return ResponseEntity.ok("All products have been removed from database !");
+    // } catch(Exception error){
+    //   error.printStackTrace();
+    //   System.out.println(error.getMessage());
+    //   return ResponseEntity.internalServerError().body("Can't delete products from database !");
+    // }
   }
   
 }

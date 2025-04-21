@@ -5,13 +5,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoSocketException;
 import com.mongodb.MongoTimeoutException;
-import com.server.databases.mongodb.models.invoices.stripe.CheckoutSessionsModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 
+@Service
 public class InvoicesStripeService {
   
   @Autowired
@@ -19,31 +21,50 @@ public class InvoicesStripeService {
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
 
    public ResponseEntity<Object> createOne(String requestString){
+    System.out.println(requestString);
     try {
-      CheckoutSessionsModel requestObject = objectMapper.readValue(requestString, CheckoutSessionsModel.class);
+      // StripeCheckoutSessionsModel requestObject = objectMapper.readValue(requestString, StripeCheckoutSessionsModel.class);
 
-      requestObject.setUpdated(requestObject.getCreated());
+      System.out.println("-------------------------------------------------------------------------------------------------------------------");
+      // System.out.println(objectMapper.writeValueAsString(requestObject));
 
-      CheckoutSessionsModel savedObject = mongoTemplate.save(requestObject);
+      // StripeCheckoutSessionsModel savedObject = mongoTemplate.save(requestObject);
 
-      String responseString = objectMapper.writeValueAsString(savedObject);
+      // String responseString = objectMapper.writeValueAsString(savedObject);
 
-      return ResponseEntity.ok(responseString);
+      return ResponseEntity.ok(requestString);
     } catch (MongoSocketException | MongoTimeoutException error) {
+      error.printStackTrace();
       return ResponseEntity.status(503).body("Database unavailable");
     } catch (IllegalArgumentException error) {
+      error.printStackTrace();
       return ResponseEntity.status(400).body("Invalid data");
     } catch (Exception error) {
+      error.printStackTrace();
       return ResponseEntity.status(500).body("Unexpected error");
     }
   }
 
   public ResponseEntity<Object> findAllById(List<String> id){
     try {
-      List<CheckoutSessionsModel> savedObject = mainService.findAllById("id", id, CheckoutSessionsModel.class);
+      List<StripeCheckoutSessionsModel> savedObject = mainService.findAllById("id", id, StripeCheckoutSessionsModel.class);
+
+      String responseString = objectMapper.writeValueAsString(savedObject);
+
+      return ResponseEntity.ok(responseString);
+    } catch (MongoSocketException | MongoTimeoutException error) {
+      return ResponseEntity.status(503).body("Database unavailable");
+    } catch (Exception error) {
+      return ResponseEntity.status(500).body("Unexpected error");
+    }
+  }
+
+  public ResponseEntity<Object> deleteAllById(List<String> id){
+    try {
+      ResponseEntity<Object> savedObject = mainService.deleteAllById(id, StripeCheckoutSessionsModel.class);
 
       String responseString = objectMapper.writeValueAsString(savedObject);
 

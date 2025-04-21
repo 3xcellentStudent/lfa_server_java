@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.server.databases.mongodb.helpers.bodies.DeleteManyById;
 import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
 import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.diffusers.DiffusersReviewsService;
 
 @RestController
@@ -33,7 +33,7 @@ public class DiffusersReviewsController {
   @Autowired
   private DiffusersReviewsService reviewsService;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
   @Autowired
   private MongoTemplate mongoTemplate;
 

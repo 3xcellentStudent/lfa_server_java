@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.models.global.GlobalDataModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.global.GlobalDataService;
 
 @RestController
@@ -28,7 +28,7 @@ public class GlobalDataController {
   @Autowired
   private GlobalDataService globalDataService;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
   @Autowired
   private MongoTemplate mongoTemplate;
 
@@ -58,7 +58,7 @@ public class GlobalDataController {
     }
   }
 
-  @GetMapping("/get/{id}")
+  @GetMapping("/find/{id}")
   public ResponseEntity<Object> findById(@PathVariable String id){
     try {
       GlobalDataModel foundObject = mongoTemplate.findById(id, GlobalDataModel.class);
@@ -71,7 +71,7 @@ public class GlobalDataController {
     }
   }
 
-  @GetMapping("/get")
+  @GetMapping("/find")
   public ResponseEntity<Object> findAll(){
     try {
       ResponseEntity<Object> response = mainService.findAll(GlobalDataModel.class);

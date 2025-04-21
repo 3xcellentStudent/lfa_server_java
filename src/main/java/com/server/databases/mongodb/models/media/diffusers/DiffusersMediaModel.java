@@ -2,6 +2,7 @@ package com.server.databases.mongodb.models.media.diffusers;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ public class DiffusersMediaModel {
   private String parentId;
   private long createdAt;
   private long updatedAt;
-  public TitleContent titleContent;
+  public TitleContent titleContent = new TitleContent();
   public ArrayList<ArrayList<Image>> images = new ArrayList<>();
 
 

@@ -24,8 +24,8 @@ import com.server.stripe.services.checkout.CheckoutCreateSession;
 public class CheckoutSessionsController {
 
   private final String stripeCheckoutEndpoint = "https://api.stripe.com/v1/checkout/sessions";
-  private final String mongodbSaveDataEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save/completed";
-  private final String pdfCreateEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save/completed";
+  private final String mongodbSaveDataEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
+  private final String pdfCreateEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
   // private final String mailerSendEmailEndpoint = "http://localhost:5000/api/mailer/";
 
   @Autowired
@@ -39,14 +39,9 @@ public class CheckoutSessionsController {
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     String tokenSecret = env.getProperty("stripe.token.secret");
     try {
-      // String path = "https://api.stripe.com/v1/checkout/sessions";
-      // URL url = new URI(path).toURL();
-      // HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       HttpURLConnection connection = CreateHttpUrlConnection
       .connect(stripeCheckoutEndpoint, "POST", "application/x-www-form-urlencoded");
 
-      // connection.setRequestMethod("POST");
-      // connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
       connection.setRequestProperty("Authorization", "Bearer " + tokenSecret);
       connection.setRequestProperty("Stripe-Version", "2025-03-31.basil");
       connection.setDoInput(true);
@@ -64,10 +59,10 @@ public class CheckoutSessionsController {
     }
   }
 
-  @PostMapping("/save/completed")
+  @PostMapping("/save")
   public ResponseEntity<Object> save(@RequestBody String requestBodyString){
     try {
-      System.out.println(requestBodyString);
+      // System.out.println(requestBodyString);
       HttpURLConnection mongodbConnection = CreateHttpUrlConnection
       .connect(mongodbSaveDataEndpoint, "POST", "application/json");
       mongodbConnection.setDoInput(true);
@@ -77,20 +72,22 @@ public class CheckoutSessionsController {
 
       mongodbConnection.disconnect();
 
-      if(mongodbResponse.getStatusCode().value() < 400){
-        HttpURLConnection connectionCreatePdf = CreateHttpUrlConnection
-        .connect(pdfCreateEndpoint, "POST", "application/json");
-        connectionCreatePdf.setDoInput(true);
-        connectionCreatePdf.setDoOutput(true);
-  
-        ResponseEntity<Object> pdfServiceResponse = requestsToServices.createPdf(connectionCreatePdf, requestBodyString);
-  
-        connectionCreatePdf.disconnect();
+      return ResponseEntity.ok().build();
 
-        return pdfServiceResponse;
-      } else {
-        return ResponseEntity.internalServerError().body(mongodbResponse.getBody().toString());
-      }
+      // if(mongodbResponse.getStatusCode().value() < 400){
+      //   HttpURLConnection connectionCreatePdf = CreateHttpUrlConnection
+      //   .connect(pdfCreateEndpoint, "POST", "application/json");
+      //   connectionCreatePdf.setDoInput(true);
+      //   connectionCreatePdf.setDoOutput(true);
+  
+      //   ResponseEntity<Object> pdfServiceResponse = requestsToServices.createPdf(connectionCreatePdf, requestBodyString);
+  
+      //   connectionCreatePdf.disconnect();
+
+      //   return pdfServiceResponse;
+      // } else {
+      //   return ResponseEntity.internalServerError().body(mongodbResponse.getBody().toString());
+      // }
     } catch (Exception error) {
       System.err.println(error.getMessage());
       error.printStackTrace();

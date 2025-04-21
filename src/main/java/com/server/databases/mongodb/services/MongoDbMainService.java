@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DuplicateKeyException;
@@ -20,9 +21,10 @@ import com.mongodb.client.result.UpdateResult;
 import com.server.databases.mongodb.helpers.bodies.DeleteManyFromArray;
 import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
+import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
 
 @Service
-public class MainService {
+public class MongoDbMainService {
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -273,6 +275,17 @@ public class MainService {
     }
   }
 
+  public <T> ResponseEntity<Object> clearCollection(Class<T> someClass){
+    try {
+      mongoTemplate.remove(new Query(), someClass);
+
+      return ResponseEntity.ok("All products have been removed from database !");
+    } catch(Exception error){
+      error.printStackTrace();
+      System.out.println(error.getMessage());
+      return ResponseEntity.internalServerError().body("Can't delete products from database !");
+    }
+  }
   // public <T> ResponseEntity<Object> createOne(T someClass){
   //   try {
   //     T createdObject = mongoTemplate.save(someClass);

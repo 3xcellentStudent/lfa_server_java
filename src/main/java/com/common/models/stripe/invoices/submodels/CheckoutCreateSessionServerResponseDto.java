@@ -1,4 +1,4 @@
-package com.server.stripe.models.checkout.dtos;
+package com.common.models.stripe.invoices.submodels;
 
 import java.util.Map;
 

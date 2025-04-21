@@ -1,162 +1,170 @@
-package com.server.stripe.models.checkout.dtos;
+package com.common.models.stripe.invoices.submodels;
 
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.stripe.models.checkout.dtos.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
+import org.springframework.stereotype.Component;
 
+import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Component
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CheckoutSessionsDataModel {
 
-  private String id;
-  private String object;
+  public String id;
+  public String object;
+
+  // @JsonProperty("api_version")
+  // public AdaptivePricing apiVersion;
   
   @JsonProperty("adaptive_pricing")
-  private AdaptivePricing adaptivePricing;
+  public AdaptivePricing adaptivePricing;
   
   @JsonProperty("after_expiration")
-  private AfterExpiration afterExpiration;
+  public AfterExpiration afterExpiration;
   
   @JsonProperty("allow_promotion_codes")
-  private Boolean allowPromotionCodes;
+  public Boolean allowPromotionCodes;
   
   @JsonProperty("amount_subtotal")
-  private Integer amountSubtotal;
+  public Integer amountSubtotal;
   
   @JsonProperty("amount_total")
-  private Integer amountTotal;
+  public Integer amountTotal;
   
   @JsonProperty("automatic_tax")
-  private AutomaticTax automaticTax;
+  public AutomaticTax automaticTax;
   
   @JsonProperty("billing_address_collection")
-  private String billingAddressCollection;
+  public String billingAddressCollection;
   
   @JsonProperty("cancel_url")
-  private String cancelUrl;
+  public String cancelUrl;
   
   @JsonProperty("client_reference_id")
-  private String clientReferenceId;
+  public String clientReferenceId;
   
   @JsonProperty("client_secret")
-  private String clientSecret;
+  public String clientSecret;
   
   @JsonProperty("collected_information")
-  private Object collectedInformation;
+  public Object collectedInformation;
   
-  private Object consent;
+  public Object consent;
   
   @JsonProperty("consent_collection")
-  private Object consentCollection;
+  public Object consentCollection;
   
-  private Long created;
-  private String currency;
+  public Long created;
+  public String currency;
   
   @JsonProperty("currency_conversion")
-  private Object currencyConversion;
+  public Object currencyConversion;
   
   @JsonProperty("custom_fields")
-  private List<Object> customFields;
+  public List<Object> customFields;
   
   @JsonProperty("custom_text")
-  private CustomText customText;
+  public CustomText customText;
   
-  private Object customer;
+  public Object customer;
   
   @JsonProperty("customer_creation")
-  private String customerCreation;
+  public String customerCreation;
   
   @JsonProperty("customer_details")
-  private CustomerDetails customerDetails;
+  public CustomerDetails customerDetails;
   
   @JsonProperty("customer_email")
-  private String customerEmail;
+  public String customerEmail;
   
-  private List<Object> discounts;
+  public List<Object> discounts;
   
   @JsonProperty("expires_at")
-  private Long expiresAt;
+  public Long expiresAt;
   
-  private String invoice;
+  public String invoice;
   
   @JsonProperty("invoice_creation")
-  private InvoiceCreation invoiceCreation;
+  public InvoiceCreation invoiceCreation;
   
-  private Boolean livemode;
-  private String locale;
-  private Map<String, Object> metadata;
-  private String mode;
+  public Boolean livemode;
+  public String locale;
+  public Map<String, Object> metadata;
+  public String mode;
   
   @JsonProperty("payment_intent")
-  private String paymentIntent;
+  public String paymentIntent;
   
   @JsonProperty("payment_link")
-  private String paymentLink;
+  public String paymentLink;
   
   @JsonProperty("payment_method_collection")
-  private String paymentMethodCollection;
+  public String paymentMethodCollection;
   
   @JsonProperty("payment_method_configuration_details")
-  private Object paymentMethodConfigurationDetails;
+  public Object paymentMethodConfigurationDetails;
   
   @JsonProperty("payment_method_options")
-  private PaymentMethodOptions paymentMethodOptions;
+  public PaymentMethodOptions paymentMethodOptions;
   
   @JsonProperty("payment_method_types")
-  private List<String> paymentMethodTypes;
+  public List<String> paymentMethodTypes;
   
   @JsonProperty("payment_status")
-  private String paymentStatus;
+  public String paymentStatus;
   
-  private Object permissions;
+  public Object permissions;
   
   @JsonProperty("phone_number_collection")
-  private PhoneNumberCollection phoneNumberCollection;
+  public PhoneNumberCollection phoneNumberCollection;
   
   @JsonProperty("recovered_from")
-  private String recoveredFrom;
+  public String recoveredFrom;
   
   @JsonProperty("redirect_on_completion")
-  private String redirectOnCompletion;
+  public String redirectOnCompletion;
   
   @JsonProperty("return_url")
-  private String returnUrl;
+  public String returnUrl;
   
   @JsonProperty("saved_payment_method_options")
-  private Object savedPaymentMethodOptions;
+  public Object savedPaymentMethodOptions;
   
   @JsonProperty("setup_intent")
-  private String setupIntent;
+  public String setupIntent;
   
   @JsonProperty("shipping_address_collection")
-  private ShippingAddressCollection shippingAddressCollection;
+  public ShippingAddressCollection shippingAddressCollection;
   
   @JsonProperty("shipping_cost")
-  private ShippingCost shippingCost;
+  public ShippingCost shippingCost;
   
   @JsonProperty("shipping_details")
-  private Object shippingDetails;
+  public Object shippingDetails;
   
   @JsonProperty("shipping_options")
-  private List<Object> shippingOptions;
+  public List<Object> shippingOptions;
   
-  private String status;
+  public String status;
   
   @JsonProperty("submit_type")
-  private Object submitType;
+  public Object submitType;
   
-  private Object subscription;
+  public Object subscription;
   
   @JsonProperty("success_url")
-  private Object successUrl;
+  public Object successUrl;
   
   @JsonProperty("total_details")
-  private TotalDetails totalDetails;
+  public TotalDetails totalDetails;
   
   @JsonProperty("ui_mode")
-  private String uiMode;
+  public String uiMode;
   
-  private Object url;
+  public Object url;
 
   public static class AdaptivePricing {
     public Boolean enabled;
@@ -164,7 +172,7 @@ public class CheckoutSessionsDataModel {
 
   public static class AfterExpiration {
     @JsonProperty("recovery")
-    private Recovery recovery;
+    public Recovery recovery;
 
     public static class Recovery {
       @JsonProperty("allow_promotion_codes")

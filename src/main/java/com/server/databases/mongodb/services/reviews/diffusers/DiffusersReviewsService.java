@@ -12,7 +12,7 @@ import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
 import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 
 @Service
 public class DiffusersReviewsService {
@@ -22,7 +22,7 @@ public class DiffusersReviewsService {
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
 
   public ResponseEntity<Object> createOne(String id, String parent_id, long timestamp){
     try {

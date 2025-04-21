@@ -1,4 +1,4 @@
-package com.server.pdf;
+package com.server.pdf.services;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.util.Date;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -18,14 +19,15 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
 import com.server.pdf.models.Address;
-import com.server.pdf.models.CaptureResponseObject;
+import com.server.pdf.models.CaptureResponseDto;
 import com.server.pdf.models.Payer;
-import com.server.pdf.services.pdf.Cells;
-import com.server.pdf.services.pdf.Tables;
+import com.server.pdf.services.components.Cells;
+import com.server.pdf.services.components.Tables;
 
-public class PDFService {
+@Service
+public class PdfMainService {
 
-  public JSONObject create(CaptureResponseObject data){
+  public JSONObject create(CaptureResponseDto data){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
       final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
@@ -66,7 +68,7 @@ public class PDFService {
     return;
   }
 
-  private void mainInfoTable(CaptureResponseObject data, Document document){
+  private void mainInfoTable(CaptureResponseDto data, Document document){
     Tables multiTable1 = new Tables(2, 100);
 
     String[] content = {"Company Name", "My name", "My email"};
@@ -87,7 +89,7 @@ public class PDFService {
     }
   }
 
-  private void billToInfoTable(CaptureResponseObject data, Document document){
+  private void billToInfoTable(CaptureResponseDto data, Document document){
     Address address = data.address;
     Payer payer = data.payer;
     String fullName = payer.first_name + " " + payer.second_name;
@@ -128,7 +130,7 @@ public class PDFService {
     return;
   }
 
-  private void descriptionFieldsTable(CaptureResponseObject data, Document document){
+  private void descriptionFieldsTable(CaptureResponseDto data, Document document){
     String[] tableFields = {"Items", "Quantity", "Total", "Subtotal"};
     PdfPTable table = new Tables(4, new float[]{55f, 15f, 15f, 15f}).createTable();
     table.setSpacingBefore(30f);

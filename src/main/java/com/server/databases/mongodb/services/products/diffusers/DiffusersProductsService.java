@@ -15,7 +15,7 @@ import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
 import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
 import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.databases.mongodb.services.MainService;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.diffusers.DiffusersMediaService;
 import com.server.databases.mongodb.services.uuid.CustomUUID;
 
@@ -27,7 +27,7 @@ public class DiffusersProductsService {
   @Autowired
   private MongoTemplate mongoTemplate;
   @Autowired
-  private MainService mainService;
+  private MongoDbMainService mainService;
   @Autowired
   private ObjectMapper objectMapper;
 
