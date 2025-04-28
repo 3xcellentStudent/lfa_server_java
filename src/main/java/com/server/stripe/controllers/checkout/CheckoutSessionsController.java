@@ -62,7 +62,6 @@ public class CheckoutSessionsController {
   @PostMapping("/save")
   public ResponseEntity<Object> save(@RequestBody String requestBodyString){
     try {
-      // System.out.println(requestBodyString);
       HttpURLConnection mongodbConnection = CreateHttpUrlConnection
       .connect(mongodbSaveDataEndpoint, "POST", "application/json");
       mongodbConnection.setDoInput(true);

@@ -31,7 +31,7 @@ public class CheckoutCreateSessionServerResponseDto {
 
   public CheckoutCreateSessionServerResponseDto(){}
 
-  public CheckoutCreateSessionServerResponseDto(CheckoutSessionsDataModel requestBody){
+  public CheckoutCreateSessionServerResponseDto(StripeCheckoutSessionsDataModel requestBody){
     this.id = requestBody.getId();
     this.clientSecret = requestBody.getClientSecret();
     this.metadata = requestBody.getMetadata();

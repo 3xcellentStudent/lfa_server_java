@@ -3,7 +3,7 @@ package com.common.models.stripe.invoices;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
-import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel;
+import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,7 +32,7 @@ public class StripeCheckoutSessionsModel {
 
   public static class DataObject {
     @JsonProperty("object")
-    public CheckoutSessionsDataModel object;
+    public StripeCheckoutSessionsDataModel object;
   }
 
   public static class RequestObject {
@@ -47,8 +47,8 @@ public class StripeCheckoutSessionsModel {
   public Long getCreated(){
     return this.created;
   }
-  public CheckoutSessionsDataModel getData(){
-    return this.data.object;
+  public DataObject getData(){
+    return this.data;
   }
   public Boolean getLivemode(){
     return this.livemode;

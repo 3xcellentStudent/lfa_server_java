@@ -43,7 +43,7 @@ public class ResponseReader {
   //   }
   // }
 
-  public static String read(HttpURLConnection connection){
+  public static String readStripeCheckoutSessionCompleted(HttpURLConnection connection){
     ObjectMapper objectMapper = new ObjectMapper();
 
     try {
@@ -61,7 +61,7 @@ public class ResponseReader {
 
       StripeCheckoutSessionsModel stripeResponseModel = objectMapper
       .readValue(responseStringData.toString(), StripeCheckoutSessionsModel.class);
-      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel.getData());
+      CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel.getData().object);
 
       String responseString = objectMapper.writeValueAsString(serverResponseDto);
       return responseString;

@@ -21,7 +21,7 @@ public class RequestsToServices {
       outputStream.write(bytes);
       outputStream.close();
 
-      String responseString = ResponseReader.read(connection);
+      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
 
       return ResponseEntity.ok(responseString);
     } catch (Exception error) {
@@ -38,7 +38,7 @@ public class RequestsToServices {
       outputStream.write(bytes);
       outputStream.close();
 
-      String responseString = ResponseReader.read(connection);
+      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
 
       if(connection.getResponseCode() == 200){
         HttpURLConnection connectionSendEmail = CreateHttpUrlConnection
@@ -69,7 +69,7 @@ public class RequestsToServices {
       outputStream.write(bytes);
       outputStream.close();
 
-      String responseString = ResponseReader.read(connection);
+      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
 
       return ResponseEntity.ok(responseString);
     } catch (Exception error) {

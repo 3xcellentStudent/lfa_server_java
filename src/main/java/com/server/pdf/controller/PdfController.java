@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.mailer.MailerService;
-import com.server.pdf.models.CaptureResponseDto;
+import com.server.pdf.models.CreatePdfDocumentDto;
+// import com.server.pdf.models.CaptureResponseDto;
 import com.server.pdf.services.PdfMainService;
 import com.server.pdf.services.http.HttpService;
 
@@ -47,19 +49,22 @@ public class PdfController {
   //   }
   // }
 
-  @PostMapping("/write")
+  @PostMapping("/create")
   // public String writePdfFile(HttpServletRequest request, @RequestHeader("Content-Disposition") String contentDisposition){
-  public String writePdfFile(@RequestBody String requestBodyString){
-    System.out.println(requestBodyString);
+  public ResponseEntity<String> createPdfFile(@RequestBody String requestBodyString){
     try {
+      System.out.println(requestBodyString);
       StripeCheckoutSessionsModel stripeCheckoutSessionsObject = objectMapper.readValue(requestBodyString, StripeCheckoutSessionsModel.class);
 
-      // mainService.create()
+      CreatePdfDocumentDto dto = new CreatePdfDocumentDto(stripeCheckoutSessionsObject.getData().object);
+      ResponseEntity<String> response = mainService.create(dto);
 
-      return "File uploaded and saved to";
+      // return response;
+      return ResponseEntity.ok().build();
     } catch (IOException error) {
       error.printStackTrace();
-      return "Failed to save file: " + error.getMessage();
+      System.err.println("Failed to save file: " + error.getMessage());
+      return ResponseEntity.internalServerError().body("Failed to save file: " + error.getMessage());
     }
   }
 

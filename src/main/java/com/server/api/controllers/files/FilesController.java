@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.pdf.models.CaptureResponseDto;
+// import com.server.pdf.models.CaptureResponseDto;
 import com.server.pdf.services.PdfMainService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class FilesController {
   @PostMapping(value = "/create-pdf")
   public void createpdfFile(@RequestBody String body){
     JSONObject jsonBody = new JSONObject(body);
-    new PdfMainService().create(new CaptureResponseDto(jsonBody));
+    // new PdfMainService().create(new CaptureResponseDto(jsonBody));
     return;
   }
   

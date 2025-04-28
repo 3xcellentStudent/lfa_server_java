@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionClientRequestDto;
 import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionServerResponseDto;
-import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel;
+import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -70,8 +70,8 @@ public class CheckoutCreateSession {
       reader.close();
       inputStream.close();
 
-      CheckoutSessionsDataModel stripeResponseModel = objectMapper
-      .readValue(responseStringData.toString(), CheckoutSessionsDataModel.class);
+      StripeCheckoutSessionsDataModel stripeResponseModel = objectMapper
+      .readValue(responseStringData.toString(), StripeCheckoutSessionsDataModel.class);
       CheckoutCreateSessionServerResponseDto serverResponseDto = new CheckoutCreateSessionServerResponseDto(stripeResponseModel);
 
       String responseString = objectMapper.writeValueAsString(serverResponseDto);

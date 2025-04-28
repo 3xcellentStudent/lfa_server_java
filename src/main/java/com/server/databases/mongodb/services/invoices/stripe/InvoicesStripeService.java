@@ -24,18 +24,12 @@ public class InvoicesStripeService {
   private MongoDbMainService mainService;
 
    public ResponseEntity<Object> createOne(String requestString){
-    System.out.println(requestString);
     try {
-      // StripeCheckoutSessionsModel requestObject = objectMapper.readValue(requestString, StripeCheckoutSessionsModel.class);
+      StripeCheckoutSessionsModel requestObject = objectMapper.readValue(requestString, StripeCheckoutSessionsModel.class);
+      StripeCheckoutSessionsModel savedObject = mongoTemplate.save(requestObject);
+      String responseString = objectMapper.writeValueAsString(savedObject);
 
-      System.out.println("-------------------------------------------------------------------------------------------------------------------");
-      // System.out.println(objectMapper.writeValueAsString(requestObject));
-
-      // StripeCheckoutSessionsModel savedObject = mongoTemplate.save(requestObject);
-
-      // String responseString = objectMapper.writeValueAsString(savedObject);
-
-      return ResponseEntity.ok(requestString);
+      return ResponseEntity.ok(responseString);
     } catch (MongoSocketException | MongoTimeoutException error) {
       error.printStackTrace();
       return ResponseEntity.status(503).body("Database unavailable");

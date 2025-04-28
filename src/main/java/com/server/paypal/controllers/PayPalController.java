@@ -12,7 +12,7 @@ import com.server.api.helpers.paypal.PayPalRoutes;
 import com.server.databases.redis.service.RedisService;
 import com.server.paypal.services.PayPalCaptureOrder;
 import com.server.paypal.services.PayPalCreateOrder;
-import com.server.pdf.models.CaptureResponseDto;
+// import com.server.pdf.models.CaptureResponseDto;
 import com.server.pdf.services.PdfMainService;
 
 import org.springframework.http.ResponseEntity;
@@ -87,7 +87,7 @@ public class PayPalController {
     // String message = jsonBody.getString("data");
     
     // new PDFService().create(message);
-    new PdfMainService().create(new CaptureResponseDto(jsonBody));
+    // new PdfMainService().create(new CaptureResponseDto(jsonBody));
   }
 
 

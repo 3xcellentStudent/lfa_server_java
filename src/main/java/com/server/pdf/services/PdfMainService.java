@@ -1,11 +1,20 @@
 package com.server.pdf.services;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.lowagie.text.Document;
@@ -18,40 +27,47 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
-import com.server.pdf.models.Address;
-import com.server.pdf.models.CaptureResponseDto;
-import com.server.pdf.models.Payer;
+import com.server.pdf.models.CreatePdfDocumentDto;
 import com.server.pdf.services.components.Cells;
 import com.server.pdf.services.components.Tables;
 
 @Service
 public class PdfMainService {
 
-  public JSONObject create(CaptureResponseDto data){
+  public ResponseEntity<String> create(CreatePdfDocumentDto dto){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
+      System.out.println("Creating the PDF document...");
       final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
 
       metadata(instance);
 
       document.open();
-
       document.newPage();
+
       instance.setPageEmpty(false);
 
-      mainInfoTable(data, document);
+      mainInfoTable(dto, document);
       
-      billToInfoTable(data, document);
+      billToInfoTable(dto, document);
 
-      descriptionFieldsTable(data, document);
+      descriptionFieldsTable(dto, document);
 
       document.close();
 
-      return new JSONObject().put("status", HttpURLConnection.HTTP_OK).put("data", outputStream.toByteArray());
+      Files.write(Path.of("/home/andrew/Desktop/newfile.pdf"), outputStream.toByteArray());
+
+      return ResponseEntity.ok(outputStream.toByteArray().toString());
+
     } catch(DocumentException error){
+      error.printStackTrace();
       System.err.println(error.getMessage());
-      return null;
-      // return new JSONObject().put("status", HttpURLConnection.HTTP_BAD_REQUEST).put("data", outputStream.toByteArray());
+      return ResponseEntity.internalServerError()
+      .body("Something went wrong while while creating PDF document, with error message: " + error.getMessage());
+    } catch(IOException error){
+      error.printStackTrace();
+      System.err.println(error.getMessage());
+      return ResponseEntity.internalServerError().body(error.getMessage());
     }
   }
   
@@ -68,13 +84,13 @@ public class PdfMainService {
     return;
   }
 
-  private void mainInfoTable(CaptureResponseDto data, Document document){
+  private void mainInfoTable(CreatePdfDocumentDto dto, Document document){
     Tables multiTable1 = new Tables(2, 100);
 
     String[] content = {"Company Name", "My name", "My email"};
     String[][] innerMainContent = {
       {"Invoce#", "Creation date", "Currency"},
-      {data.orderId, data.create_time, data.currency_code}
+      {dto.invoiceId, dto.created.toString(), dto.currency}
     };
 
     for(int i = 0; i < content.length; i++){
@@ -89,26 +105,23 @@ public class PdfMainService {
     }
   }
 
-  private void billToInfoTable(CaptureResponseDto data, Document document){
-    Address address = data.address;
-    Payer payer = data.payer;
-    String fullName = payer.first_name + " " + payer.second_name;
+  private void billToInfoTable(CreatePdfDocumentDto dto, Document document){
     String[][] content = {
       {
         "Customer name:", 
-        "Customer email:", 
+        // "Customer email:", 
         "Street:", 
         "Apartment/Suite:", 
         "Province/Region:",
         "City/Town:"
       },
       {
-        fullName, 
-        payer.email_address, 
-        address.address_line_1,
-        address.address_line_2,
-        address.admin_area_1,
-        address.admin_area_2
+        dto.payerName, 
+        // payer.email_address, 
+        dto.address.line1,
+        dto.address.line2,
+        dto.address.state,
+        dto.address.postalCode
       }
     };
 
@@ -130,7 +143,7 @@ public class PdfMainService {
     return;
   }
 
-  private void descriptionFieldsTable(CaptureResponseDto data, Document document){
+  private void descriptionFieldsTable(CreatePdfDocumentDto dto, Document document){
     String[] tableFields = {"Items", "Quantity", "Total", "Subtotal"};
     PdfPTable table = new Tables(4, new float[]{55f, 15f, 15f, 15f}).createTable();
     table.setSpacingBefore(30f);

@@ -5,13 +5,13 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.common.models.stripe.invoices.submodels.CheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
+import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CheckoutSessionsDataModel {
+public class StripeCheckoutSessionsDataModel {
 
   public String id;
   public String object;
@@ -50,7 +50,7 @@ public class CheckoutSessionsDataModel {
   public String clientSecret;
   
   @JsonProperty("collected_information")
-  public Object collectedInformation;
+  public CollectedInformation collectedInformation;
   
   public Object consent;
   
@@ -187,6 +187,7 @@ public class CheckoutSessionsDataModel {
     }
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class AutomaticTax {
     public Boolean enabled;
     public Liability liability;
@@ -219,7 +220,7 @@ public class CheckoutSessionsDataModel {
         public String line2;
 
         @JsonProperty("postal_code")
-        public String postal_code;
+        public String postalCode;
 
         public String state;
       }
@@ -326,9 +327,9 @@ public class CheckoutSessionsDataModel {
     public Object breakdown;
   }
 
-  public CheckoutSessionsDataModel(){}
+  public StripeCheckoutSessionsDataModel(){}
 
-  public CheckoutSessionsDataModel(CheckoutSessionsDataModel requestBody){
+  public StripeCheckoutSessionsDataModel(StripeCheckoutSessionsDataModel requestBody){
     this.metadata = requestBody.metadata;
     this.livemode = requestBody.livemode;
     this.amountTotal = requestBody.amountTotal;
