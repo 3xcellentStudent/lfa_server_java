@@ -1,70 +1,50 @@
 package com.server.pdf.controller;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.mailer.MailerService;
 import com.server.pdf.models.CreatePdfDocumentDto;
 // import com.server.pdf.models.CaptureResponseDto;
 import com.server.pdf.services.PdfMainService;
-import com.server.pdf.services.http.HttpService;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/pdf")
 @CrossOrigin("*")
 public class PdfController {
+
+  private final Logger logger = LoggerFactory.getLogger(PdfController.class);
   
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
-  PdfMainService mainService;
-  // @PostMapping(value = "/create")
-  // public void createPdfFile(@RequestBody String body){
-  //   JSONObject jsonBody = new JSONObject(body);
-  //   JSONObject jsonResponse = new PDFService().create(new CaptureResponseObject(jsonBody));
-  //   if(jsonResponse != null){
-  //     byte[] fileBytes = (byte[]) jsonResponse.get("data");
-  //     System.out.println(fileBytes.length);
-  //     String fileName = "invoice_" + System.currentTimeMillis() + ".pdf";
-  //     HttpService.uploadPdfFile(fileBytes, fileName);
-  //     MailerService.send("lamps.for.all00@gmail.com", fileBytes, fileName, "Invoice on Your email.", "Thank You for purchasing in our store !");
-  //   } else {
-  //     // Send request from gcp to my server, saving data about error for creating pdf and send mail later. 
-  //   }
-  // }
+  private PdfMainService pdfMainService;
 
   @PostMapping("/create")
-  // public String writePdfFile(HttpServletRequest request, @RequestHeader("Content-Disposition") String contentDisposition){
   public ResponseEntity<String> createPdfFile(@RequestBody String requestBodyString){
     try {
-      System.out.println(requestBodyString);
       StripeCheckoutSessionsModel stripeCheckoutSessionsObject = objectMapper.readValue(requestBodyString, StripeCheckoutSessionsModel.class);
 
       CreatePdfDocumentDto dto = new CreatePdfDocumentDto(stripeCheckoutSessionsObject.getData().object);
-      ResponseEntity<String> response = mainService.create(dto);
+      ResponseEntity<String> responseBytes = pdfMainService.create(dto);
 
-      // return response;
-      return ResponseEntity.ok().build();
-    } catch (IOException error) {
+      return responseBytes;
+    } catch(IOException error){
       error.printStackTrace();
-      System.err.println("Failed to save file: " + error.getMessage());
-      return ResponseEntity.internalServerError().body("Failed to save file: " + error.getMessage());
+      String errorCustomMessage = "IOException occurred during HTTP request";
+      logger.error(errorCustomMessage + ": " + error.getMessage());
+      return ResponseEntity.internalServerError().body(errorCustomMessage);
     }
   }
 

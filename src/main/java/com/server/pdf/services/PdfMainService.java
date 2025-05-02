@@ -1,24 +1,18 @@
 package com.server.pdf.services;
 
 import java.awt.Color;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.Phrase;
@@ -34,10 +28,12 @@ import com.server.pdf.services.components.Tables;
 @Service
 public class PdfMainService {
 
+  private final Logger logger = LoggerFactory.getLogger(PdfMainService.class);
+
   public ResponseEntity<String> create(CreatePdfDocumentDto dto){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
-      System.out.println("Creating the PDF document...");
+      logger.info(String.format("Creating the PDF document with ID %s...", dto.invoiceId));
       final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
 
       metadata(instance);
@@ -56,17 +52,11 @@ public class PdfMainService {
       document.close();
 
       Files.write(Path.of("/home/andrew/Desktop/newfile.pdf"), outputStream.toByteArray());
-
+      logger.info(String.format("The PDF document with ID %s successfuly created !", dto.invoiceId));
       return ResponseEntity.ok(outputStream.toByteArray().toString());
-
-    } catch(DocumentException error){
-      error.printStackTrace();
-      System.err.println(error.getMessage());
-      return ResponseEntity.internalServerError()
-      .body("Something went wrong while while creating PDF document, with error message: " + error.getMessage());
     } catch(IOException error){
       error.printStackTrace();
-      System.err.println(error.getMessage());
+      logger.error("An error occurred during creating document.", error);
       return ResponseEntity.internalServerError().body(error.getMessage());
     }
   }
@@ -75,12 +65,11 @@ public class PdfMainService {
     instance.getInfo().put(PdfName.TITLE, new PdfString("Invoice #"));
     instance.getInfo().put(PdfName.CREATOR, new PdfString("version " + Document.getVersion()));
     instance.getInfo().put(PdfName.PRODUCER, new PdfString("Created by OpenPDF"));
-    instance.getInfo().put(PdfName.AUTHOR, new PdfString("Andrew Prokuda"));
+    instance.getInfo().put(PdfName.AUTHOR, new PdfString("My store name"));
     instance.getInfo().put(PdfName.SUBJECT, new PdfString("Invoice for purchased goods"));
     instance.getInfo().put(PdfName.KEYWORDS, new PdfString("invoice, payment, order, purchase"));
     instance.getInfo().put(PdfName.CREATIONDATE, new PdfString((new Date().toString())));
 
-    System.out.println("Metadata created !...");
     return;
   }
 

@@ -1,8 +1,10 @@
-package com.server.mailer;
+package com.server.mailer.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
+
+import com.server.mailer.MailerConfig;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.mailer.MailerService;
+import com.server.mailer.services.MailerService;
 import com.server.services.firebase.FirebaseService;
 
 @CrossOrigin(origins = "http://localhost:3000")
