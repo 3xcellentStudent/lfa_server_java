@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lowagie.text.Document;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
@@ -21,7 +25,7 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
-import com.server.pdf.models.CreatePdfDocumentDto;
+import com.server.pdf.dto.CreatePdfDocumentDto;
 import com.server.pdf.services.components.Cells;
 import com.server.pdf.services.components.Tables;
 
@@ -30,7 +34,10 @@ public class PdfMainService {
 
   private final Logger logger = LoggerFactory.getLogger(PdfMainService.class);
 
-  public ResponseEntity<String> create(CreatePdfDocumentDto dto){
+  @Autowired
+  private ObjectMapper objectMapper;
+
+  public ResponseEntity<Object> create(CreatePdfDocumentDto dto){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try(Document document = new Document();){
       logger.info(String.format("Creating the PDF document with ID %s...", dto.invoiceId));
@@ -51,12 +58,23 @@ public class PdfMainService {
 
       document.close();
 
-      Files.write(Path.of("/home/andrew/Desktop/newfile.pdf"), outputStream.toByteArray());
+      // Files.write(Path.of(String.format("/home/andrew/Desktop/newfile-%d.pdf", System.currentTimeMillis())), outputStream.toByteArray());
       logger.info(String.format("The PDF document with ID %s successfuly created !", dto.invoiceId));
-      return ResponseEntity.ok(outputStream.toByteArray().toString());
+
+      String fileName = String.format("newfile-%d.pdf", System.currentTimeMillis());
+
+      Map<String, Object> responseBodyMap = new HashMap<>();
+      responseBodyMap.put("fileName", fileName);
+      responseBodyMap.put("fileBytes", outputStream.toByteArray());
+      responseBodyMap.put("emailContent", dto);
+
+      String responseBodyString = objectMapper.writeValueAsString(responseBodyMap);
+
+      return ResponseEntity.ok()
+      .header("Content-Type", "application/json")
+      .body(responseBodyString);
     } catch(IOException error){
-      error.printStackTrace();
-      logger.error("An error occurred during creating document.", error);
+      logger.error("An error occurred during creating document !", error);
       return ResponseEntity.internalServerError().body(error.getMessage());
     }
   }
@@ -98,15 +116,15 @@ public class PdfMainService {
     String[][] content = {
       {
         "Customer name:", 
-        // "Customer email:", 
+        "Customer email:", 
         "Street:", 
         "Apartment/Suite:", 
         "Province/Region:",
         "City/Town:"
       },
       {
-        dto.payerName, 
-        // payer.email_address, 
+        dto.customerName, 
+        dto.customerEmail, 
         dto.address.line1,
         dto.address.line2,
         dto.address.state,

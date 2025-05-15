@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.pdf.models.CreatePdfDocumentDto;
-// import com.server.pdf.models.CaptureResponseDto;
+import com.server.pdf.dto.CreatePdfDocumentDto;
 import com.server.pdf.services.PdfMainService;
 
 
@@ -32,29 +30,17 @@ public class PdfController {
   private PdfMainService pdfMainService;
 
   @PostMapping("/create")
-  public ResponseEntity<String> createPdfFile(@RequestBody String requestBodyString){
+  public ResponseEntity<Object> createPdfFile(@RequestBody String requestBodyString){
     try {
-      StripeCheckoutSessionsModel stripeCheckoutSessionsObject = objectMapper.readValue(requestBodyString, StripeCheckoutSessionsModel.class);
+      CreatePdfDocumentDto dto = objectMapper.readValue(requestBodyString, CreatePdfDocumentDto.class);
+      
+      ResponseEntity<Object> response = pdfMainService.create(dto);
 
-      CreatePdfDocumentDto dto = new CreatePdfDocumentDto(stripeCheckoutSessionsObject.getData().object);
-      ResponseEntity<String> responseBytes = pdfMainService.create(dto);
-
-      return responseBytes;
+      return response;
     } catch(IOException error){
-      error.printStackTrace();
-      String errorCustomMessage = "IOException occurred during HTTP request";
-      logger.error(errorCustomMessage + ": " + error.getMessage());
-      return ResponseEntity.internalServerError().body(errorCustomMessage);
+      String message = "I/O exception occurred during HTTP request !";
+      logger.error(message + ": " + error.getCause().getMessage());
+      return ResponseEntity.internalServerError().body(message);
     }
   }
-
-  // private String extractFileName(String contentDisposition) {
-  //   String[] parts = contentDisposition.split(";");
-  //   for (String part : parts) {
-  //     if (part.trim().startsWith("filename=")) {
-  //       return part.split("=")[1].trim().replaceAll("\"", "");
-  //     }
-  //   }
-  //   return null;
-  // }
 }

@@ -7,50 +7,71 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.time.Duration;
-import java.io.IOException; // import java.io.IOException for handling IOException
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException; // import java.util.concurrent.CompletionException for handling CompletionException
+import java.io.IOException;
+import java.util.concurrent.CompletionException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.common.dto.coordinator.AfterCreationStripeInvoiceDto;
+import com.server.coordinator.services.mailer.MailerServiceApi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class PdfServiceApi {
   
   private final String pdfCreateDocEndpoint = "http://localhost:5000/api/pdf/create";
-  // amazonq-ignore-next-line
+
   private final HttpClient client = HttpClient.newHttpClient();
   private static final Logger logger = LoggerFactory.getLogger(PdfServiceApi.class);
 
-  public CompletableFuture<Void> createPdfDocument(String requestBodyString){
+  @Autowired
+  private MailerServiceApi mailerServiceApi;
+  @Autowired
+  private ObjectMapper objectMapper;
 
+  public void createPdfDocument(AfterCreationStripeInvoiceDto stripeInvoiceDto){
     try {
-      HttpRequest request = HttpRequest.newBuilder().uri(new URI(pdfCreateDocEndpoint))
-      // amazonq-ignore-next-line
-      .header("Content-Type", "application/json").timeout(Duration.ofSeconds(5))
-      .POST(BodyPublishers.ofString(requestBodyString)).build();
+      String requestDtoStringPdf = objectMapper.writeValueAsString(stripeInvoiceDto);
 
-      return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-      .thenAcceptAsync(response -> {
-        logger.info("PDF document created successfully");
-      })
-      .exceptionallyAsync(error -> {
-        if(error instanceof CompletionException && error.getCause() instanceof IOException){
-          logger.error("IOException occurred during HTTP request: {}", error.getCause().getMessage());
-        } else if(error instanceof CompletionException && error.getCause() instanceof InterruptedException){
-          logger.error("InterruptedException occurred during HTTP request: {}", error.getCause().getMessage());
-          Thread.currentThread().interrupt();
-        } else {
-          logger.error("An error occurred during HTTP request", error);
-        }
-        return null;
-      });
+      HttpRequest request = HttpRequest.newBuilder().uri(new URI(pdfCreateDocEndpoint))
+      .header("Content-Type", "application/json")
+      .timeout(Duration.ofSeconds(10))
+      .POST(BodyPublishers.ofString(requestDtoStringPdf)).build();
+
+      client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+      .thenAcceptAsync(response -> fulfilled(response))
+      .exceptionallyAsync(error -> rejected(error));
     } catch(URISyntaxException error){
-      logger.error("URISyntaxException occurred", error);
-      return CompletableFuture.failedFuture(error);
+      logger.error("Invalid URI.", error);
+    } catch(IOException error){
+      logger.error("An error occurred during HTTP operations.", error);
     }
+  }
+
+  private void fulfilled(HttpResponse<String> response){
+    if(response.statusCode() == 200){
+      logger.info("PDF document created successfully");
+      mailerServiceApi.send(response.body());
+    } else {
+      logger.error("PDF document creation failed");
+    }
+  }
+
+  private Void rejected(Throwable error){
+    if(error instanceof CompletionException && error.getCause() instanceof IOException){
+      logger.error("IOException occurred during HTTP request: ", error.getCause().getMessage());
+    } else if(error instanceof CompletionException && error.getCause() instanceof InterruptedException){
+      logger.error("InterruptedException occurred during HTTP request: ", error.getCause().getMessage());
+      Thread.currentThread().interrupt();
+    } else {
+      logger.error("An error occurred during HTTP request", error);
+    }
+    return null;
   }
 
 }

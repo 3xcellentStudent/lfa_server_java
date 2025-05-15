@@ -1,15 +1,23 @@
 package com.server.mailer.services;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.server.mailer.MailerConfig;
+import com.server.mailer.config.MailerConfig;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -25,6 +33,10 @@ public class MailerService {
 
 	@Autowired
 	private MailerConfig mailerConfig;
+	@Autowired
+	private Environment env;
+
+	private Logger logger = org.slf4j.LoggerFactory.getLogger(MailerService.class);
 
   public boolean send(String emailTo, byte[] attachmentData, String attachmentName, String subject, String text){
 		try {
@@ -39,6 +51,7 @@ public class MailerService {
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(emailTo));
 			message.setSubject(subject);
 
+			getBytesOfTemplate();
 			String htmlContent = "<h2>Hello, this letter from Andrew to Andrew :)</h2>";
 	
 			MimeBodyPart htmlPart = new MimeBodyPart();
@@ -60,10 +73,31 @@ public class MailerService {
 	
 			Transport.send(message);
 			return true;
-		} catch (Exception error) {
-			System.out.println(error.getMessage());
-			error.printStackTrace();
+		} catch (MessagingException error) {
+			String message = "An error occurred while sending email to customer !";
+			logger.error(message, error);
 			return false;
 		}
 	}
+
+	private void getBytesOfTemplate(){
+		String stringUrl = env.getProperty("email.templates.common");
+		try {
+			ClassLoader classLoader = getClass().getClassLoader();
+			URL resource = classLoader.getResource(stringUrl);
+			
+			if (resource == null) {
+				throw new IllegalArgumentException("HTML template not found !");
+			}
+			
+			String fileString = Files.readString(Path.of(resource.toURI()));
+
+			System.out.println(fileString.replace("%s", "Hello Andrew"));
+		} catch (IOException error) {
+			logger.error("Error occured while reading HTML template for writing email letter to customer !", error);
+		} catch (URISyntaxException error) {
+			logger.error("Wrong URL to html template !", error);
+		}
+	}
+
 }

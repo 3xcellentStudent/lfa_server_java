@@ -1,4 +1,4 @@
-package com.server.pdf.models;
+package com.server.pdf.dto;
 
 import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel;
 import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
@@ -11,7 +11,8 @@ public class CreatePdfDocumentDto {
   public Long created;
   public String currency;
   public String paymentStatus;
-  public String payerName;
+  public String customerName;
+  public String customerEmail;
 
   public CreatePdfDocumentDto(){}
 
@@ -23,7 +24,8 @@ public class CreatePdfDocumentDto {
     this.created = dataModel.created;
     this.currency = dataModel.currency;
     this.paymentStatus = dataModel.paymentStatus;
-    this.payerName = dataModel.collectedInformation.shippingDetails.name;
+    this.customerName = dataModel.collectedInformation.shippingDetails.name;
+    this.customerEmail = dataModel.customerDetails.email;
   }
 
 }

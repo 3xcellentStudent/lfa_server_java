@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document(collection = "stripe_invoices")
+// @Document(collection = "stripe_invoices")
 public class StripeCheckoutSessionsModel {
   public String id;
   public String object;
@@ -47,7 +47,7 @@ public class StripeCheckoutSessionsModel {
   public Long getCreated(){
     return this.created;
   }
-  public DataObject getData(){
+  public DataObject getStripeData(){
     return this.data;
   }
   public Boolean getLivemode(){

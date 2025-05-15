@@ -1,4 +1,4 @@
-package com.server.mailer;
+package com.server.mailer.config;
 
 import java.util.Properties;
 
@@ -11,31 +11,6 @@ public class MailerConfig {
 
   @Autowired
 	private Environment env;
-  
-  // public Properties getProperties(){
-    // Properties properties = new Properties();
-    // properties.setProperty("mail.transport.protocol", "smtp");
-    // properties.setProperty("mail.host", "smtp.gmail.com");
-    // properties.put("mail.smtp.auth", "true");
-    // properties.put("mail.smtp.port", "587");
-    // properties.put("mail.smtp.starttls.enable", "true");
-    // properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-
-
-  //   Properties properties = new Properties();
-  //   properties.setProperty("mail.transport.protocol", mailerConfigProperties.getTransportProtocol());
-  //   properties.setProperty("mail.host", mailerConfigProperties.getHost());
-  //   properties.put("mail.smtp.auth", mailerConfigProperties.getAuth());
-  //   properties.put("mail.smtp.port", mailerConfigProperties.getPort());
-  //   properties.put("mail.smtp.starttls.enable", mailerConfigProperties.getStarttlsEnable());
-  //   properties.put("mail.smtp.ssl.trust", mailerConfigProperties.getSslTrust());
-    
-  //   return properties;
-  // }
-
-  // public static String getUsername(){return "lamps.for.all00@gmail.com";}
-
-  // public static String getPassword(){return "slgifhmoptjpqkpu";}
 
   public MailerConfig(){}
 

@@ -29,10 +29,16 @@ public class MongodbStripeInvoicesController {
   @Autowired
   private MongoDbMainService mainService;
 
-  @PutMapping("/save")
-  public ResponseEntity<Object> save(@RequestBody String requestBodyString){
-    System.out.println(requestBodyString);
+  @PostMapping("/create")
+  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     ResponseEntity<Object> savedPaymentObject = invoicesService.createOne(requestBodyString);
+
+    return savedPaymentObject;
+  }
+
+  @PutMapping("/update")
+  public ResponseEntity<Object> update(@RequestBody String requestBodyString){
+    ResponseEntity<Object> savedPaymentObject = invoicesService.updateOne(requestBodyString, requestBodyString);
 
     return savedPaymentObject;
   }

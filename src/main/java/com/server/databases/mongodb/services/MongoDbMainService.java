@@ -11,17 +11,12 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.DuplicateKeyException;
-import com.mongodb.MongoSocketException;
-import com.mongodb.MongoTimeoutException;
 import com.mongodb.client.result.UpdateResult;
 import com.server.databases.mongodb.helpers.bodies.DeleteManyFromArray;
 import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
-import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
 
 @Service
 public class MongoDbMainService {

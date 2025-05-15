@@ -1,82 +1,47 @@
 package com.server.stripe.helpers.services.thirdParty;
 
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletionException;
 
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.server.stripe.helpers.CreateHttpUrlConnection;
-import com.server.stripe.helpers.services.ResponseReader;
 
 @Service
 public class RequestsToServices {
 
-  private final String mailerSendEmailEndpoint = "http://localhost:5000/api/mailer/";
+  // private final String mongodbSaveDataEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
+  // private final String mailerSendEmailEndpoint = "http://localhost:5000/api/mailer/";
+  private final String pdfCreateEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
 
-  public ResponseEntity<Object> sendEmail(HttpURLConnection connection, String requestBodyString){
-    try {
-      OutputStream outputStream = connection.getOutputStream();
-      byte[] bytes = requestBodyString.getBytes();
-      outputStream.write(bytes);
-      outputStream.close();
+  private final Logger logger = org.slf4j.LoggerFactory.getLogger(RequestsToServices.class);
 
-      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
+  private HttpClient httpClient = HttpClient.newHttpClient();
 
-      return ResponseEntity.ok(responseString);
-    } catch (Exception error) {
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().build();
-    }
-  }
+  // public ResponseEntity<String> createPdf(String requestBodyString){
+  //   HttpRequest httpRequest = HttpRequest.newBuilder()
+  //   .uri(java.net.URI.create(pdfCreateEndpoint))
+  //   .header("Content-Type", "application/json")
+  //   .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
+  //   .build();
 
-  public ResponseEntity<Object> createPdf(HttpURLConnection connection, String requestBodyString){
-    try {
-      OutputStream outputStream = connection.getOutputStream();
-      byte[] bytes = requestBodyString.getBytes();
-      outputStream.write(bytes);
-      outputStream.close();
+  //   try {
+  //     String responseBodyString = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+  //     .thenApply(HttpResponse::body)
+  //     .join();
 
-      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
+  //     String responseString = responseReader.readStripeCheckoutSessionCompleted(responseBodyString);
 
-      if(connection.getResponseCode() == 200){
-        HttpURLConnection connectionSendEmail = CreateHttpUrlConnection
-        .connect(mailerSendEmailEndpoint, "POST", "application/json");
-        connectionSendEmail.setDoInput(true);
-        connectionSendEmail.setDoOutput(true);
-  
-        ResponseEntity<Object> emailServiceResponse = sendEmail(connectionSendEmail, requestBodyString);
-  
-        connectionSendEmail.disconnect();
-
-        return emailServiceResponse;
-      } else {
-        return ResponseEntity.badRequest().body(responseString);
-      }
-
-    } catch (Exception error) {
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().body(error.getMessage());
-    }
-  }
-
-  public ResponseEntity<Object> saveInDb(HttpURLConnection connection, String requestBodyString){
-    try {
-      OutputStream outputStream = connection.getOutputStream();
-      byte[] bytes = requestBodyString.getBytes();
-      outputStream.write(bytes);
-      outputStream.close();
-
-      String responseString = ResponseReader.readStripeCheckoutSessionCompleted(connection);
-
-      return ResponseEntity.ok(responseString);
-    } catch (Exception error) {
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().build();
-    }
-  }
+  //     return ResponseEntity.ok(responseString);
+  //   } catch (CompletionException error){
+  //     String message = "Error occured while HTTP request to PDF service failed !";
+  //     logger.error(message, error);
+  //     return ResponseEntity.internalServerError()
+  //     .body(message);
+  //   }
+  // }
 
 }
