@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mailing-scenario xmlns='http://www.canadapost.ca/ws/ship/rate-v4'>
+  <customer-number>%s</customer-number>
+  <parcel-characteristics>
+    <weight>%d</weight>
+    <dimensions>
+      <length>%d</length>
+      <width>%d</width>
+      <height>%d</height>
+    </dimensions>
+  </parcel-characteristics>
+  <origin-postal-code>%S</origin-postal-code>
+  <destination>
+    <domestic>
+      <postal-code>%S</postal-code>
+    </domestic>
+  </destination>
+</mailing-scenario>

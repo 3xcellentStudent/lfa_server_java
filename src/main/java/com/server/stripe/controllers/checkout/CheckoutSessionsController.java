@@ -17,33 +17,15 @@ import com.server.stripe.services.checkout.CheckoutCreateSessionService;
 @CrossOrigin("*")
 public class CheckoutSessionsController {
 
-  // private final String mongodbSaveDataEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
-  // private final String pdfCreateEndpoint = "http://localhost:5000/api/mongodb/invoices/stripe/save";
-  // private final String mailerSendEmailEndpoint = "http://localhost:5000/api/mailer/";
-
   @Autowired
   private CheckoutCreateSessionService createSessionService;
-  // @Autowired
-  // private RequestsToServices requestsToServices;
   
   @PostMapping("/create")
   public ResponseEntity<Object> createCheckout(@RequestBody String requestBodyString){
-    // HttpURLConnection connection = CreateHttpUrlConnection
-    // .connect(stripeCheckoutEndpoint, "POST", "application/x-www-form-urlencoded");
-
-    // connection.setRequestProperty("Authorization", "Bearer " + tokenSecret);
-    // connection.setRequestProperty("Stripe-Version", "2025-03-31.basil");
-    // connection.setDoInput(true);
-    // connection.setDoOutput(true);
-
-    ResponseEntity<Object> response = createSessionService.create(requestBodyString);
-
-    // connection.disconnect();
-
-    return response;
+    System.out.println(requestBodyString);
+    return createSessionService.create(requestBodyString);
   }
 
-  // @PostMapping("/save")
   // public ResponseEntity<Object> save(@RequestBody String requestBodyString){
   //   try {
   //     HttpURLConnection mongodbConnection = CreateHttpUrlConnection

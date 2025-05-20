@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.api.helpers.paypal.CreateResponse;
-import com.server.api.helpers.paypal.PayPalRoutes;
 import com.server.databases.redis.service.RedisService;
 import com.server.paypal.services.PayPalCaptureOrder;
 import com.server.paypal.services.PayPalCreateOrder;
@@ -26,69 +24,69 @@ public class PayPalController {
   public static final String HASH_KEY = "PayPalToken";
   private RedisService redis = new RedisService();
 
-  @PostMapping(value = PayPalRoutes.ENDPOINT_CREATE_ORDER)
-  public ResponseEntity<String> createOrder(@RequestBody String body){
-    try {
-      JSONObject jsonData = redis.getToken(HASH_KEY);
-      if(jsonData.getInt("status") == 200){
-        String accessToken = jsonData.getString("data");
-        int status = jsonData.getInt("status");
+  // @PostMapping(value = PayPalRoutes.ENDPOINT_CREATE_ORDER)
+  // public ResponseEntity<String> createOrder(@RequestBody String body){
+  //   try {
+  //     JSONObject jsonData = redis.getToken(HASH_KEY);
+  //     if(jsonData.getInt("status") == 200){
+  //       String accessToken = jsonData.getString("data");
+  //       int status = jsonData.getInt("status");
 
-        if(status >= 400){return CreateResponse.toEntity(404, accessToken);} 
-        else {return PayPalCreateOrder.createOrder(accessToken);}
-      } else {
-        String message = "Got error while requesting token in Redis !";
-        return CreateResponse.toEntity(500, message);
-      }
-    } catch(Exception error){
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return CreateResponse.toEntity(500, "Server error !");
-    }
-  }
+  //       if(status >= 400){return CreateResponse.toEntity(404, accessToken);} 
+  //       else {return PayPalCreateOrder.createOrder(accessToken);}
+  //     } else {
+  //       String message = "Got error while requesting token in Redis !";
+  //       return CreateResponse.toEntity(500, message);
+  //     }
+  //   } catch(Exception error){
+  //     System.err.println(error.getMessage());
+  //     error.printStackTrace();
+  //     return CreateResponse.toEntity(500, "Server error !");
+  //   }
+  // }
 
-  @PostMapping(value = PayPalRoutes.ENDPOINT_CAPTURE_ORDER)
-  public ResponseEntity<String> captureOrder(@RequestParam String orderId){
-    String sysMessage = String.format("Capturing order with orderId: %s...", orderId);
-    System.out.println(sysMessage);
-    try {
-      JSONObject jsonRedisData = redis.getToken(HASH_KEY);
-      if(jsonRedisData.getInt("status") == 200){
-        String accessToken = jsonRedisData.getString("data");
-        int status = jsonRedisData.getInt("status");
-        if(status >= 400){return CreateResponse.toEntity(404, jsonRedisData);}
-        else {
-          String orderDetails = PayPalCaptureOrder.getOrderDetails(orderId, accessToken);
-          String orderStatus = new JSONObject(orderDetails).getString("status");
-          if(orderStatus.contains("APPROVED")){
-            JSONObject response = PayPalCaptureOrder.captureOrder(orderId, accessToken);
-            System.out.println("Captured response status: " + response.getString("status"));
-            return PayPalCaptureOrder.isCapturedOrder(response);
-          } else {
-            return CreateResponse.toEntity(404, "You are canceled this order !");
-          }
-        }
-      } else {
-        System.out.println("Server error. Something went wrong at \"PayPalController.java\" !");
-        return CreateResponse.toEntity(404, "Can't find token at database !");
-      }
-    } catch(Exception error){
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return CreateResponse.toEntity(500, "Server error !");
-    }
-  }
+  // @PostMapping(value = PayPalRoutes.ENDPOINT_CAPTURE_ORDER)
+  // public ResponseEntity<String> captureOrder(@RequestParam String orderId){
+  //   String sysMessage = String.format("Capturing order with orderId: %s...", orderId);
+  //   System.out.println(sysMessage);
+  //   try {
+  //     JSONObject jsonRedisData = redis.getToken(HASH_KEY);
+  //     if(jsonRedisData.getInt("status") == 200){
+  //       String accessToken = jsonRedisData.getString("data");
+  //       int status = jsonRedisData.getInt("status");
+  //       if(status >= 400){return CreateResponse.toEntity(404, jsonRedisData);}
+  //       else {
+  //         String orderDetails = PayPalCaptureOrder.getOrderDetails(orderId, accessToken);
+  //         String orderStatus = new JSONObject(orderDetails).getString("status");
+  //         if(orderStatus.contains("APPROVED")){
+  //           JSONObject response = PayPalCaptureOrder.captureOrder(orderId, accessToken);
+  //           System.out.println("Captured response status: " + response.getString("status"));
+  //           return PayPalCaptureOrder.isCapturedOrder(response);
+  //         } else {
+  //           return CreateResponse.toEntity(404, "You are canceled this order !");
+  //         }
+  //       }
+  //     } else {
+  //       System.out.println("Server error. Something went wrong at \"PayPalController.java\" !");
+  //       return CreateResponse.toEntity(404, "Can't find token at database !");
+  //     }
+  //   } catch(Exception error){
+  //     System.err.println(error.getMessage());
+  //     error.printStackTrace();
+  //     return CreateResponse.toEntity(500, "Server error !");
+  //   }
+  // }
 
-  @PostMapping("/create-pdf")
-  public void createPdf(@RequestBody String body){
-    System.out.println(body);
+  // @PostMapping("/create-pdf")
+  // public void createPdf(@RequestBody String body){
+  //   System.out.println(body);
     
-    JSONObject jsonBody = new JSONObject(body);
-    // String message = jsonBody.getString("data");
+  //   JSONObject jsonBody = new JSONObject(body);
+  //   // String message = jsonBody.getString("data");
     
-    // new PDFService().create(message);
-    // new PdfMainService().create(new CaptureResponseDto(jsonBody));
-  }
+  //   // new PDFService().create(message);
+  //   // new PdfMainService().create(new CaptureResponseDto(jsonBody));
+  // }
 
 
 

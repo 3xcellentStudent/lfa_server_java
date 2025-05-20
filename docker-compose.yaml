@@ -1,0 +1,8 @@
+services:
+  spring-app:
+    build: .
+    ports:
+      - "5000:5000"
+    container_name: spring-boot-app
+    environment:
+     - MY_NAME=Andrew

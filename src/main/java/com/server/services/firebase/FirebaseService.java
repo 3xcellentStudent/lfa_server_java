@@ -13,30 +13,30 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
-import com.server.heplers.FirebaseHelper;
+// import com.server.heplers.FirebaseHelper;
 
 // @Service
 public class FirebaseService {
   private Firestore firestore = FirestoreClient.getFirestore();
 
-  public ResponseEntity<JSONObject> readDocument(String collName, String docName){
-    DocumentReference document = firestore.collection(collName).document(docName);
-    ApiFuture<DocumentSnapshot> data = document.get();
-    try {
-      DocumentSnapshot snapshot = data.get();
-      if(snapshot.exists()) return FirebaseHelper.resEntityJSON(200, snapshot.getData());
-      else return FirebaseHelper.resEntityJSON(204, "Document not found!");
-    } catch(Exception err){return FirebaseHelper.resEntityJSON(500, err);}
-  }
+  // public ResponseEntity<JSONObject> readDocument(String collName, String docName){
+  //   DocumentReference document = firestore.collection(collName).document(docName);
+  //   ApiFuture<DocumentSnapshot> data = document.get();
+  //   try {
+  //     DocumentSnapshot snapshot = data.get();
+  //     if(snapshot.exists()) return FirebaseHelper.resEntityJSON(200, snapshot.getData());
+  //     else return FirebaseHelper.resEntityJSON(204, "Document not found!");
+  //   } catch(Exception err){return FirebaseHelper.resEntityJSON(500, err);}
+  // }
 
-  public ResponseEntity<JSONObject> readCollection(String collName){
-    CollectionReference collection = firestore.collection(collName);
-    ApiFuture<QuerySnapshot> snapshot = collection.get();
-    try {
-      List<QueryDocumentSnapshot> documents = snapshot.get().getDocuments();
-      return FirebaseHelper.resEntityJSON(201, documents);
-    } catch(Exception err){return FirebaseHelper.resEntityJSON(500, err);}
-  }
+  // public ResponseEntity<JSONObject> readCollection(String collName){
+  //   CollectionReference collection = firestore.collection(collName);
+  //   ApiFuture<QuerySnapshot> snapshot = collection.get();
+  //   try {
+  //     List<QueryDocumentSnapshot> documents = snapshot.get().getDocuments();
+  //     return FirebaseHelper.resEntityJSON(201, documents);
+  //   } catch(Exception err){return FirebaseHelper.resEntityJSON(500, err);}
+  // }
 
   public int postDocument(String collName, Object data){
     CollectionReference collection = firestore.collection(collName);

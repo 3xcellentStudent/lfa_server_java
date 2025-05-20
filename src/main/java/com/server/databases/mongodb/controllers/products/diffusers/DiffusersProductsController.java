@@ -21,7 +21,7 @@ import com.server.databases.mongodb.services.products.diffusers.DiffusersProduct
 @RequestMapping("/api/mongodb/products/diffusers")
 @CrossOrigin("*")
 public class DiffusersProductsController {
-  
+
   @Autowired
   private DiffusersProductsService productsService;
   @Autowired
@@ -29,15 +29,7 @@ public class DiffusersProductsController {
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
-    try {
-      ResponseEntity<Object> response = productsService.createOne(requestBodyString);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't add new product to database !");
-    }
+    return productsService.createOne(requestBodyString);
   }
 
   @PatchMapping("/update")
@@ -55,77 +47,37 @@ public class DiffusersProductsController {
 
   @GetMapping("/find")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
-    try {
-      if(id == null || id.isEmpty()){
-        ResponseEntity<Object> response = mainService.findAll(DiffusersProductsModel.class);
+    if(id == null || id.isEmpty()){
+      ResponseEntity<Object> response = mainService.findAll(DiffusersProductsModel.class);
 
-        return response;
-      } else {
-        // ResponseEntity<Object> response = mainService.findAllById("id", id, DiffusersProductsModel.class);
-        List<DiffusersProductsModel> foundProducts = mainService.findAllById("id", id, DiffusersProductsModel.class);
+      return response;
+    } else {
+      List<DiffusersProductsModel> foundProducts = mainService.findAllById("id", id, DiffusersProductsModel.class);
 
-        ResponseEntity<Object> response = mainService.getAsResponseEntity(foundProducts);
-  
-        return response;
-      }
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Internal server error: " + error.getMessage());
+      ResponseEntity<Object> response = mainService.getAsResponseEntity(foundProducts);
+
+      return response;
     }
   }
 
   @GetMapping("/find/recursive")
   public ResponseEntity<Object> findAllByIdRecursive(@RequestParam List<String> id){
-    try {
-      ResponseEntity<Object> response = productsService.findAllRecursive(id);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Internal server error: " + error.getMessage());
-    }
+    return productsService.findAllRecursive(id);
   }
 
   @GetMapping("/delete")
   public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id){
-    try {
-      ResponseEntity<Object> response =  mainService.deleteAllById(id, DiffusersProductsModel.class);
-      
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't delete product by ID from database !");
-    }
+    return mainService.deleteAllById(id, DiffusersProductsModel.class);
   }
 
   @GetMapping("/delete/recursive")
   public ResponseEntity<Object> deleteAllByIdRecursive(@RequestParam List<String> id){
-    try {
-      ResponseEntity<Object> response = productsService.deleteRecursiveById(id);
-      
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't delete product by ID from database !");
-    }
+      return productsService.deleteRecursiveById(id);
   }
 
   @GetMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(){
     return mainService.clearCollection(DiffusersProductsModel.class);
-    // try {
-    //   mongoTemplate.remove(new Query(), DiffusersProductsModel.class);
-
-    //   return ResponseEntity.ok("All products have been removed from database !");
-    // } catch(Exception error){
-    //   error.printStackTrace();
-    //   System.out.println(error.getMessage());
-    //   return ResponseEntity.internalServerError().body("Can't delete products from database !");
-    // }
   }
   
 }

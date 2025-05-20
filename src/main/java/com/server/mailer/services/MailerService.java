@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class MailerService {
 	@Autowired
 	private Environment env;
 
-	private Logger logger = org.slf4j.LoggerFactory.getLogger(MailerService.class);
+	private Logger logger = LoggerFactory.getLogger(MailerService.class);
 
   public boolean send(String emailTo, byte[] attachmentData, String attachmentName, String subject, String text){
 		try {

@@ -8,8 +8,11 @@ import java.time.Duration;
 import java.util.Base64;
 
 public class PayPalAuth {
-  private final String client_id = "ATHQwc_7vusceyesHb517p7px8cvZZiQttp0aJwEXovWdahlvn_dkkerAETa8LmZe-0aETwoWGSzPFKB";
-  private final String client_secret = "EJfGzL6oUru26ztZlq2vehmpVTvB2LGl6vJg2t5BjxNpChZfTxSqOeMtyf6G0n4aPraY78O-9Z0xeRzw";
+  // private final String client_id = "ATHQwc_7vusceyesHb517p7px8cvZZiQttp0aJwEXovWdahlvn_dkkerAETa8LmZe-0aETwoWGSzPFKB";
+  // private final String client_secret = "EJfGzL6oUru26ztZlq2vehmpVTvB2LGl6vJg2t5BjxNpChZfTxSqOeMtyf6G0n4aPraY78O-9Z0xeRzw";
+  
+  private final String client_id = "";
+  private final String client_secret = "";
   
   private String body = "grant_type=client_credentials";
   private String URL = "https://api-m.sandbox.paypal.com/v1/oauth2/token";

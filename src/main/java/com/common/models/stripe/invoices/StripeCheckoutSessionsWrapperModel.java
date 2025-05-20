@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Document(collection = "stripe_invoices")
 public class StripeCheckoutSessionsWrapperModel {
   @Id
-  private String invoiceId;
+  public String invoiceId;
   public StripeCheckoutSessionsModel stripeObject;
   public Delivery delivery;
   public OrderStatus orderStatus;
@@ -23,6 +23,7 @@ public class StripeCheckoutSessionsWrapperModel {
     public String trackingNumber;
     public String trackingUrl;
     public String carrier;
+    public String price;
   }
 
   public class OrderStatus {
