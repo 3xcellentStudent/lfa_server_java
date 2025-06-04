@@ -34,7 +34,7 @@ public class PaymentIntentsService {
       requestBody.append("&capture_method=automatic");
       requestBody.append("&payment_method_data[type]=card");
       // requestBody.append("&receipt_email=");
-      requestBody.append("&amount=" + requestBodyObject.unitAmount);
+      // requestBody.append("&amount=" + requestBodyObject.unitAmount);
       requestBody.append("&automatic_payment_methods[enabled]=true");
       requestBody.append("&return_url=").append(URLEncoder.encode("http://localhost:5000/api/stripe/checkout/sessions/capture", "UTF-8"));
 

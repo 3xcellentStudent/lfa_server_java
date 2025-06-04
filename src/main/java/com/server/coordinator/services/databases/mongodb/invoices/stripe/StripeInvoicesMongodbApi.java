@@ -35,9 +35,12 @@ public class StripeInvoicesMongodbApi {
 
   public void saveInDatabase(String requestBodyString){
     try {
-      HttpRequest request = HttpRequest.newBuilder().uri(new URI(mongodbStripeInvoicesSaveEndpoint))
-      .header("Content-Type", "application/json").timeout(Duration.ofSeconds(10))
-      .POST(BodyPublishers.ofString(requestBodyString)).build();
+      HttpRequest request = HttpRequest.newBuilder()
+      .uri(new URI(mongodbStripeInvoicesSaveEndpoint))
+      .header("Content-Type", "application/json")
+      .timeout(Duration.ofSeconds(5))
+      .POST(BodyPublishers.ofString(requestBodyString))
+      .build();
   
       HttpClient client = HttpClient.newHttpClient();
   

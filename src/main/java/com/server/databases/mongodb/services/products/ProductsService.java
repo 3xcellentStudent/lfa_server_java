@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.services.products.diffusers;
+package com.server.databases.mongodb.services.products;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,35 +7,33 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
-import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
+import com.server.databases.mongodb.models.products.ProductsModel;
 import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.diffusers.DiffusersMediaService;
 import com.server.databases.mongodb.services.uuid.CustomUUID;
 
 @Service
-public class DiffusersProductsService {
+public class ProductsService {
 
   @Autowired
   private DiffusersMediaService mediaService;
   @Autowired
   private MongoTemplate mongoTemplate;
   @Autowired
-  private MongoDbMainService mainService;
-  @Autowired
   private ObjectMapper objectMapper;
 
-  public ResponseEntity<Object> createOne(String requestBodyString){
+  public ResponseEntity<Object> createOne(ProductsModel productObject, String collectionName){
     try {
-      DiffusersProductsModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersProductsModel.class);
-      String id = CustomUUID.fromString(new String[] {requestBodyObject.title, requestBodyObject.stockInfo.category});
-      boolean isExists = mongoTemplate.exists(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
+      String id = CustomUUID.fromString(new String[] {productObject.getTitle(), productObject.getStockInfo().category});
+      Query query = Query.query(Criteria.where("id").is(id));
+      boolean isExists = mongoTemplate.exists(query, ProductsModel.class, collectionName);
       
       if(isExists == false){
         String mediaId = CustomUUID.fromString(id);
@@ -44,12 +42,12 @@ public class DiffusersProductsService {
   
         Object mediaServiceEntity = mediaService.createOne(mediaId, id, timestamp).getBody();
       
-        requestBodyObject.setId(id);
-        requestBodyObject.setMediaId(mediaId);
-        requestBodyObject.setCreateTime(timestamp);
-        requestBodyObject.setUpdateTime(timestamp);
+        productObject.setId(id);
+        productObject.setMediaId(mediaId);
+        productObject.setCreatedAt(timestamp);
+        productObject.setUpdatedAt(timestamp);
 
-        DiffusersProductsModel savedProduct = mongoTemplate.save(requestBodyObject);
+        ProductsModel savedProduct = mongoTemplate.save(productObject, collectionName);
         
         savedProduct.setMediaContent((DiffusersMediaModel) mediaServiceEntity);
 
@@ -66,11 +64,12 @@ public class DiffusersProductsService {
     }
   }
 
-  public ResponseEntity<Object> findAllRecursive(List<String> id){
+  public ResponseEntity<Object> findAllRecursiveById(List<String> id){
     try {
-      List<DiffusersProductsModel> foundProducts = mongoTemplate
-      .find(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
-      List<DiffusersProductsModel> modifiedProducts = modifyProducts(foundProducts);
+      Query query = Query.query(Criteria.where("id").in(id));
+      List<ProductsModel> foundProducts = mongoTemplate
+      .find(query, ProductsModel.class);
+      List<ProductsModel> modifiedProducts = modifyProducts(foundProducts);
 
       String response = objectMapper.writeValueAsString(modifiedProducts);
 
@@ -84,12 +83,12 @@ public class DiffusersProductsService {
 
   public ResponseEntity<Object> deleteRecursiveById(List<String> id){
     try {
-      List<DiffusersProductsModel> removedProducts = mongoTemplate
-      .findAllAndRemove(QueriesHelper.getId("id", id), DiffusersProductsModel.class);
+      List<ProductsModel> removedProducts = mongoTemplate
+      .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductsModel.class);
       List<DiffusersReviewsModel> removedReviews = mongoTemplate
-      .findAllAndRemove(QueriesHelper.getId("parentId", id), DiffusersReviewsModel.class);
+      .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), DiffusersReviewsModel.class);
       List<DiffusersMediaModel> removedMedia = mongoTemplate
-      .findAllAndRemove(QueriesHelper.getId("parentId", id), DiffusersMediaModel.class);
+      .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), DiffusersMediaModel.class);
 
       Map<String, Object> jsonBody = new HashMap<>();
       jsonBody.put("products", removedProducts);
@@ -106,9 +105,9 @@ public class DiffusersProductsService {
     }
   }
 
-  private List<DiffusersProductsModel> modifyProducts(List<DiffusersProductsModel> productsList){
+  private List<ProductsModel> modifyProducts(List<ProductsModel> productsList){
     try {
-      List<DiffusersProductsModel> modifiedProductsList = productsList.stream()
+      List<ProductsModel> modifiedProductsList = productsList.stream()
       .map(oneObject -> {
         // List<DiffusersReviewsModel> reviewsList = mainService
         // .findAllById("parentId", oneObject.getId(), DiffusersReviewsModel.class);

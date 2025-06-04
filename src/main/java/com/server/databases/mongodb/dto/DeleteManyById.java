@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.helpers.bodies;
+package com.server.databases.mongodb.dto;
 
 import java.util.List;
 

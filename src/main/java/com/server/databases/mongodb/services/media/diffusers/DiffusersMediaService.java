@@ -2,11 +2,12 @@ package com.server.databases.mongodb.services.media.diffusers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
 
 @Service
@@ -43,7 +44,10 @@ public class DiffusersMediaService {
     try {
       DiffusersMediaModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersMediaModel.class);
       String id = requestBodyObject.getId();
-      boolean isExists = mongoTemplate.exists(QueriesHelper.getId("id", id), DiffusersMediaModel.class);
+
+      Query query = Query.query(Criteria.where("id").is(id));
+
+      boolean isExists = mongoTemplate.exists(query, DiffusersMediaModel.class);
       if(isExists){
         return ResponseEntity.status(303).body("Document already exists !");
       } else {

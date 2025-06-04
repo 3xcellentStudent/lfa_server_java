@@ -1,58 +1,109 @@
 package com.server.databases.mongodb.models.global;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
 @Document(collection = "global_data")
 public class GlobalDataModel {
 
   @Id
-  private String id;
-  public Colors colors;
-  public String type;
-  private long createdAt;
-  private long updatedAt;
+  @JsonProperty private String id;
+  @JsonProperty private Colors colors;
+  @JsonProperty private Categories categories = new Categories();
+  @JsonProperty private String type;
+  @JsonProperty private long createdAt;
+  @JsonProperty private long updatedAt;
 
   public GlobalDataModel(){}
 
   public GlobalDataModel(GlobalDataModel requestBody){
     this.colors = requestBody.colors;
     this.type = requestBody.type;
+    this.categories = requestBody.categories;
   }
 
   public static class Colors {
-    public TextColors text;
-    public BackgroundColors backgrounds;
+    @JsonProperty private TextColors text;
+    @JsonProperty private BackgroundColors backgrounds;
 
     public static class TextColors {
-      public ColorCode primaryText;
-      public ColorCode secondaryText;
-      public ColorCode optionalText;
+      @JsonProperty private ColorCode primaryText;
+      @JsonProperty private ColorCode secondaryText;
+      @JsonProperty private ColorCode optionalText;
     }
 
     public static class BackgroundColors {
-      public ColorCode primaryBg;
-      public ColorCode secondaryBg;
-      public ColorCode optionalBg;
-      public ColorCode elementsPrimaryBg;
-      public ColorCode elementsSecondaryBg;
-      public ColorCode elementsOptionalBg;
+      @JsonProperty private ColorCode primaryBg;
+      @JsonProperty private ColorCode secondaryBg;
+      @JsonProperty private ColorCode optionalBg;
+      @JsonProperty private ColorCode elementsPrimaryBg;
+      @JsonProperty private ColorCode elementsSecondaryBg;
+      @JsonProperty private ColorCode elementsOptionalBg;
     }
 
     public static class ColorCode {
-      public String hex;
-      public String rgb;
+      @JsonProperty private String hex;
+      @JsonProperty private String rgb;
     }
   }
 
-  public void setId(String id){
-    this.id = id;
+  public static class Categories {
+    @JsonProperty private Category diffusers = new Category();
+    @JsonProperty private Category essentialOils = new Category();
+    @JsonProperty private Category soaps = new Category();
+    @JsonProperty private Category liquidSoaps = new Category();
+    @JsonProperty private Category bathBombs = new Category();
+    @JsonProperty private Category creams = new Category();
+
+    // create gertters
+    public Category getDiffusers(){
+      return this.diffusers;
+    }
+
+    public Category getEssentialOils(){
+      return this.essentialOils;
+    }
+
+    public Category getSoaps(){
+      return this.soaps;
+    }
+
+    public Category getLiquidSoaps(){
+      return this.liquidSoaps;
+    }
+
+    public Category getBathBombs(){
+      return this.bathBombs;
+    }
+
+    public Category getCreams(){
+      return this.creams;
+    }
+
+  }
+
+  public static class Category {
+    @JsonProperty private String name;
+    @JsonProperty private String titleImage;
+    @JsonProperty private String description;
+    @JsonProperty private List<String> products = new ArrayList<>();
   }
 
   public String getId(){
     return this.id;
+  }
+
+  public void setId(String id){
+    if(id != null || id.length() > 10){
+      this.id = id;
+    }
   }
 
   public void setCreatedAt(long timestamp){
@@ -69,6 +120,14 @@ public class GlobalDataModel {
 
   public long getUpdatedAt(){
     return this.updatedAt;
+  }
+
+  public Categories getCategories(){
+    return this.categories;
+  }
+
+  public String getType(){
+    return this.type;
   }
 
 }

@@ -3,6 +3,7 @@ package com.server.databases.mongodb.controllers.invoices.stripe;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +30,9 @@ public class MongodbStripeInvoicesController {
   @Autowired
   private MongoDbMainService mainService;
 
+  @Value("${mongodb.collections.stripe.invoices}")
+  private String collectionName;
+
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
     ResponseEntity<Object> savedPaymentObject = invoicesService.createOne(requestBodyString);
@@ -43,7 +47,7 @@ public class MongodbStripeInvoicesController {
     return savedPaymentObject;
   }
 
-  @PostMapping("/find")
+  @PostMapping("/get")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
     ResponseEntity<Object> savedPaymentObject = invoicesService.findAllById(id);
 
@@ -59,7 +63,7 @@ public class MongodbStripeInvoicesController {
 
   @GetMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(){
-    return mainService.clearCollection(StripeCheckoutSessionsModel.class);
+    return mainService.clearCollection(StripeCheckoutSessionsModel.class, collectionName);
   }
 
 }

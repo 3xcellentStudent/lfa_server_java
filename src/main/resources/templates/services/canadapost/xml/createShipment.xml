@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<non-contract-shipment xmlns='http://www.canadapost.ca/ws/ncshipment-v4'>
+  <requested-shipping-point>T6C4G0</requested-shipping-point>
+  <delivery-spec>
+    <service-code>DOM.EP</service-code>
+    <sender>
+      <company>Andrew Corporation</company>
+      <contact-phone>7807295953</contact-phone>
+      <address-details>
+        <address-line-1>9009 85 St NW</address-line-1>
+        <city>Edmonton</city>
+        <prov-state>AB</prov-state>
+        <postal-zip-code>T6C3C6</postal-zip-code>
+      </address-details>
+    </sender>
+    <destination>
+      <name>John Doe</name>
+      <company>Consumer</company>
+      <address-details>
+        <address-line-1>701 32nd St W</address-line-1>
+        <city>Saskatoon</city>
+        <prov-state>SK</prov-state>
+        <country-code>CA</country-code>
+        <postal-zip-code>S7L2A1</postal-zip-code>
+      </address-details>
+    </destination>
+    <options>
+      <option>
+        <option-code>DC</option-code>
+      </option>
+    </options>
+    <parcel-characteristics>
+      <weight>3</weight>
+      <dimensions>
+        <length>6</length>
+        <width>4</width>
+        <height>2</height>
+      </dimensions>
+    </parcel-characteristics>
+    <preferences>
+      <show-packing-instructions>true</show-packing-instructions>
+    </preferences>
+  </delivery-spec>
+</non-contract-shipment>

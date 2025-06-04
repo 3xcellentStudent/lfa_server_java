@@ -20,17 +20,25 @@ public class CanadaPostController {
   @Autowired
   private CanadaPostService canadaPostService;
 
-  @GetMapping("pickup-availability/{code}")
+  @GetMapping("/pickup-availability/{code}")
   public ResponseEntity<Object> pickupAvailability(@PathVariable String code){
     Object response = canadaPostService.pickupAvailability(code);
 
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping("ship-price")
+  @PostMapping("/ship-price")
   public ResponseEntity<Object> shipPrice(@RequestBody String body){
     Object response = canadaPostService.shipPrice(body);
 
     return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/create-shipment")
+  // public ResponseEntity<Object> createShipment(){
+  public ResponseEntity<Object> createShipment(){
+    ResponseEntity<Object> response = canadaPostService.createShipment();
+
+    return response;
   }
 }

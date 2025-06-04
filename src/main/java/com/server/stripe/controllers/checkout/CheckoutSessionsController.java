@@ -21,9 +21,9 @@ public class CheckoutSessionsController {
   private CheckoutCreateSessionService createSessionService;
   
   @PostMapping("/create")
-  public ResponseEntity<Object> createCheckout(@RequestBody String requestBodyString){
-    System.out.println(requestBodyString);
-    return createSessionService.create(requestBodyString);
+  public ResponseEntity<String> createCheckout(@RequestBody(required = true) String incomingBodyString){
+    System.out.println(incomingBodyString);
+    return createSessionService.create(incomingBodyString);
   }
 
   // public ResponseEntity<Object> save(@RequestBody String requestBodyString){

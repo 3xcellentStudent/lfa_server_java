@@ -1,21 +1,22 @@
-package com.server.databases.mongodb.services.reviews.diffusers;
+package com.server.databases.mongodb.services.reviews;
 
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.databases.mongodb.helpers.bodies.UpdateOneById;
-import com.server.databases.mongodb.helpers.queries.QueriesHelper;
-import com.server.databases.mongodb.models.products.diffusers.DiffusersProductsModel;
+import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.models.products.ProductsModel;
 import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 
 @Service
-public class DiffusersReviewsService {
+public class ReviewsService {
   
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -72,21 +73,23 @@ public class DiffusersReviewsService {
   }
 
   public ResponseEntity<Object> updateReviewsArrayByParentId(String parentId, String id){
-    UpdateOneById updateReviewsById = new UpdateOneById(parentId, "reviewsId", id);
-    return mainService.pushNewOneToArrayById(updateReviewsById, DiffusersProductsModel.class);
+    UpdateOneByIdDto updateReviewsById = new UpdateOneByIdDto(parentId, "reviewsId", id);
+    return mainService.pushNewOneToArrayById(updateReviewsById, ProductsModel.class);
   }
 
   public ResponseEntity<Object> increaseStockInfoFields(String parentId, int rating){
-    int countOfReviews = mongoTemplate.findById(parentId, DiffusersProductsModel.class).stockInfo.countOfReviews;
-    UpdateOneById updateCountOfReviewsById = new UpdateOneById(parentId, "stockInfo.countOfReviews", countOfReviews + 1);
-    mainService.updateNewOneById(updateCountOfReviewsById, DiffusersProductsModel.class);
+    int countOfReviews = mongoTemplate.findById(parentId, ProductsModel.class).getStockInfo().countOfReviews;
+    UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1);
+    mainService.updateNewOneById(updateCountOfReviewsById, ProductsModel.class);
 
     String[] reviewsSnapshotKeys = new String[] {"one", "two", "three", "four", "five"};
 
-    DiffusersProductsModel productObject = mongoTemplate.findOne(QueriesHelper.getId("id", parentId), DiffusersProductsModel.class);
+    Query query = Query.query(Criteria.where("id").is(parentId));
+
+    ProductsModel productObject = mongoTemplate.findOne(query, ProductsModel.class);
     int oneStarCounts = productObject.getReviewsSnapshotByFieldName(reviewsSnapshotKeys[rating - 1]);
-    UpdateOneById updateReviewsSnapshotById = new UpdateOneById(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1);
-    return mainService.updateNewOneById(updateReviewsSnapshotById, DiffusersProductsModel.class);
+    UpdateOneByIdDto updateReviewsSnapshotById = new UpdateOneByIdDto(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1);
+    return mainService.updateNewOneById(updateReviewsSnapshotById, ProductsModel.class);
   }
 
 }

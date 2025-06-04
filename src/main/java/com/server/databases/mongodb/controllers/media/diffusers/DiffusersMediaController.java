@@ -3,6 +3,7 @@ package com.server.databases.mongodb.controllers.media.diffusers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
@@ -33,103 +34,54 @@ public class DiffusersMediaController {
   @Autowired
   private MongoTemplate mongoTemplate;
 
+  @Value("${mongodb.collections.media}")
+  private String collectionName;
+
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
-    try {
-      ResponseEntity<Object> response = mediaService.createOne(requestBodyString);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't add new product to database !");
-    }
+    return mediaService.createOne(requestBodyString);
   }
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
-    try {
-      ResponseEntity<Object> response = mainService.updateNewOneById(requestBodyString, DiffusersMediaModel.class);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Unable to update this product at database !");
-    }
+    return mainService.updateNewOneById(requestBodyString, DiffusersMediaModel.class, collectionName);
   }
 
   @PutMapping("/push")
   public ResponseEntity<Object> pushNewOneToArrayById(@RequestBody String requestBodyString){
-    try {
-      ResponseEntity<Object> response = mainService.pushNewOneToArrayById(requestBodyString, DiffusersMediaModel.class);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Unable to update this product at database !");
-    }
+    return mainService.pushNewOneToArrayById(requestBodyString, DiffusersMediaModel.class, collectionName);
   }
 
   @DeleteMapping("/delete-many-from-array")
   public ResponseEntity<Object> deleteManyFromArray(@RequestBody String requestBodyString){
-    try {
-      ResponseEntity<Object> response = mainService.deleteManyFromArrayById(requestBodyString, DiffusersMediaModel.class);
-
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Unable to delete this object from array !");
-    }
+    return mainService.deleteManyFromArrayById(requestBodyString, DiffusersMediaModel.class, collectionName);
   }
 
   @GetMapping("/get")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
-    try {
-      if(id == null || id.isEmpty()){
-        ResponseEntity<Object> response = mainService.findAll(DiffusersMediaModel.class);
+    if(id == null || id.isEmpty()){
+      ResponseEntity<Object> response = mainService.findAll(DiffusersMediaModel.class, collectionName);
 
-        return response;
-      } else {
-        List<DiffusersMediaModel> foundMedia = mainService.findAllById("id", id, DiffusersMediaModel.class);
+      return response;
+    } else {
+      List<DiffusersMediaModel> foundMedia = mainService.findAllById("id", id, DiffusersMediaModel.class, collectionName);
 
-        ResponseEntity<Object> response = mainService.getAsResponseEntity(foundMedia);
-  
-        return response;
-      }
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Internal server error: " + error.getMessage());
+      ResponseEntity<Object> response = mainService.getAsResponseEntity(foundMedia);
+
+      return response;
     }
   }
 
   @GetMapping("/delete")
   public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id){
-    try {
-      ResponseEntity<Object> response =  mainService.deleteAllById(id, DiffusersMediaModel.class);
-      
-      return response;
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't delete product by ID from database !");
-    }
+    return mainService.deleteAllById(id, DiffusersMediaModel.class, collectionName);
   }
 
   @GetMapping("/clear-col")
   public ResponseEntity<String> clearCollection(){
-    try {
-      mongoTemplate.remove(new Query(), DiffusersMediaModel.class);
+    mongoTemplate.remove(new Query(), DiffusersMediaModel.class);
 
-      return ResponseEntity.ok("All products have been removed from database !");
-    } catch(Exception error){
-      error.printStackTrace();
-      System.out.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("Can't delete products from database !");
-    }
+    return ResponseEntity.ok("All products have been removed from database !");
   }
   
 }

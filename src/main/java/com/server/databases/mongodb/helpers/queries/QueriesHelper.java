@@ -8,13 +8,13 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class QueriesHelper {
 
-  public static <T> Query getId(String selector, List<T> id){
-    return new Query(Criteria.where(selector).in(id));
-  }
+  // public static <T> Query getId(String selector, List<T> id){
+  //   return new Query(Criteria.where(selector).in(id));
+  // }
 
-  public static Query getId(String selector, String id){
-    return new Query(Criteria.where(selector).is(id));
-  }
+  // public static Query getId(String selector, String id){
+  //   return new Query(Criteria.where(selector).is(id));
+  // }
 
   public static Query getSliceOfReviewsList(String searchIdentifier, String id, int fromIndex, int toIndex){
     Query query = new Query(Criteria.where(searchIdentifier).is(id));

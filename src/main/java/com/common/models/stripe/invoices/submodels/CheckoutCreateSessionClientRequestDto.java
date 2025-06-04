@@ -1,17 +1,22 @@
 package com.common.models.stripe.invoices.submodels;
 
+import java.util.List;
+
 public class CheckoutCreateSessionClientRequestDto {
 
-  public String productName;
-  public String unitAmount;
-  public String quantity;
+  public List<DataArray> data;
+
+  public static class DataArray {
+    public String productName;
+    public String productId;
+    public float unitAmount;
+    public String quantity;
+  }
   
   public CheckoutCreateSessionClientRequestDto(){}
 
   public CheckoutCreateSessionClientRequestDto(CheckoutCreateSessionClientRequestDto requestBody){
-    this.productName = requestBody.productName;
-    this.unitAmount = requestBody.unitAmount;
-    this.quantity = requestBody.quantity;
+    this.data = requestBody.data;
   }
 
 }
