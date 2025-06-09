@@ -45,7 +45,7 @@ public class ReviewsService {
     }
   }
 
-  public ResponseEntity<Object> createOne(String requestBodyString){
+  public ResponseEntity<Object> createOne(String requestBodyString, String collectionName){
     String id = UUID.randomUUID().toString();
     long timestamp = System.currentTimeMillis();
 
@@ -53,8 +53,8 @@ public class ReviewsService {
       DiffusersReviewsModel requestBodyObject = objectMapper.readValue(requestBodyString, DiffusersReviewsModel.class);
 
       String parentId = requestBodyObject.getParentId();
-      updateReviewsArrayByParentId(parentId, id);
-      increaseStockInfoFields(parentId, requestBodyObject.rating);
+      updateReviewsArrayByParentId(parentId, id, collectionName);
+      increaseStockInfoFields(parentId, requestBodyObject.rating, collectionName);
 
       requestBodyObject.setId(id);
       requestBodyObject.setCreateAt(timestamp);
@@ -72,14 +72,14 @@ public class ReviewsService {
     }
   }
 
-  public ResponseEntity<Object> updateReviewsArrayByParentId(String parentId, String id){
-    UpdateOneByIdDto updateReviewsById = new UpdateOneByIdDto(parentId, "reviewsId", id);
+  public ResponseEntity<Object> updateReviewsArrayByParentId(String parentId, String id, String collectionName){
+    UpdateOneByIdDto updateReviewsById = new UpdateOneByIdDto(parentId, "reviewsId", id, collectionName);
     return mainService.pushNewOneToArrayById(updateReviewsById, ProductsModel.class);
   }
 
-  public ResponseEntity<Object> increaseStockInfoFields(String parentId, int rating){
+  public ResponseEntity<Object> increaseStockInfoFields(String parentId, int rating, String collectionName){
     int countOfReviews = mongoTemplate.findById(parentId, ProductsModel.class).getStockInfo().countOfReviews;
-    UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1);
+    UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1, collectionName);
     mainService.updateNewOneById(updateCountOfReviewsById, ProductsModel.class);
 
     String[] reviewsSnapshotKeys = new String[] {"one", "two", "three", "four", "five"};
@@ -88,7 +88,7 @@ public class ReviewsService {
 
     ProductsModel productObject = mongoTemplate.findOne(query, ProductsModel.class);
     int oneStarCounts = productObject.getReviewsSnapshotByFieldName(reviewsSnapshotKeys[rating - 1]);
-    UpdateOneByIdDto updateReviewsSnapshotById = new UpdateOneByIdDto(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1);
+    UpdateOneByIdDto updateReviewsSnapshotById = new UpdateOneByIdDto(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1, collectionName);
     return mainService.updateNewOneById(updateReviewsSnapshotById, ProductsModel.class);
   }
 

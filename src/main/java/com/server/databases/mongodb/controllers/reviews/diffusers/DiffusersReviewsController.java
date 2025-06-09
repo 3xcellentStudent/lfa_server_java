@@ -43,7 +43,7 @@ public class DiffusersReviewsController {
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@RequestBody String requestBodyString){
-    return reviewsService.createOne(requestBodyString);
+    return reviewsService.createOne(requestBodyString,collectionName);
   }
 
   @PatchMapping("/update")

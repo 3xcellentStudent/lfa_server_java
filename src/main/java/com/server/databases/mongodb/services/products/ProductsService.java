@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -28,6 +29,8 @@ public class ProductsService {
   private MongoTemplate mongoTemplate;
   @Autowired
   private ObjectMapper objectMapper;
+  @Value("${mongodb.collections.products.diffusers}")
+  private String collectionName;
 
   public ResponseEntity<Object> createOne(ProductsModel productObject, String collectionName){
     try {
@@ -64,21 +67,13 @@ public class ProductsService {
     }
   }
 
-  public ResponseEntity<Object> findAllRecursiveById(List<String> id){
-    try {
-      Query query = Query.query(Criteria.where("id").in(id));
-      List<ProductsModel> foundProducts = mongoTemplate
-      .find(query, ProductsModel.class);
-      List<ProductsModel> modifiedProducts = modifyProducts(foundProducts);
+  public ResponseEntity<Object> findAllRecursiveById(List<String> id, String collectionName){
+    Query query = Query.query(Criteria.where("id").in(id));
+    List<ProductsModel> foundProducts = mongoTemplate
+    .find(query, ProductsModel.class, collectionName);
+    List<ProductsModel> modifiedProducts = modifyProducts(foundProducts);
 
-      String response = objectMapper.writeValueAsString(modifiedProducts);
-
-      return ResponseEntity.ok(response);
-    } catch(Exception error){
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().body("internal server error in class " + this.getClass().getName());
-    }
+    return ResponseEntity.ok(modifiedProducts);
   }
 
   public ResponseEntity<Object> deleteRecursiveById(List<String> id){

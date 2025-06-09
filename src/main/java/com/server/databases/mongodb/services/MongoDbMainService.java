@@ -44,7 +44,6 @@ public class MongoDbMainService {
 
       update.set("updatedAt", timestamp);
 
-      // T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass);
       T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collectionName);
 
       String response = objectMapper.writeValueAsString(modifiedProduct);
@@ -57,17 +56,17 @@ public class MongoDbMainService {
     }
   }
 
-  public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto requestBodyObject, Class<T> someClass, String collectionName){
+  public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto body, Class<T> someClass){
     try {
       long timestamp = System.currentTimeMillis();
 
-      Query query = Query.query(Criteria.where("id").is(requestBodyObject.getId()));
-      Update update = QueriesHelper.getUpdateForNonArray(requestBodyObject.getField(), requestBodyObject.getNewData());
+      Query query = Query.query(Criteria.where("id").is(body.getId()));
+      Update update = QueriesHelper.getUpdateForNonArray(body.getField(), body.getNewData());
       FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
       update.set("updatedAt", timestamp);
 
-      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collectionName);
+      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
 
       String response = objectMapper.writeValueAsString(modifiedProduct);
 
@@ -103,17 +102,17 @@ public class MongoDbMainService {
     }
   }
 
-  public <T> ResponseEntity<Object> pushNewOneToArrayById(UpdateOneByIdDto requestBodyObject, Class<T> someClass, String collectionName){
+  public <T> ResponseEntity<Object> pushNewOneToArrayById(UpdateOneByIdDto body, Class<T> someClass){
     try {
       long timestamp = System.currentTimeMillis();
 
-      Query query = Query.query(Criteria.where("id").is(requestBodyObject.getId()));
-      Update update = QueriesHelper.getUpdateForArray(requestBodyObject.getField(), requestBodyObject.getNewData());
+      Query query = Query.query(Criteria.where("id").is(body.getId()));
+      Update update = QueriesHelper.getUpdateForArray(body.getField(), body.getNewData());
       FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
       update.set("updatedAt", timestamp);
 
-      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collectionName);
+      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
 
       String response = objectMapper.writeValueAsString(modifiedProduct);
 
@@ -199,41 +198,22 @@ public class MongoDbMainService {
   }
 
   public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collectionName){
-    try {
-      List<T> foundObjects = mongoTemplate.findAll(someClass, collectionName).stream()
-      .filter(Objects::nonNull).toList();
+    List<T> foundObjects = mongoTemplate.findAll(someClass, collectionName).stream()
+    .filter(Objects::nonNull).toList();
 
-      if(foundObjects.isEmpty()){
-        return ResponseEntity.status(404).body(new ArrayList<>());
-      } else {
-        String response = objectMapper.writeValueAsString(foundObjects);
-
-        return ResponseEntity.ok(response);
-      }
-    } catch(JsonProcessingException error){
-      String message = "Error occured while processing JSON !";
-      logger.error(message, error);
-      return ResponseEntity.internalServerError().body(message);
+    if(foundObjects.isEmpty()){
+      return ResponseEntity.status(404).body(new ArrayList<>());
+    } else {
+      return ResponseEntity.ok(foundObjects);
     }
   }
 
   public <T> List<T> findAllById(String selector, List<String> id, Class<T> someClass, String collectionName){
-    // try {
-      Query query = Query.query(Criteria.where(selector).in(id));
-      List<T> foundObjectsList = mongoTemplate.find(query, someClass, collectionName)
-      .stream().filter(Objects::nonNull).toList();
+    Query query = Query.query(Criteria.where(selector).in(id));
+    List<T> foundObjectsList = mongoTemplate.find(query, someClass, collectionName)
+    .stream().filter(Objects::nonNull).toList();
 
-      return foundObjectsList;
-
-      // String response = objectMapper.writeValueAsString(foundObjectsList);
-
-      // return ResponseEntity.ok(response); 
-    // } catch(JsonProcessingException error){
-    //   System.err.println(error.getMessage());
-    //   error.printStackTrace();
-    //   return null;
-    //   // return ResponseEntity.internalServerError().body("internal server error in class " + this.getClass().getName());
-    // }
+    return foundObjectsList;
   }
 
   public <T> List<T> findAllById(String selector, String id, Class<T> someClass, String collectionName){

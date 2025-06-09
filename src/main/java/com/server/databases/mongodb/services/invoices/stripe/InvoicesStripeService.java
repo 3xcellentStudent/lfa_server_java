@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,8 @@ public class InvoicesStripeService {
   private ObjectMapper objectMapper;
   @Autowired
   private MongoDbMainService mainService;
+  @Value("${mongodb.collections.stripe.invoices}")
+  private String collectionName;
 
    public ResponseEntity<Object> createOne(String requestString){
     try {
@@ -73,7 +76,7 @@ public class InvoicesStripeService {
 
   public ResponseEntity<Object> findAllById(List<String> id){
     try {
-      List<StripeCheckoutSessionsModel> savedObject = mainService.findAllById("id", id, StripeCheckoutSessionsModel.class);
+      List<StripeCheckoutSessionsModel> savedObject = mainService.findAllById("id", id, StripeCheckoutSessionsModel.class, collectionName);
 
       String responseString = objectMapper.writeValueAsString(savedObject);
 
@@ -87,7 +90,7 @@ public class InvoicesStripeService {
 
   public ResponseEntity<Object> deleteAllById(List<String> id){
     try {
-      ResponseEntity<Object> savedObject = mainService.deleteAllById(id, StripeCheckoutSessionsModel.class);
+      ResponseEntity<Object> savedObject = mainService.deleteAllById(id, StripeCheckoutSessionsModel.class, collectionName);
 
       String responseString = objectMapper.writeValueAsString(savedObject);
 
