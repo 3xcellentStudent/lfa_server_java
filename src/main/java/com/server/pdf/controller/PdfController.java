@@ -22,25 +22,25 @@ import com.server.pdf.services.PdfMainService;
 @CrossOrigin("*")
 public class PdfController {
 
-  private final Logger logger = LoggerFactory.getLogger(PdfController.class);
+  // private final Logger logger = LoggerFactory.getLogger(PdfController.class);
   
-  @Autowired
-  private ObjectMapper objectMapper;
+  // @Autowired
+  // private ObjectMapper objectMapper;
   @Autowired
   private PdfMainService pdfMainService;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> createPdfFile(@RequestBody String requestBodyString){
-    try {
-      CreatePdfDocumentDto dto = objectMapper.readValue(requestBodyString, CreatePdfDocumentDto.class);
+  public ResponseEntity<Object> createPdfFile(@RequestBody CreatePdfDocumentDto body){
+    // try {
+      // CreatePdfDocumentDto dto = objectMapper.readValue(requestBodyString, CreatePdfDocumentDto.class);
       
-      ResponseEntity<Object> response = pdfMainService.create(dto);
+      ResponseEntity<Object> response = pdfMainService.create(body);
 
       return response;
-    } catch(IOException error){
-      String message = "I/O exception occurred during HTTP request !";
-      logger.error(message + ": " + error.getCause().getMessage());
-      return ResponseEntity.internalServerError().body(message);
-    }
+    // } catch(IOException error){
+    //   String message = "I/O exception occurred during HTTP request !";
+    //   logger.error(message + ": " + error.getCause().getMessage());
+    //   return ResponseEntity.internalServerError().body(message);
+    // }
   }
 }

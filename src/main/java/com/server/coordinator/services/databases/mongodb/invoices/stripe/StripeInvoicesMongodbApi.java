@@ -38,7 +38,7 @@ public class StripeInvoicesMongodbApi {
       HttpRequest request = HttpRequest.newBuilder()
       .uri(new URI(mongodbStripeInvoicesSaveEndpoint))
       .header("Content-Type", "application/json")
-      .timeout(Duration.ofSeconds(5))
+      .timeout(Duration.ofSeconds(1))
       .POST(BodyPublishers.ofString(requestBodyString))
       .build();
   

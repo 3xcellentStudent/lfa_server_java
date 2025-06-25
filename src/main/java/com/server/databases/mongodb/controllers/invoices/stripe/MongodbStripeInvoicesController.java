@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.invoices.stripe.InvoicesStripeService;
-// import com.server.pdf.models.CaptureResponseDto;
 
 @RestController
 @RequestMapping("/api/mongodb/invoices/stripe")
@@ -47,7 +46,7 @@ public class MongodbStripeInvoicesController {
     return savedPaymentObject;
   }
 
-  @PostMapping("/get")
+  @GetMapping("/get")
   public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
     ResponseEntity<Object> savedPaymentObject = invoicesService.findAllById(id);
 
@@ -61,7 +60,7 @@ public class MongodbStripeInvoicesController {
     return savedPaymentObject;
   }
 
-  @GetMapping("/clear-col")
+  @DeleteMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(){
     return mainService.clearCollection(StripeCheckoutSessionsModel.class, collectionName);
   }

@@ -3,8 +3,6 @@ package com.server.pdf.services;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +37,8 @@ public class PdfMainService {
 
   public ResponseEntity<Object> create(CreatePdfDocumentDto dto){
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    try(Document document = new Document();){
+    // try(Document document = new Document();){
+      Document document = new Document();
       logger.info(String.format("Creating the PDF document with ID %s...", dto.invoiceId));
       final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
 
@@ -68,15 +67,15 @@ public class PdfMainService {
       responseBodyMap.put("fileBytes", outputStream.toByteArray());
       responseBodyMap.put("emailContent", dto);
 
-      String responseBodyString = objectMapper.writeValueAsString(responseBodyMap);
+      // String responseBodyString = objectMapper.writeValueAsString(responseBodyMap);
 
       return ResponseEntity.ok()
       .header("Content-Type", "application/json")
-      .body(responseBodyString);
-    } catch(IOException error){
-      logger.error("An error occurred during creating document !", error);
-      return ResponseEntity.internalServerError().body(error.getMessage());
-    }
+      .body(responseBodyMap);
+    // } catch(IOException error){
+    //   logger.error("An error occurred during creating document !", error);
+    //   return ResponseEntity.internalServerError().body(error.getMessage());
+    // }
   }
   
   private void metadata(final PdfWriter instance){

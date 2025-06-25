@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,22 +30,19 @@ public class ProductsController {
   @Autowired
   private MongoDbMainService mainService;
 
-  @PostMapping("/create")
-  public ResponseEntity<Object> create(
-    @RequestBody ProductsModel productObject, @RequestParam(name = "collectionName", required = true) String collectionName
-  ){
-    return productsService.createOne(productObject, collectionName);
+  @PostMapping("/create/{collectionName}")
+  public ResponseEntity<Object> create(@RequestBody ProductsModel body, @PathVariable(required = true) String collectionName){
+    return productsService.createOne(body, collectionName);
   }
 
-  @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
-    return mainService
-    .updateNewOneById(body, ProductsModel.class);
+  @PatchMapping("/update/{collectionName}")
+  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body, @PathVariable(required = true) String collectionName){
+    return mainService.updateNewOneById(body, ProductsModel.class, collectionName);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/get/{collectionName}")
   public ResponseEntity<Object> findAll(
-    @RequestParam(name = "id", required = false) List<String> id, @RequestParam(name = "collectionName", required = true) String collectionName
+    @RequestParam(name = "id", required = false) List<String> id, @PathVariable(required = true) String collectionName
   ){
     if(id == null || id.isEmpty()){
       ResponseEntity<Object> response = mainService
@@ -53,29 +52,33 @@ public class ProductsController {
     } else {
       List<ProductsModel> foundProducts = mainService.findAllById("id", id, ProductsModel.class, collectionName);
 
-      ResponseEntity<Object> response = mainService.getAsResponseEntity(foundProducts);
-
-      return response;
+      return ResponseEntity.ok(foundProducts);
     }
   }
 
-  @GetMapping("/get/recursive")
-  public ResponseEntity<Object> findAllByIdRecursive(@RequestParam List<String> id, String collectionName){
+  @GetMapping("/get/recursive/{collectionName}")
+  public ResponseEntity<Object> findAllByIdRecursive(
+    @RequestParam List<String> id, @PathVariable(required = true) String collectionName
+  ){
     return productsService.findAllRecursiveById(id, collectionName);
   }
 
-  @GetMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id, String collectionName){
-    return mainService.deleteAllById(id, ProductsModel.class, collectionName);
+  @DeleteMapping("/delete/{collectionName}")
+  public ResponseEntity<Object> deleteAllById(
+    @RequestParam(name = "id", required = true) List<String> id, @PathVariable(required = true) String collectionName
+  ){
+    return mainService.deleteManyById(id, ProductsModel.class, collectionName);
   }
 
-  @GetMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteAllByIdRecursive(@RequestParam List<String> id){
-    return productsService.deleteRecursiveById(id);
+  @DeleteMapping("/delete/recursive/{collectionName}")
+  public ResponseEntity<Object> deleteAllByIdRecursive(
+    @RequestParam(name = "id", required = true) List<String> id, @PathVariable(required = true) String collectionName
+  ){
+    return productsService.deleteRecursiveById(id, collectionName);
   }
 
-  @GetMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@RequestParam(name = "collectionName", required = true) String collectionName){
+  @DeleteMapping("/clear-col/{collectionName}")
+  public ResponseEntity<Object> clearCollection(@PathVariable(required = true) String collectionName){
     return mainService.clearCollection(ProductsModel.class, collectionName);
   }
   

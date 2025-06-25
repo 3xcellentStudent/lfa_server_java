@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mongodb.client.result.DeleteResult;
+import com.server.databases.mongodb.dto.DeleteManyById;
+import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.global.GlobalDataModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.global.GlobalDataService;
@@ -42,16 +46,8 @@ public class GlobalDataController {
   }
 
   @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody String requestBodyString){
-    return mainService.updateNewOneById(requestBodyString, GlobalDataModel.class, collectionName);
-  }
-
-  public @PatchMapping("/categories/update-id") ResponseEntity<Object> categoryUpdate(@RequestBody String requestBodyString){
-    return mainService.updateNewOneById(requestBodyString, GlobalDataModel.class, collectionName);
-  }
-
-  public @PatchMapping("/categories/delete-id") ResponseEntity<Object> categoryDelete(@RequestBody String requestBodyString){
-    return mainService.updateNewOneById(requestBodyString, GlobalDataModel.class, collectionName);
+  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+    return mainService.updateNewOneById(body, GlobalDataModel.class, collectionName);
   }
 
   @GetMapping("/get/{id}")
@@ -66,16 +62,18 @@ public class GlobalDataController {
     return mainService.findAll(GlobalDataModel.class, collectionName);
   }
 
-  @GetMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = true) List<String> id){
-    return mainService.deleteAllById(id, GlobalDataModel.class, collectionName);
+  @DeleteMapping("/delete")
+  public ResponseEntity<Object> deleteAllById(
+    @RequestParam(name = "id", required = true) List<String> id
+    ){
+    return mainService.deleteManyById(id, GlobalDataModel.class, collectionName);
   }
 
-  @GetMapping("/clear-col")
-  public ResponseEntity<String> clearCollection(){
-    mongoTemplate.remove(new Query(), GlobalDataModel.class);
+  @DeleteMapping("/clear-col")
+  public ResponseEntity<Object> clearCollection(){
+    DeleteResult result = mongoTemplate.remove(new Query(), GlobalDataModel.class, collectionName);
 
-    return ResponseEntity.ok("All products have been removed from database !");
+    return ResponseEntity.ok(result);
   }
   
 }

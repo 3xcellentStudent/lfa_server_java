@@ -3,12 +3,13 @@ package com.server.databases.mongodb.models.products;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
-import com.server.databases.mongodb.models.reviews.ReviewsModel.ReviewsSnapshot;
+import com.server.databases.mongodb.models.media.MediaModel;
+import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 
 @Component
 public class ProductsModel {
@@ -23,8 +24,10 @@ public class ProductsModel {
   @JsonProperty private StockInfo stockInfo;
   @JsonProperty private List<ProductOption> productOptions;
   @JsonProperty private Specifications specifications;
-  @JsonProperty private DiffusersMediaModel mediaContent;
-  @JsonProperty private String categoryName;
+  @JsonProperty private MediaModel mediaContent;
+  @Autowired
+  @JsonProperty private ReviewsSnapshot reviewsSnapshot;
+  @JsonProperty private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -37,7 +40,8 @@ public class ProductsModel {
     public String category;
     public int quantityMax;
     public String price;
-    public ReviewsSnapshot reviewsSnapshot = new ReviewsSnapshot();
+    @Autowired
+    public ReviewsSnapshot reviewsSnapshot;
     public int countOfReviews;
   }
 
@@ -125,11 +129,11 @@ public class ProductsModel {
     this.updatedAt = newTime;
   }
 
-  public DiffusersMediaModel getMediaContent(){
+  public MediaModel getMediaContent(){
     return this.mediaContent;
   }
 
-  public void setMediaContent(DiffusersMediaModel mediaContent){
+  public void setMediaContent(MediaModel mediaContent){
     this.mediaContent = mediaContent;
   }
 
@@ -168,8 +172,12 @@ public class ProductsModel {
     return this.specifications;
   }
 
-  public String getCategoryName(){
-    return this.categoryName;
+  public String getCollectionName(){
+    return this.collectionName;
+  }
+
+  public ReviewsSnapshot getReviewsSnapshot(){
+    return this.stockInfo.reviewsSnapshot;
   }
 
   public ProductsModel(){}
@@ -185,7 +193,8 @@ public class ProductsModel {
     this.productOptions = dataModel.getProductOptions();
     this.specifications = dataModel.getSpecifications();
     this.mediaContent = dataModel.getMediaContent();
-    this.categoryName = dataModel.getCategoryName();
+    this.collectionName = dataModel.getCollectionName();
+    this.reviewsSnapshot = dataModel.getReviewsSnapshot();
     this.createdAt = dataModel.getCreatedAt();
     this.updatedAt = dataModel.getUpdatedAt();
   }

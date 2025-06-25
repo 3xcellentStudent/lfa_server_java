@@ -1,10 +1,5 @@
 package com.server.coordinator.controller.checkout.stripe;
 
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

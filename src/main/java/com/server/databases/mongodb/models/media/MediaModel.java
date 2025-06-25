@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.models.media.diffusers;
+package com.server.databases.mongodb.models.media;
 
 import java.util.ArrayList;
 
@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel.MediaContent.Image;
-import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel.MediaContent.TitleContent;
+import com.server.databases.mongodb.models.media.MediaModel.MediaContent.Image;
+import com.server.databases.mongodb.models.media.MediaModel.MediaContent.TitleContent;
 
 // @Component
 // @Document(collection = "media_diffusers")
@@ -81,7 +81,7 @@ import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel.M
 
 @Component
 @Document(collection = "media_diffusers")
-public class DiffusersMediaModel {
+public class MediaModel {
 
   @Id
   @JsonProperty private String id;
@@ -91,9 +91,9 @@ public class DiffusersMediaModel {
   @JsonProperty private TitleContent titleContent = new TitleContent();
   @JsonProperty private ArrayList<ArrayList<Image>> images = new ArrayList<>();
 
-  public DiffusersMediaModel(){}
+  public MediaModel(){}
 
-  public DiffusersMediaModel(DiffusersMediaModel dataModel){
+  public MediaModel(MediaModel dataModel){
     this.titleContent = dataModel.titleContent;
     this.images = dataModel.images;
   }

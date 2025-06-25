@@ -34,7 +34,7 @@ public class MailerServiceApi {
 
   private void fulfilled(HttpResponse<String> response){
     if(response.statusCode() == 200){
-      // I should create endpoint for updating information status about current order in MongoDb that client that client got email notification with invoice pdf file
+      // I should create endpoint for updating information status about current order in MongoDb that client got email notification with invoice pdf file
       logger.info("Email notification sent successfully");
     } else {
       // I'm not sure that I need this part of if/else block, because if operation is not successful then I will return status code >= 500 or >= 400

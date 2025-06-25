@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +24,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CheckoutCreateSessionService {
-  private final String stripeCheckoutEndpoint = "https://api.stripe.com/v1/checkout/sessions";
-  private final String stripeCheckoutReturnUrl = "https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg";
+  @Value("${stripe.routes.checkout.create_session}")
+  private String stripeCheckoutEndpoint;
+  @Value("${stripe.routes.checkout.return_url}")
+  private String stripeCheckoutReturnUrl;
 
   private final int unitAmountCoefficient = 100;
 
   @Autowired
-  private Environment env;
-  @Autowired
   private ObjectMapper objectMapper;
+  
+  @Value("${stripe.token.secret}")
+  private String tokenSecret;
+  @Value("${stripe.api.version}")
+  private String stripeApiVersion;
 
   private Logger logger = LoggerFactory.getLogger(CheckoutCreateSessionService.class);
 
@@ -41,7 +46,6 @@ public class CheckoutCreateSessionService {
   public CheckoutCreateSessionService(){}
   
   public ResponseEntity<String> create(String incomingBodyString){
-    // String tokenSecret = env.getProperty("stripe.token.secret");
     String encodingType = "UTF-8";
     
     try {
@@ -111,9 +115,6 @@ public class CheckoutCreateSessionService {
   }
 
   private ResponseEntity<String> request(String stringRequestBody){
-    String tokenSecret = env.getProperty("stripe.token.secret");
-    String stripeApiVersion = env.getProperty("stripe.api.version");
-    
     try {
       HttpRequest request = HttpRequest.newBuilder()
       .uri(new URI(stripeCheckoutEndpoint))

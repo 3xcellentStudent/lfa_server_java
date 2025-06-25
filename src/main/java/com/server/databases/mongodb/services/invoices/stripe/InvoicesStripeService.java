@@ -90,7 +90,7 @@ public class InvoicesStripeService {
 
   public ResponseEntity<Object> deleteAllById(List<String> id){
     try {
-      ResponseEntity<Object> savedObject = mainService.deleteAllById(id, StripeCheckoutSessionsModel.class, collectionName);
+      ResponseEntity<Object> savedObject = mainService.deleteManyById(id, StripeCheckoutSessionsModel.class, collectionName);
 
       String responseString = objectMapper.writeValueAsString(savedObject);
 

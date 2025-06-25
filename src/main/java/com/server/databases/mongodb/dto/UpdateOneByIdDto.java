@@ -4,7 +4,6 @@ public class UpdateOneByIdDto {
   private String id;
   private String field;
   private Object newData;
-  private String collectionName;
 
   public String getId() {
     return id;
@@ -30,14 +29,6 @@ public class UpdateOneByIdDto {
     this.newData = newData;
   }
 
-  public String getCollectionName() {
-    return collectionName;
-  }
-
-  public void setCollectionName(String collectionName) {
-    this.collectionName = collectionName;
-  }
-
   public UpdateOneByIdDto(){}
 
   public UpdateOneByIdDto(UpdateOneByIdDto requestBody){
@@ -50,7 +41,6 @@ public class UpdateOneByIdDto {
     this.id = id;
     this.field = field;
     this.newData = newData;
-    this.collectionName = collectionName;
   }
 
 }

@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.server.mailer.config.MailerConfig;
@@ -34,8 +34,9 @@ public class MailerService {
 
 	@Autowired
 	private MailerConfig mailerConfig;
-	@Autowired
-	private Environment env;
+
+	@Value("${email.templates.common}")
+	private String stringUrl;
 
 	private Logger logger = LoggerFactory.getLogger(MailerService.class);
 
@@ -82,7 +83,6 @@ public class MailerService {
 	}
 
 	private void getBytesOfTemplate(){
-		String stringUrl = env.getProperty("email.templates.common");
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
 			URL resource = classLoader.getResource(stringUrl);

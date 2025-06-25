@@ -6,120 +6,86 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.databases.mongodb.models.media.diffusers.DiffusersMediaModel;
+import com.server.databases.mongodb.models.media.MediaModel;
 import com.server.databases.mongodb.models.products.ProductsModel;
-import com.server.databases.mongodb.models.reviews.diffusers.DiffusersReviewsModel;
-import com.server.databases.mongodb.services.media.diffusers.DiffusersMediaService;
+import com.server.databases.mongodb.models.reviews.ReviewsModel;
+import com.server.databases.mongodb.services.media.MediaService;
 import com.server.databases.mongodb.services.uuid.CustomUUID;
 
 @Service
 public class ProductsService {
 
   @Autowired
-  private DiffusersMediaService mediaService;
+  private MediaService mediaService;
   @Autowired
   private MongoTemplate mongoTemplate;
-  @Autowired
-  private ObjectMapper objectMapper;
-  @Value("${mongodb.collections.products.diffusers}")
-  private String collectionName;
 
-  public ResponseEntity<Object> createOne(ProductsModel productObject, String collectionName){
-    try {
-      String id = CustomUUID.fromString(new String[] {productObject.getTitle(), productObject.getStockInfo().category});
-      Query query = Query.query(Criteria.where("id").is(id));
-      boolean isExists = mongoTemplate.exists(query, ProductsModel.class, collectionName);
+  public ResponseEntity<Object> createOne(ProductsModel body, String collectionName){
+    String id = CustomUUID.fromString(new String[] {body.getTitle(), body.getStockInfo().category});
+    Query query = Query.query(Criteria.where("id").is(id));
+    boolean isExists = mongoTemplate.exists(query, ProductsModel.class, collectionName);
+    
+    if(isExists == false){
+      String mediaId = CustomUUID.fromString(id);
+
+      long timestamp = System.currentTimeMillis();
+
+      Object mediaServiceEntity = mediaService.createOne(mediaId, id, timestamp, "media-" + collectionName).getBody();
+    
+      body.setId(id);
+      body.setMediaId(mediaId);
+      body.setCreatedAt(timestamp);
+      body.setUpdatedAt(timestamp);
+
+      ProductsModel savedProduct = mongoTemplate.save(body, collectionName);
       
-      if(isExists == false){
-        String mediaId = CustomUUID.fromString(id);
+      savedProduct.setMediaContent((MediaModel) mediaServiceEntity);
 
-        long timestamp = System.currentTimeMillis();
-  
-        Object mediaServiceEntity = mediaService.createOne(mediaId, id, timestamp).getBody();
-      
-        productObject.setId(id);
-        productObject.setMediaId(mediaId);
-        productObject.setCreatedAt(timestamp);
-        productObject.setUpdatedAt(timestamp);
-
-        ProductsModel savedProduct = mongoTemplate.save(productObject, collectionName);
-        
-        savedProduct.setMediaContent((DiffusersMediaModel) mediaServiceEntity);
-
-        String response = objectMapper.writeValueAsString(savedProduct);
-
-        return ResponseEntity.ok(response);
-      } else {
-        return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
-      }
-    } catch(Exception error){
-      error.printStackTrace();
-      System.err.println(error.getMessage());
-      return ResponseEntity.internalServerError().body("internal server error in class " + this.getClass().getName());
+      return ResponseEntity.ok(savedProduct);
+    } else {
+      return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
     }
   }
 
   public ResponseEntity<Object> findAllRecursiveById(List<String> id, String collectionName){
     Query query = Query.query(Criteria.where("id").in(id));
-    List<ProductsModel> foundProducts = mongoTemplate
-    .find(query, ProductsModel.class, collectionName);
-    List<ProductsModel> modifiedProducts = modifyProducts(foundProducts);
+    List<ProductsModel> foundProducts = mongoTemplate.find(query, ProductsModel.class, collectionName);
+    List<ProductsModel> modifiedProducts = modifyMediaOfProduct(foundProducts, collectionName);
 
     return ResponseEntity.ok(modifiedProducts);
   }
 
-  public ResponseEntity<Object> deleteRecursiveById(List<String> id){
-    try {
-      List<ProductsModel> removedProducts = mongoTemplate
-      .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductsModel.class);
-      List<DiffusersReviewsModel> removedReviews = mongoTemplate
-      .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), DiffusersReviewsModel.class);
-      List<DiffusersMediaModel> removedMedia = mongoTemplate
-      .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), DiffusersMediaModel.class);
+  public ResponseEntity<Object> deleteRecursiveById(List<String> id, String productCollectionName){
+    List<ProductsModel> removedProducts = mongoTemplate
+    .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductsModel.class, productCollectionName);
+    List<ReviewsModel> removedReviews = mongoTemplate
+    .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), ReviewsModel.class, "reviews " + productCollectionName);
+    List<MediaModel> removedMedia = mongoTemplate
+    .findAllAndRemove(Query.query(Criteria.where("parentId").in(id)), MediaModel.class, "media " + productCollectionName);
 
-      Map<String, Object> jsonBody = new HashMap<>();
-      jsonBody.put("products", removedProducts);
-      jsonBody.put("reviews", removedReviews);
-      jsonBody.put("media", removedMedia);
+    Map<String, Object> responseBody = new HashMap<>();
+    responseBody.put("products", removedProducts);
+    responseBody.put("reviews", removedReviews);
+    responseBody.put("media", removedMedia);
 
-      String response = objectMapper.writeValueAsString(jsonBody);
-
-      return ResponseEntity.ok(response);
-    } catch(Exception error){
-      System.err.println(error.getMessage());
-      error.printStackTrace();
-      return ResponseEntity.internalServerError().body("Internal server error in class " + this.getClass().getName());
-    }
+    return ResponseEntity.ok(responseBody);
   }
 
-  private List<ProductsModel> modifyProducts(List<ProductsModel> productsList){
-    try {
-      List<ProductsModel> modifiedProductsList = productsList.stream()
-      .map(oneObject -> {
-        // List<DiffusersReviewsModel> reviewsList = mainService
-        // .findAllById("parentId", oneObject.getId(), DiffusersReviewsModel.class);
+  private List<ProductsModel> modifyMediaOfProduct(List<ProductsModel> productsList, String producCollectionName){
+    List<ProductsModel> modifiedProductsList = productsList.stream().map(oneObject -> {
+      MediaModel mediaObject = mongoTemplate.findById(oneObject.getMediaId(), MediaModel.class, "media " + producCollectionName);
 
-        DiffusersMediaModel mediaObject = mongoTemplate.findById(oneObject.getMediaId(), DiffusersMediaModel.class);
+      oneObject.setMediaContent(mediaObject);
+      return oneObject;
+    }).filter(Objects::nonNull).toList();
 
-        // oneObject.setReviews(reviewsList);
-        oneObject.setMediaContent(mediaObject);
-        return oneObject;
-      }).filter(Objects::nonNull).toList();
-
-      return modifiedProductsList;
-    } catch (Exception error) {
-      error.printStackTrace();
-      System.err.println("Internal server error in class: " + this.getClass().getName());
-      return null;
-    }
+    return modifiedProductsList;
   }
 
 }
