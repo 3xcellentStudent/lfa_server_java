@@ -1,0 +1,132 @@
+{
+	"rating": "4.5",
+	"title": "LARQ",
+	"categoryName": "diffusers",
+	"descriptions": {
+		"summary": "Here is description about this air humidifier. It should be short with most important information about this product (model, type, color etc.)",
+		"presentable": [
+			"Here is should be beatiful description about this thing, beacuse it will be presented for customer.",
+			"So, You have to make like it :)"
+		]
+	},
+	"stockInfo": {
+		"category": "air humidifier",
+		"quantityMax": 0,
+		"price": "20.50",
+		"reviewsSnapshot": {
+		}
+	},
+	"productOptions": [
+		{
+			"name": "Color",
+			"type": "color",
+			"items": [
+				{
+					"value": "Blue",
+					"fill": "#29B6F6",
+					"stroke": "transparent",
+					"stockStatus": false,
+					"mediaIndex": 0
+				},
+				{
+					"value": "White",
+					"fill": "#fff",
+					"stroke": "transparent",
+					"stockStatus": true,
+					"mediaIndex": 0
+				},
+				{
+					"value": "Yellow",
+					"fill": "#FFEB3B",
+					"stroke": "transparent",
+					"stockStatus": false,
+					"mediaIndex": 0
+				},
+				{
+					"value": "Brown",
+					"fill": "#9a3412",
+					"stroke": "transparent",
+					"stockStatus": true,
+					"mediaIndex": 0
+				},
+				{
+					"value": "Black",
+					"fill": "#000",
+					"stroke": "transparent",
+					"stockStatus": true,
+					"mediaIndex": 0
+				},
+				{
+					"value": "Red",
+					"fill": "#dc2626",
+					"stroke": "transparent",
+					"stockStatus": true,
+					"mediaIndex": 0
+				}
+			]
+		}
+	],
+	"specifications": {
+		"titles": [
+			"Specifications",
+			"Size & Weight"
+		],
+		"properties": [
+			{
+				"name": "Specifications",
+				"array": [
+					{
+						"name": "Model",
+						"value": "Motion Sensor Light"
+					},
+					{
+						"name": "Voltage",
+						"value": "5V"
+					},
+					{
+						"name": "Light Source",
+						"value": "LED Bulbs"
+					},
+					{
+						"name": "Body Material",
+						"value": "Aluminum"
+					},
+					{
+						"name": "Battery Type",
+						"value": "Lithium Metal"
+					},
+					{
+						"name": "Power Source",
+						"value": "Rechargeable Battery"
+					},
+					{
+						"name": "Wattage",
+						"value": "0-5W"
+					}
+				]
+			},
+			{
+				"name": "Size & Weight",
+				"array": [
+					{
+						"name": "Width",
+						"value": "2cm"
+					},
+					{
+						"name": "Height",
+						"value": "2cm"
+					},
+					{
+						"name": "Length",
+						"value": "20cm"
+					},
+					{
+						"name": "Weight",
+						"value": "1kg"
+					}
+				]
+			}
+		]
+	},
+	"collectionName": "essential oils"
+}

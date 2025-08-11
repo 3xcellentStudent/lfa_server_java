@@ -26,7 +26,7 @@ public class MongoDbMainService {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto body, Class<T> someClass, String collectionName){
+  public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto body, Class<T> someClass){
     long timestamp = System.currentTimeMillis();
 
     Query query = Query.query(Criteria.where("id").is(body.getId()));
@@ -35,7 +35,7 @@ public class MongoDbMainService {
 
     update.set("updatedAt", timestamp);
 
-    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collectionName);
+    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
 
     return ResponseEntity.ok(modifiedProduct);
   }
@@ -71,21 +71,21 @@ public class MongoDbMainService {
     return ResponseEntity.ok(updatedObject);
   }
 
-  public <T> ResponseEntity<Object> deleteManyById(DeleteManyById body, Class<T> someClass, String collectionName){
+  public <T> ResponseEntity<Object> deleteManyById(DeleteManyById body, Class<T> someClass){
     Query query = Query.query(Criteria.where("id").in(body.getId()));
 
-    List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collectionName);
+    List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, body.getCollectionName());
 
     return ResponseEntity.ok(removedObjects);
   }
 
-  public <T> ResponseEntity<Object> deleteManyById(List<String> id, Class<T> someClass, String collectionName){
-    Query query = Query.query(Criteria.where("id").in(id));
+  // public <T> ResponseEntity<Object> deleteManyById(List<String> id, Class<T> someClass, String collectionName){
+  //   Query query = Query.query(Criteria.where("id").in(id));
 
-    List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collectionName);
+  //   List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collectionName);
 
-    return ResponseEntity.ok(removedObjects);
-  }
+  //   return ResponseEntity.ok(removedObjects);
+  // }
 
   public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collectionName){
     List<T> foundObjects = mongoTemplate.findAll(someClass, collectionName).stream()
@@ -98,7 +98,7 @@ public class MongoDbMainService {
     }
   }
 
-  public <T> List<T> findAllById(String selector, List<String> id, Class<T> someClass, String collectionName){
+  public <T> List<T> findManyById(String selector, List<String> id, Class<T> someClass, String collectionName){
     Query query = Query.query(Criteria.where(selector).in(id));
     List<T> foundObjectsList = mongoTemplate.find(query, someClass, collectionName)
     .stream().filter(Objects::nonNull).toList();
@@ -106,7 +106,7 @@ public class MongoDbMainService {
     return foundObjectsList;
   }
 
-  public <T> List<T> findAllById(String selector, String id, Class<T> someClass, String collectionName){
+  public <T> List<T> findManyById(String selector, String id, Class<T> someClass, String collectionName){
     Query query = Query.query(Criteria.where(selector).is(id));
     List<T> foundObject = mongoTemplate.find(query, someClass, collectionName);
 

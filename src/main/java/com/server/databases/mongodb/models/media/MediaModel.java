@@ -86,6 +86,7 @@ public class MediaModel {
   @Id
   @JsonProperty private String id;
   @JsonProperty private String parentId;
+  @JsonProperty private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
   @JsonProperty private TitleContent titleContent = new TitleContent();
@@ -96,6 +97,7 @@ public class MediaModel {
   public MediaModel(MediaModel dataModel){
     this.titleContent = dataModel.titleContent;
     this.images = dataModel.images;
+    this.collectionName = dataModel.collectionName;
   }
 
   public static class MediaContent {
@@ -143,5 +145,13 @@ public class MediaModel {
 
   public void setUpdateAt(long newTime){
     this.updatedAt = newTime;
+  }
+
+  public void setCollectionName(String collectionName){
+    this.collectionName = collectionName;
+  }
+
+  public String getCollectionName(){
+    return this.collectionName;
   }
 }

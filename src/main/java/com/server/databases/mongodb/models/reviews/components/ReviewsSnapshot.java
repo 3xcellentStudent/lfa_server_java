@@ -9,4 +9,8 @@ public class ReviewsSnapshot {
   public int three;
   public int two;
   public int one;
+
+  public int getTotal() {
+    return five + four + three + two + one;
+  }
 }

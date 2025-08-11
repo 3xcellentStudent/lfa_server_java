@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,9 +28,9 @@ import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
 
 @RestController
-@RequestMapping("/api/mongodb/reviews")
+@RequestMapping("/api/mongodb/review")
 @CrossOrigin("*")
-public class ReviewsController {
+public class ReviewController {
   
   @Autowired
   private ReviewsService reviewsService;
@@ -40,49 +39,44 @@ public class ReviewsController {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @PostMapping("/create/{collectionName}")
-  public ResponseEntity<Object> create(@RequestBody ReviewsModel body, @PathVariable(required = true) String collectionName){
-    return reviewsService.createOne(body, collectionName);
+  @PostMapping("/create")
+  public ResponseEntity<Object> create(@RequestBody ReviewsModel body){
+    return reviewsService.createOne(body);
   }
 
-  @PatchMapping("/update/{collectionName}")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body, @PathVariable(required = true) String collectionName){
-    return mainService.updateNewOneById(body, ReviewsModel.class, collectionName);
+  @PatchMapping("/update")
+  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+    return mainService.updateNewOneById(body, ReviewsModel.class);
   }
   
-  @GetMapping("/get/{collectionName}")
-  public ResponseEntity<Object> findAllById(
-    @RequestParam(name = "id", required = false) List<String> id, @PathVariable(required = true) String collectionName
+  @GetMapping("/get")
+  public ResponseEntity<Object> findManyById(
+    @RequestParam(required = false) List<String> id, @RequestParam(required = true) String collectionName
   ){
     if(id == null || id.isEmpty()){
       ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collectionName);
 
       return response;
     } else {
-      List<ReviewsModel> foundReviews = mainService.findAllById("id", id, ReviewsModel.class, collectionName);
+      List<ReviewsModel> foundReviews = mainService.findManyById("id", id, ReviewsModel.class, collectionName);
 
       return ResponseEntity.ok(foundReviews);
     }
   }
 
-  @DeleteMapping("/delete/{collectionName}")
-  public ResponseEntity<Object> deleteAllById(
-    @RequestParam(name = "id", required = true) List<String> id, @PathVariable(required = true) String collectionName
-  ){
-    return mainService.deleteManyById(id, ReviewsModel.class, collectionName);
+  @DeleteMapping("/delete")
+  public ResponseEntity<Object> deleteManyById(@RequestBody DeleteManyById body){
+    return mainService.deleteManyById(body, ReviewsModel.class);
   }
 
-  @DeleteMapping("/delete/recursive/{collectionName}")
-  public ResponseEntity<Object> deleteAllById(@RequestBody DeleteManyById body, @PathVariable(required = true) String collectionName){
-    List<String> id = body.getId();
-    String parentId = body.getParentId();
-
+  @DeleteMapping("/delete/recursive")
+  public ResponseEntity<Object> deleteManyByIdRecursive(@RequestBody DeleteManyById body){
     CompletableFuture<ResponseEntity<Object>> completableFuture = CompletableFuture.supplyAsync(() -> {
-      ResponseEntity<Object> response = mainService.deleteManyById(id, ReviewsModel.class, collectionName);
+      ResponseEntity<Object> response = mainService.deleteManyById(body, ReviewsModel.class);
 
-      Update update = new Update().pullAll("reviewsId", id.toArray(new String[0]));
+      Update update = new Update().pullAll("reviewsId", body.getId().toArray(new String[0]));
       mongoTemplate.updateMulti(new Query(Criteria.where("id")
-      .is(parentId)), update, ProductsModel.class, collectionName);
+      .is(body.getParentId())), update, ProductsModel.class, body.getCollectionName());
 
       return response;
     });
@@ -90,8 +84,8 @@ public class ReviewsController {
     return completableFuture.join();
   }
 
-  @DeleteMapping("/clear-col/{collectionName}")
-  public ResponseEntity<Object> clearCollection(@PathVariable(required = true) String collectionName){
+  @DeleteMapping("/clear-col")
+  public ResponseEntity<Object> clearCollection(@RequestParam(required = true) String collectionName){
     DeleteResult result = mongoTemplate.remove(new Query(), ReviewsModel.class, collectionName);
 
     return ResponseEntity.ok(result);

@@ -8,8 +8,7 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.server.canadapost.models.ShipPriceRequest;
@@ -18,12 +17,13 @@ import com.server.canadapost.models.ShipPriceRequest;
 public class TemplateReader {
 
   private final Logger logger = LoggerFactory.getLogger(TemplateReader.class);
+	
+	@Value("${delivery.canadapost.templates.common}")
+	private String stringUrl;
+	@Value("${delivery.canadapost.account.number}")
+	private String accountNumber;
 
-  @Autowired
-  private Environment env;
-
-  public String getTemplateAsString(String templateName, ShipPriceRequest requestBody){
-		String stringUrl = env.getProperty("delivery.canadapost.templates.common");
+  public String getTemplateAsString(String templateName, ShipPriceRequest body){
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
 			URL resource = classLoader.getResource(stringUrl + templateName);
@@ -36,13 +36,13 @@ public class TemplateReader {
 
 			String formatted = String.format(
 				fileString, 
-				env.getProperty("delivery.canadapost.account.number"), 
-				requestBody.weight, 
-				requestBody.length, 
-				requestBody.width, 
-				requestBody.height, 
-				requestBody.originPostalCode, 
-				requestBody.destinationPostalCode
+				accountNumber, 
+				body.getWeight(), 
+				body.getLength(), 
+				body.getWidth(), 
+				body.getHeight(), 
+				body.getOriginPostalCode(), 
+				body.getDestinationPostalCode()
 			);
 
 			return formatted;

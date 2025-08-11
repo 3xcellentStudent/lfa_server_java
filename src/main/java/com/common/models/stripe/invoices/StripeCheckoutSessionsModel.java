@@ -1,6 +1,5 @@
 package com.common.models.stripe.invoices;
 
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel;
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-// @Document(collection = "stripe_invoices")
 public class StripeCheckoutSessionsModel {
   public String id;
   public String object;

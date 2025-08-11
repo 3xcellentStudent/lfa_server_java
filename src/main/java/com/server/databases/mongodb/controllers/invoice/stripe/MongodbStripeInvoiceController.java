@@ -1,6 +1,4 @@
-package com.server.databases.mongodb.controllers.invoices.stripe;
-
-import java.util.List;
+package com.server.databases.mongodb.controllers.invoice.stripe;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,53 +7,53 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
+import com.server.databases.mongodb.dto.DeleteManyById;
+import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.invoices.stripe.InvoicesStripeService;
 
 @RestController
-@RequestMapping("/api/mongodb/invoices/stripe")
+@RequestMapping("/api/mongodb/invoice/stripe")
 @CrossOrigin("*")
-public class MongodbStripeInvoicesController {
+public class MongodbStripeInvoiceController {
 
   @Autowired
   private InvoicesStripeService invoicesService;
   @Autowired
   private MongoDbMainService mainService;
 
-  @Value("${mongodb.collections.stripe.invoices}")
+  @Value("${mongodb.collections.invoice}")
   private String collectionName;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
-    ResponseEntity<Object> savedPaymentObject = invoicesService.createOne(requestBodyString);
+  public ResponseEntity<Object> create(@RequestBody StripeCheckoutSessionsModel body){
+    ResponseEntity<Object> savedPaymentObject = invoicesService.createOne(body);
 
     return savedPaymentObject;
   }
 
-  @PutMapping("/update")
-  public ResponseEntity<Object> update(@RequestBody String requestBodyString){
-    ResponseEntity<Object> savedPaymentObject = invoicesService.updateOne(requestBodyString, requestBodyString);
+  // @PutMapping("/update")
+  // public ResponseEntity<Object> update(@RequestBody StripeCheckoutSessionsModel body){
+  //   ResponseEntity<Object> savedPaymentObject = invoicesService.updateOne(body);
 
-    return savedPaymentObject;
-  }
+  //   return savedPaymentObject;
+  // }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAllById(@RequestParam(name = "id", required = false) List<String> id){
-    ResponseEntity<Object> savedPaymentObject = invoicesService.findAllById(id);
+  public ResponseEntity<Object> findManyById(@RequestBody GetManyById body){
+    ResponseEntity<Object> savedPaymentObject = invoicesService.findManyById(body);
 
     return savedPaymentObject;
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(@RequestParam(name = "id", required = false) List<String> id){
-    ResponseEntity<Object> savedPaymentObject = invoicesService.deleteAllById(id);
+  public ResponseEntity<Object> deleteManyById(@RequestBody DeleteManyById body){
+    ResponseEntity<Object> savedPaymentObject = invoicesService.deleteManyById(body);
 
     return savedPaymentObject;
   }

@@ -6,37 +6,38 @@ public class DeleteManyFromArray {
   private List<Integer> indexes;
   private String selector;
   private String id;
+  private String collectionName;
 
   DeleteManyFromArray(){}
 
-  DeleteManyFromArray(DeleteManyFromArray requestBody){
-    this.indexes = requestBody.indexes;
-    this.selector = requestBody.selector;
-    this.id = requestBody.id;
+  DeleteManyFromArray(DeleteManyFromArray body){
+    this.indexes = body.indexes;
+    this.selector = body.selector;
+    this.id = body.id;
+    this.collectionName = body.collectionName;
+  }
+
+  DeleteManyFromArray(List<Integer> indexes, String selector, String id, String collectionName){
+    this.indexes = indexes;
+    this.selector = selector;
+    this.id = id;
+    this.collectionName = collectionName;
   }
 
   public String getId() {
     return this.id;
   }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public List<Integer> getIndexes(){
     return this.indexes;
-  }
-
-  public void setIndexes(List<Integer> indexes){
-    this.indexes = indexes;
   }
 
   public String getSelector(){
     return this.selector;
   }
 
-  public void setSelector(String selector){
-    this.selector = selector;
+  public String getCollectionName(){
+    return this.collectionName;
   }
 
 }

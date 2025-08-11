@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.client.result.DeleteResult;
+import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.DeleteManyFromArray;
+import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.media.MediaModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
@@ -37,50 +38,48 @@ public class MediaController {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @PostMapping("/create/{collectionName}")
-  public ResponseEntity<Object> create(@RequestBody MediaModel body, @PathVariable(required = true) String collectionName){
-    return mediaService.createOne(body, collectionName);
+  @PostMapping("/create")
+  public ResponseEntity<Object> create(@RequestBody MediaModel body){
+    return mediaService.createOne(body);
   }
 
-  @PatchMapping("/update/{collectionName}")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body, @PathVariable(required = true) String collectionName){
-    return mainService.updateNewOneById(body, MediaModel.class, collectionName);
+  @PatchMapping("/update")
+  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+    return mainService.updateNewOneById(body, MediaModel.class);
   }
 
-  @PutMapping("/push/{collectionName}")
-  public ResponseEntity<Object> pushNewOneToArrayById(@RequestBody UpdateOneByIdDto body, @PathVariable(required = true) String collectionName){
-    return mainService.pushNewOneToArrayById(body, MediaModel.class, collectionName);
+  @PutMapping("/push")
+  public ResponseEntity<Object> pushNewOneToArrayById(@RequestBody UpdateOneByIdDto body){
+    return mainService.pushNewOneToArrayById(body, MediaModel.class, body.getCollectionName());
   }
 
-  @DeleteMapping("/delete-many-from-array/{collectionName}")
-  public ResponseEntity<Object> deleteManyFromArray(@RequestBody DeleteManyFromArray body, @PathVariable(required = true) String collectionName){
-    return mainService.deleteManyFromArrayById(body, MediaModel.class, collectionName);
+  @DeleteMapping("/delete-many-from-array")
+  public ResponseEntity<Object> deleteManyFromArray(@RequestBody DeleteManyFromArray body){
+    return mainService.deleteManyFromArrayById(body, MediaModel.class, body.getCollectionName());
   }
 
-  @GetMapping("/get/{collectionName}")
-  public ResponseEntity<Object> findAllById(
-    @RequestParam(name = "id", required = false) List<String> id, @PathVariable(required = true) String collectionName
-  ){
-    if(id == null || id.isEmpty()){
-      ResponseEntity<Object> response = mainService.findAll(MediaModel.class, collectionName);
+  @GetMapping("/get")
+  public ResponseEntity<Object> findAllById(@RequestBody GetManyById body){
+    if(body.getId() == null || body.getId().isEmpty()){
+      ResponseEntity<Object> response = mainService.findAll(MediaModel.class, body.getCollectionName());
 
       return response;
     } else {
-      List<MediaModel> foundMedia = mainService.findAllById("id", id, MediaModel.class, collectionName);
+      List<MediaModel> foundMedia = mainService.findManyById("id", body.getId(), MediaModel.class, body.getCollectionName());
 
       return ResponseEntity.ok(foundMedia);
     }
   }
 
-  @DeleteMapping("/delete/{collectionName}")
+  @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteAllById(
-    @RequestParam(name = "id", required = true) List<String> id, @PathVariable(required = true) String collectionName
+    @RequestBody DeleteManyById body
   ){
-    return mainService.deleteManyById(id, MediaModel.class, collectionName);
+    return mainService.deleteManyById(body, MediaModel.class);
   }
 
-  @DeleteMapping("/clear-col/{collectionName}")
-  public ResponseEntity<Object> clearCollection(@PathVariable(required = true) String collectionName){
+  @DeleteMapping("/clear-col")
+  public ResponseEntity<Object> clearCollection(@RequestParam(required = true) String collectionName){
     DeleteResult result = mongoTemplate.remove(new Query(), MediaModel.class, collectionName);
 
     return ResponseEntity.ok(result);

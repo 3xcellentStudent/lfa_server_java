@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.databases.mongodb.dto.categories.DeleteCategoriesDto;
 import com.server.databases.mongodb.dto.categories.UpdateCategoriesDto;
-// import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 import com.server.databases.mongodb.models.global.GlobalDataModel;
 import com.server.databases.mongodb.services.uuid.CustomUUID;
 

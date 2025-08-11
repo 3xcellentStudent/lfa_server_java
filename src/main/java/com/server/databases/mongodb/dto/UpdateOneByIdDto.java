@@ -4,43 +4,38 @@ public class UpdateOneByIdDto {
   private String id;
   private String field;
   private Object newData;
+  private String collectionName;
 
   public String getId() {
     return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public String getField() {
     return field;
   }
 
-  public void setField(String field) {
-    this.field = field;
-  }
-
   public Object getNewData() {
     return newData;
   }
 
-  public void setNewData(Object newData) {
-    this.newData = newData;
+  public String getCollectionName() {
+    return collectionName;
   }
 
   public UpdateOneByIdDto(){}
 
-  public UpdateOneByIdDto(UpdateOneByIdDto requestBody){
-    this.id = requestBody.id;
-    this.field = requestBody.field;
-    this.newData = requestBody.newData;
+  public UpdateOneByIdDto(UpdateOneByIdDto body){
+    this.id = body.id;
+    this.field = body.field;
+    this.newData = body.newData;
+    this.collectionName = body.collectionName;
   }
 
   public UpdateOneByIdDto(String id, String field, Object newData, String collectionName){
     this.id = id;
     this.field = field;
     this.newData = newData;
+    this.collectionName = collectionName;
   }
 
 }

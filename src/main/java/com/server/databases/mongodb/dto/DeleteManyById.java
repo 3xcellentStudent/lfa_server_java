@@ -2,36 +2,38 @@ package com.server.databases.mongodb.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DeleteManyById {
-  private List<String> id;
-  private String parentId;
+  
+  @JsonProperty private List<String> id;
+  @JsonProperty private String parentId;
+  @JsonProperty private String collectionName;
 
   DeleteManyById(){}
 
   DeleteManyById(DeleteManyById requestBody){
     this.id = requestBody.id;
     this.parentId = requestBody.parentId;
+    this.collectionName = requestBody.collectionName;
   }
 
-  DeleteManyById(List<String> id, String parentId){
+  DeleteManyById(List<String> id, String parentId, String collectionName){
     this.id = id;
     this.parentId = parentId;
+    this.collectionName = collectionName;
   }
 
   public List<String> getId() {
     return id;
   }
 
-  public void setId(List<String> id) {
-    this.id = id;
-  }
-
   public String getParentId() {
     return parentId;
   }
 
-  public void setParentId(String parentId) {
-    this.parentId = parentId;
+  public String getCollectionName() {
+    return collectionName;
   }
 
 }

@@ -29,7 +29,7 @@ public class MediaService {
     return ResponseEntity.ok(response);
   }
 
-  public ResponseEntity<Object> createOne(MediaModel body, String collectionName){
+  public ResponseEntity<Object> createOne(MediaModel body){
     long timestamp = System.currentTimeMillis();
 
     // MediaModel requestBodyObject = objectMapper.readValue(requestBodyString, MediaModel.class);
@@ -37,7 +37,7 @@ public class MediaService {
 
     Query query = Query.query(Criteria.where("id").is(id));
 
-    boolean isExists = mongoTemplate.exists(query, MediaModel.class, collectionName);
+    boolean isExists = mongoTemplate.exists(query, MediaModel.class, body.getCollectionName());
     if(isExists){
       return ResponseEntity.status(303).body("Document already exists !");
     } else {
@@ -45,7 +45,7 @@ public class MediaService {
       body.setCreateAt(timestamp);
       body.setUpdateAt(timestamp);
 
-      MediaModel savedReviews = mongoTemplate.save(body, collectionName);
+      MediaModel savedReviews = mongoTemplate.save(body, body.getCollectionName());
 
       return ResponseEntity.ok(savedReviews);
     }

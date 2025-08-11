@@ -3,12 +3,12 @@ package com.server.databases.mongodb.models.products;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.databases.mongodb.models.media.MediaModel;
+import com.server.databases.mongodb.models.products.variations.ProductVariations;
 import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 
 @Component
@@ -18,16 +18,18 @@ public class ProductsModel {
   @JsonProperty private String id;
   @JsonProperty private ArrayList<String> reviewsId = new ArrayList<>();
   @JsonProperty private String mediaId;
+  @JsonProperty private List<String> productVariationsIds;
   @JsonProperty private String rating;
   @JsonProperty private String title;
   @JsonProperty private Descriptions descriptions;
-  @JsonProperty private StockInfo stockInfo;
-  @JsonProperty private List<ProductOption> productOptions;
+  @JsonProperty private List<ProductVariations> productVariations;
+  // @JsonProperty private StockInfo stockInfo;
+  // @JsonProperty private List<ProductOption> productOptions;
   @JsonProperty private Specifications specifications;
   @JsonProperty private MediaModel mediaContent;
-  @Autowired
   @JsonProperty private ReviewsSnapshot reviewsSnapshot;
   @JsonProperty private String collectionName;
+  @JsonProperty private String category;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -36,28 +38,40 @@ public class ProductsModel {
     public String[] presentable;
   }
 
-  public static class StockInfo {
-    public String category;
-    public int quantityMax;
-    public String price;
-    @Autowired
-    public ReviewsSnapshot reviewsSnapshot;
-    public int countOfReviews;
-  }
+  // public static class StockInfo {
+  //   public int quantityMax;
+  //   public String price;
+  //   public int quantityAvailable;
+  //   // @Autowired
+  //   // public ReviewsSnapshot reviewsSnapshot;
+  //   // public int countOfReviews;
+  // }
 
-  public static class ProductOption {
-    public String name;
-    public String type;
-    public List<Item> items;
-  }
+  // public static class ProductOption {
+  //   public String name;
+  //   public String type;
+  //   public List<Item> items;
+  // }
 
-  public static class Item {
-    public String value;
-    public String fill;
-    public String stroke;
-    public boolean stockStatus;
-    public int mediaIndex;
-  }
+  // public static class Item {
+  //   public String value;
+  //   public String fill;
+  //   public String stroke;
+  //   public boolean stockStatus;
+  //   public int mediaIndex;
+  // }
+
+  // public static class ReviewsSnapshot {
+  //   public int five;
+  //   public int four;
+  //   public int three;
+  //   public int two;
+  //   public int one;
+
+  //   public int getTotal() {
+  //     return five + four + three + two + one;
+  //   }
+  // }
 
   public static class MediaContent {
     public TitleContent titleContent;
@@ -141,19 +155,47 @@ public class ProductsModel {
     return this.title;
   }
 
-  public StockInfo getStockInfo(){
-    return this.stockInfo;
+  public void setProductVariationsIds(List<String> productVariationsIds){
+    this.productVariationsIds = productVariationsIds;
   }
+
+  public List<String> getProductVariationsIds(){
+    return this.productVariationsIds;
+  }
+
+  public List<ProductVariations> getProductVariations(){
+    return this.productVariations;
+  }
+
+  public void setProductVariations(List<ProductVariations> productVariations){
+    this.productVariations = productVariations;
+  }
+
+  public void pushProductVariation(ProductVariations productVariation){
+    this.productVariations.add(productVariation);
+  }
+
+  // public StockInfo getStockInfo(){
+  //   return this.stockInfo;
+  // }
 
   public int getReviewsSnapshotByFieldName(String field){
     switch(field){
-      case "five": return stockInfo.reviewsSnapshot.five;
-      case "four": return stockInfo.reviewsSnapshot.four;
-      case "three": return stockInfo.reviewsSnapshot.three;
-      case "two": return stockInfo.reviewsSnapshot.two;
-      case "one": return stockInfo.reviewsSnapshot.one;
-      default: return stockInfo.reviewsSnapshot.five;
+      case "five": return this.reviewsSnapshot.five;
+      case "four": return this.reviewsSnapshot.four;
+      case "three": return this.reviewsSnapshot.three;
+      case "two": return this.reviewsSnapshot.two;
+      case "one": return this.reviewsSnapshot.one;
+      default: return this.reviewsSnapshot.five;
     }
+  }
+
+  public int getReviewsSnapshotSum(){
+    return this.reviewsSnapshot.getTotal();
+  }
+
+  public ReviewsSnapshot getReviewsSnapshot(){
+    return this.reviewsSnapshot;
   }
 
   public String getRating(){
@@ -164,9 +206,9 @@ public class ProductsModel {
     return this.descriptions;
   }
 
-  public List<ProductOption> getProductOptions(){
-    return this.productOptions;
-  }
+  // public List<ProductOption> getProductOptions(){
+  //   return this.productOptions;
+  // }
 
   public Specifications getSpecifications(){
     return this.specifications;
@@ -174,10 +216,6 @@ public class ProductsModel {
 
   public String getCollectionName(){
     return this.collectionName;
-  }
-
-  public ReviewsSnapshot getReviewsSnapshot(){
-    return this.stockInfo.reviewsSnapshot;
   }
 
   public ProductsModel(){}
@@ -189,8 +227,10 @@ public class ProductsModel {
     this.rating = dataModel.getRating();
     this.title = dataModel.getTitle();
     this.descriptions = dataModel.getDescriptions();
-    this.stockInfo = dataModel.getStockInfo();
-    this.productOptions = dataModel.getProductOptions();
+    this.productVariationsIds = dataModel.getProductVariationsIds();
+    this.productVariations = dataModel.getProductVariations();
+    // this.stockInfo = dataModel.getStockInfo();
+    // this.productOptions = dataModel.getProductOptions();
     this.specifications = dataModel.getSpecifications();
     this.mediaContent = dataModel.getMediaContent();
     this.collectionName = dataModel.getCollectionName();

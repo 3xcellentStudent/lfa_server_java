@@ -1,7 +1,5 @@
 package com.server.databases.mongodb.controllers.global;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.client.result.DeleteResult;
@@ -47,7 +44,7 @@ public class GlobalDataController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
-    return mainService.updateNewOneById(body, GlobalDataModel.class, collectionName);
+    return mainService.updateNewOneById(body, GlobalDataModel.class);
   }
 
   @GetMapping("/get/{id}")
@@ -64,9 +61,9 @@ public class GlobalDataController {
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteAllById(
-    @RequestParam(name = "id", required = true) List<String> id
+    @RequestBody DeleteManyById body
     ){
-    return mainService.deleteManyById(id, GlobalDataModel.class, collectionName);
+    return mainService.deleteManyById(body, GlobalDataModel.class);
   }
 
   @DeleteMapping("/clear-col")

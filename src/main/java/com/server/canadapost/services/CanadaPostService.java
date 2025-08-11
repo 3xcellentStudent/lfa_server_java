@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +24,6 @@ public class CanadaPostService {
   private Logger logger = LoggerFactory.getLogger(CanadaPostService.class);
 
   @Autowired
-  private Environment env;
-  @Autowired
   private ObjectMapper objectMapper;
   @Autowired
   private TemplateReader templateReader;
@@ -40,13 +37,16 @@ public class CanadaPostService {
   
   private HttpClient httpClient = HttpClient.newHttpClient();
 
+  @Value("${delivery.canadapost.token}")
+  private String canadapostToken;
+
   public Object pickupAvailability(String postalCode){
     try {
       HttpRequest request = HttpRequest.newBuilder()
       .uri(new URI(PICKUP_AVAILABILITY_ROUTE + postalCode))
       .GET()
       .header("Accept", "application/vnd.cpc.pickup+xml")
-      .header("Authorization", "Basic " + env.getProperty("delivery.canadapost.token"))
+      .header("Authorization", "Basic " + canadapostToken)
       .build();
 
       Object response = httpClient.sendAsync(request, null).join().body();
@@ -75,7 +75,7 @@ public class CanadaPostService {
       .header("Accept", "application/vnd.cpc.ship.rate-v4+xml")
       .header("Content-Type", "application/vnd.cpc.ship.rate-v4+xml")
       .header("Accept-language", "en-CA or fr-CA")
-      .header("Authorization", "Basic " + env.getProperty("delivery.canadapost.token"))
+      .header("Authorization", "Basic " + canadapostToken)
       .build();
 
       Object response = httpClient.sendAsync(request, null).join().body();
@@ -101,7 +101,7 @@ public class CanadaPostService {
       .POST(BodyPublishers.ofString("<?xml version='1.0' encoding='utf-8'?><non-contract-shipment xmlns='http://www.canadapost.ca/ws/ncshipment-v4'><requested-shipping-point>T6C4G0</requested-shipping-point><delivery-spec><service-code>DOM.EP</service-code><sender><company>Andrew Corporation</company><contact-phone>7807295953</contact-phone><address-details><address-line-1>9009 85 St NW</address-line-1><city>Edmonton</city><prov-state>AB</prov-state><postal-zip-code>T6C3C6</postal-zip-code></address-details></sender><destination><name>John Doe</name><company>Consumer</company><address-details><address-line-1>701 32nd St W</address-line-1><city>Saskatoon</city><prov-state>SK</prov-state><country-code>CA</country-code><postal-zip-code>S7L2A1</postal-zip-code></address-details></destination><options><option><option-code>DC</option-code></option></options><parcel-characteristics><weight>3</weight><dimensions><length>6</length><width>4</width><height>2</height></dimensions></parcel-characteristics><preferences><show-packing-instructions>true</show-packing-instructions></preferences></delivery-spec></non-contract-shipment>"))
       .header("Accept", "application/vnd.cpc.ncshipment-v4+xml")
       .header("Content-Type", "application/vnd.cpc.ncshipment-v4+xml")
-      .header("Authorization", "Basic " + env.getProperty("delivery.canadapost.token"))
+      .header("Authorization", "Basic " + canadapostToken)
       .header("Accept-language", "en-CA or fr-CA")
       .build();
 
