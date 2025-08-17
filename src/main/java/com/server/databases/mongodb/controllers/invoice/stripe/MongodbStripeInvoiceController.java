@@ -17,6 +17,8 @@ import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.invoices.stripe.InvoicesStripeService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/mongodb/invoice/stripe")
 @CrossOrigin("*")
@@ -31,7 +33,7 @@ public class MongodbStripeInvoiceController {
   private String collectionName;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody StripeCheckoutSessionsModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody StripeCheckoutSessionsModel body){
     ResponseEntity<Object> savedPaymentObject = invoicesService.createOne(body);
 
     return savedPaymentObject;
@@ -45,14 +47,14 @@ public class MongodbStripeInvoiceController {
   // }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findManyById(@RequestBody GetManyById body){
+  public ResponseEntity<Object> findManyById(@Valid @RequestBody GetManyById body){
     ResponseEntity<Object> savedPaymentObject = invoicesService.findManyById(body);
 
     return savedPaymentObject;
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteManyById(@RequestBody DeleteManyById body){
+  public ResponseEntity<Object> deleteManyById(@Valid @RequestBody DeleteManyById body){
     ResponseEntity<Object> savedPaymentObject = invoicesService.deleteManyById(body);
 
     return savedPaymentObject;

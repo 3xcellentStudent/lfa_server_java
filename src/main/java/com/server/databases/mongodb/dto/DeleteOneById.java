@@ -2,10 +2,12 @@ package com.server.databases.mongodb.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class DeleteOneById {
   
-  @JsonProperty private String id;
-  @JsonProperty private String collectionName;
+  @JsonProperty @NotBlank private String id;
+  @JsonProperty @NotBlank private String collectionName;
 
   public DeleteOneById(){}
 

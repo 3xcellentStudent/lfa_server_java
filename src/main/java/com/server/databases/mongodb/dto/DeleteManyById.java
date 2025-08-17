@@ -4,11 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class DeleteManyById {
   
-  @JsonProperty private List<String> id;
-  @JsonProperty private String parentId;
-  @JsonProperty private String collectionName;
+  @JsonProperty @NotBlank private List<String> id;
+  @JsonProperty @NotBlank private String parentId;
+  @JsonProperty @NotBlank private String collectionName;
 
   DeleteManyById(){}
 

@@ -22,6 +22,8 @@ import com.server.databases.mongodb.models.global.GlobalDataModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.global.GlobalDataService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/mongodb/global-data")
 @CrossOrigin("*")
@@ -38,17 +40,17 @@ public class GlobalDataController {
   private String collectionName;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody String requestBodyString){
+  public ResponseEntity<Object> create(@Valid @RequestBody String requestBodyString){
     return globalDataService.createOne(requestBodyString);
   }
 
   @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, GlobalDataModel.class);
   }
 
   @GetMapping("/get/{id}")
-  public ResponseEntity<Object> findById(@PathVariable String id){
+  public ResponseEntity<Object> findById(@Valid @PathVariable String id){
     GlobalDataModel foundObject = mongoTemplate.findById(id, GlobalDataModel.class);
 
     return ResponseEntity.ok(foundObject);
@@ -60,9 +62,7 @@ public class GlobalDataController {
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(
-    @RequestBody DeleteManyById body
-    ){
+  public ResponseEntity<Object> deleteAllById(@Valid @RequestBody DeleteManyById body){
     return mainService.deleteManyById(body, GlobalDataModel.class);
   }
 

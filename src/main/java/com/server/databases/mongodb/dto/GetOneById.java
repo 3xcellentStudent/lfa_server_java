@@ -2,10 +2,12 @@ package com.server.databases.mongodb.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class GetOneById {
   
-  @JsonProperty private String id;
-  @JsonProperty private String collectionName;
+  @JsonProperty @NotBlank(message = "HELOHELOHELOHELOHELO") private String id;
+  @JsonProperty @NotBlank private String collectionName;
 
   public String getId() {
     return id;
@@ -13,6 +15,14 @@ public class GetOneById {
 
   public String getCollectionName() {
     return collectionName;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setCollectionName(String collectionName) {
+    this.collectionName = collectionName;
   }
 
   public GetOneById(){}

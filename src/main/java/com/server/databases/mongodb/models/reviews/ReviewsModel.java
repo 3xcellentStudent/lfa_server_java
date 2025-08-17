@@ -7,16 +7,18 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.constraints.NotBlank;
+
 @Component
 public class ReviewsModel {
 
   @Id
   @JsonProperty private String id;
-  @JsonProperty private String parentId;
-  @JsonProperty private String content;
-  @JsonProperty private String firstName;
-  @JsonProperty private String lastName;
-  @JsonProperty private String title;
+  @JsonProperty @NotBlank private String parentId;
+  @JsonProperty @NotBlank private String content;
+  @JsonProperty @NotBlank private String firstName;
+  @JsonProperty @NotBlank private String lastName;
+  @JsonProperty @NotBlank private String title;
   @JsonProperty private int rating;
   @JsonProperty private List<String> attachments;
   @JsonProperty private long createdAt;

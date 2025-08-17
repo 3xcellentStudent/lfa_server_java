@@ -2,11 +2,16 @@ package com.server.databases.mongodb.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+
 public class DeleteManyFromArray {
-  private List<Integer> indexes;
-  private String selector;
-  private String id;
-  private String collectionName;
+  
+  @JsonProperty @NotBlank private List<Integer> indexes;
+  @JsonProperty @NotBlank private String selector;
+  @JsonProperty @NotBlank private String id;
+  @JsonProperty @NotBlank private String collectionName;
 
   DeleteManyFromArray(){}
 

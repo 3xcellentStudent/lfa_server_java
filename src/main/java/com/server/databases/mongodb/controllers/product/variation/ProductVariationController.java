@@ -19,6 +19,8 @@ import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.products.variations.ProductVariations;
 import com.server.databases.mongodb.services.MongoDbMainService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/mongodb/product/variation")
 public class ProductVariationController {
@@ -27,7 +29,7 @@ public class ProductVariationController {
   private MongoDbMainService mainService;
 
   @GetMapping("/get/parent-id")
-  public ResponseEntity<Object> getByParentId(@RequestParam String id, @RequestParam String collectionName){
+  public ResponseEntity<Object> getByParentId(@Valid @RequestParam String id, @RequestParam String collectionName){
     List<ProductVariations> productVariations = mainService
     .findManyById("parentId", id, ProductVariations.class, collectionName);
 
@@ -35,7 +37,7 @@ public class ProductVariationController {
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> getManyById(@RequestBody GetManyById body){
+  public ResponseEntity<Object> getManyById(@Valid @RequestBody GetManyById body){
     List<ProductVariations> productVariations = mainService
     .findManyById("id", body.getId(), ProductVariations.class, body.getCollectionName());
 
@@ -43,17 +45,17 @@ public class ProductVariationController {
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, ProductVariations.class);
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteById(@RequestBody DeleteManyById body){
+  public ResponseEntity<Object> deleteById(@Valid @RequestBody DeleteManyById body){
     return mainService.deleteManyById(body, ProductVariations.class);
   }
   
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@PathVariable(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(@Valid @PathVariable(required = true) String collectionName){
     return mainService.clearCollection(ProductVariations.class, collectionName);
   }
 

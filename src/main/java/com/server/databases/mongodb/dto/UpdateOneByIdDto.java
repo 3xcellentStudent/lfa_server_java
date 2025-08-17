@@ -1,10 +1,15 @@
 package com.server.databases.mongodb.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+
 public class UpdateOneByIdDto {
-  private String id;
-  private String field;
-  private Object newData;
-  private String collectionName;
+  
+  @JsonProperty @NotBlank private String id;
+  @JsonProperty @NotBlank private String field;
+  @JsonProperty @NotBlank private Object newData;
+  @JsonProperty @NotBlank private String collectionName;
 
   public String getId() {
     return id;

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.databases.mongodb.models.media.MediaModel.MediaContent.Image;
 import com.server.databases.mongodb.models.media.MediaModel.MediaContent.TitleContent;
 
+import jakarta.validation.constraints.NotBlank;
+
 // @Component
 // @Document(collection = "media_diffusers")
 // public class DiffusersMediaModel {
@@ -85,8 +87,8 @@ public class MediaModel {
 
   @Id
   @JsonProperty private String id;
-  @JsonProperty private String parentId;
-  @JsonProperty private String collectionName;
+  @JsonProperty @NotBlank private String parentId;
+  @JsonProperty @NotBlank private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
   @JsonProperty private TitleContent titleContent = new TitleContent();

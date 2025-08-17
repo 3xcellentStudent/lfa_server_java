@@ -51,6 +51,8 @@ public class ProductsService {
       body.setMediaId(mediaId);
       body.setCreatedAt(timestamp);
       body.setUpdatedAt(timestamp);
+      body.setProductVariationsIds(List.of());
+      body.setProductVariations(List.of());
 
       ProductsModel savedObject = mongoTemplate.save(body, body.getCollectionName());
       

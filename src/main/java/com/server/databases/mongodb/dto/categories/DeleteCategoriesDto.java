@@ -2,11 +2,15 @@ package com.server.databases.mongodb.dto.categories;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+
 public class DeleteCategoriesDto {
   
-  private String id;
-  private String categoryName;
-  private List<Integer> indexes;
+  @JsonProperty @NotBlank private String id;
+  @JsonProperty @NotBlank private String categoryName;
+  @JsonProperty @NotBlank private List<Integer> indexes;
 
   public String getId(){
     return id;

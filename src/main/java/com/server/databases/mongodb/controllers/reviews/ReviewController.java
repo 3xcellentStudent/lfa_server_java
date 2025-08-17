@@ -27,6 +27,9 @@ import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
 @RestController
 @RequestMapping("/api/mongodb/review")
 @CrossOrigin("*")
@@ -40,18 +43,18 @@ public class ReviewController {
   private MongoTemplate mongoTemplate;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody ReviewsModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody ReviewsModel body){
     return reviewsService.createOne(body);
   }
 
   @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, ReviewsModel.class);
   }
   
   @GetMapping("/get")
   public ResponseEntity<Object> findManyById(
-    @RequestParam(required = false) List<String> id, @RequestParam(required = true) String collectionName
+    @RequestParam(required = false) List<String> id, @NotBlank @RequestParam(required = true) String collectionName
   ){
     if(id == null || id.isEmpty()){
       ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collectionName);
@@ -65,12 +68,12 @@ public class ReviewController {
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteManyById(@RequestBody DeleteManyById body){
+  public ResponseEntity<Object> deleteManyById(@Valid @RequestBody DeleteManyById body){
     return mainService.deleteManyById(body, ReviewsModel.class);
   }
 
   @DeleteMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteManyByIdRecursive(@RequestBody DeleteManyById body){
+  public ResponseEntity<Object> deleteManyByIdRecursive(@Valid @RequestBody DeleteManyById body){
     CompletableFuture<ResponseEntity<Object>> completableFuture = CompletableFuture.supplyAsync(() -> {
       ResponseEntity<Object> response = mainService.deleteManyById(body, ReviewsModel.class);
 
@@ -85,7 +88,7 @@ public class ReviewController {
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
     DeleteResult result = mongoTemplate.remove(new Query(), ReviewsModel.class, collectionName);
 
     return ResponseEntity.ok(result);

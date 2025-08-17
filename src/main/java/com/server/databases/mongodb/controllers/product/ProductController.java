@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,8 @@ import com.server.databases.mongodb.models.products.ProductsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.products.ProductsService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/mongodb/product")
 @CrossOrigin("*")
@@ -33,54 +36,52 @@ public class ProductController {
   private MongoDbMainService mainService;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody ProductsModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody ProductsModel body){
     return productsService.createOne(body);
   }
 
   @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, ProductsModel.class);
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAll(@RequestParam(required = false) List<String> id, @RequestParam String collectionName){
-    System.out.println(id);
-    System.out.println(id.isEmpty());
-    if(id == null || id.isEmpty()){
+  public ResponseEntity<Object> findAll(@Valid @ModelAttribute GetManyById body){
+    if(body.getId() == null || body.getId().isEmpty()){
       ResponseEntity<Object> response = mainService
-      .findAll(ProductsModel.class, collectionName);
+      .findAll(ProductsModel.class, body.getCollectionName());
 
       return response;
     } else {
       List<ProductsModel> foundProducts = mainService
-      .findManyById("id", id, ProductsModel.class, collectionName);
+      .findManyById("id", body.getId(), ProductsModel.class, body.getCollectionName());
 
       return ResponseEntity.ok(foundProducts);
     }
   }
 
-  @PostMapping("/get/recursive")
-  public ResponseEntity<Object> findOneByIdRecursive(@RequestBody GetOneById body){
+  @GetMapping("/get/recursive")
+  public ResponseEntity<Object> findOneByIdRecursive(@Valid @ModelAttribute GetOneById body){
     return productsService.findRecursiveById(body.getId(), body.getCollectionName());
   }
 
-  @PostMapping("/get/recursive/many")
-  public ResponseEntity<Object> findManyByIdRecursive(@RequestBody GetManyById body){
+  @GetMapping("/get/recursive/many")
+  public ResponseEntity<Object> findManyByIdRecursive(@Valid @ModelAttribute GetManyById body){
     return productsService.findManyRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(@RequestBody DeleteManyById body){
+  public ResponseEntity<Object> deleteAllById(@Valid @RequestBody DeleteManyById body){
     return mainService.deleteManyById(body, ProductsModel.class);
   }
 
   @DeleteMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteAllByIdRecursive(@RequestBody GetManyById body){
+  public ResponseEntity<Object> deleteAllByIdRecursive(@Valid @RequestBody GetManyById body){
     return productsService.deleteRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
     return mainService.clearCollection(ProductsModel.class, collectionName);
   }
   

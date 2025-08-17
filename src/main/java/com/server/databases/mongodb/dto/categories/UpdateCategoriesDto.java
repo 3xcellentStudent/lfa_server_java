@@ -2,12 +2,16 @@ package com.server.databases.mongodb.dto.categories;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+
 public class UpdateCategoriesDto {
   
-  private String id;
-  private String categoryName;
-  private List<Integer> indexes;
-  private List<String> values;
+  @JsonProperty @NotBlank private String id;
+  @JsonProperty @NotBlank private String categoryName;
+  @JsonProperty @NotBlank private List<Integer> indexes;
+  @JsonProperty @NotBlank private List<String> values;
 
   public String getId(){
     return id;

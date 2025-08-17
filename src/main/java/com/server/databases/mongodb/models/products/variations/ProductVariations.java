@@ -2,21 +2,25 @@ package com.server.databases.mongodb.models.products.variations;
 
 import java.util.List;
 
+import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 
 public class ProductVariations {
 
   @Id
   @JsonProperty private String id;
-  @JsonProperty private String parentId;
+  @JsonProperty @NotBlank private String parentId;
   @JsonProperty private StockInfo stockInfo;
-  @JsonProperty private String variationName;
+  @JsonProperty @NotBlank private String variationName;
   @JsonProperty private List<ProductOption> productOptions;
   @JsonProperty private List<String> images;
-  @JsonProperty private String collectionName;
-  @JsonProperty private String category;
+  @JsonProperty @NotBlank private String collectionName;
+  @JsonProperty @NotBlank private String category;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -26,9 +30,11 @@ public class ProductVariations {
   }
 
   public static class StockInfo {
-    public int quantityMax;
+    @Min(0) public int quantityMax;
+    @NotBlank(message = "\"price\" cannot be blank !")
+    @Pattern(regexp = "^[0-9]+$", message = "\"id\" must contain only digits")
     public String price;
-    public int quantityAvailable;
+    @Min(0) public int quantityAvailable;
   }
 
   public static class ProductOption {

@@ -26,6 +26,8 @@ import com.server.databases.mongodb.models.media.MediaModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.MediaService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/mongodb/media")
 @CrossOrigin("*")
@@ -39,27 +41,27 @@ public class MediaController {
   private MongoTemplate mongoTemplate;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@RequestBody MediaModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody MediaModel body){
     return mediaService.createOne(body);
   }
 
   @PatchMapping("/update")
-  public ResponseEntity<Object> updateOneById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, MediaModel.class);
   }
 
   @PutMapping("/push")
-  public ResponseEntity<Object> pushNewOneToArrayById(@RequestBody UpdateOneByIdDto body){
+  public ResponseEntity<Object> pushNewOneToArrayById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.pushNewOneToArrayById(body, MediaModel.class, body.getCollectionName());
   }
 
   @DeleteMapping("/delete-many-from-array")
-  public ResponseEntity<Object> deleteManyFromArray(@RequestBody DeleteManyFromArray body){
+  public ResponseEntity<Object> deleteManyFromArray(@Valid @RequestBody DeleteManyFromArray body){
     return mainService.deleteManyFromArrayById(body, MediaModel.class, body.getCollectionName());
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAllById(@RequestBody GetManyById body){
+  public ResponseEntity<Object> findAllById(@Valid @RequestBody GetManyById body){
     if(body.getId() == null || body.getId().isEmpty()){
       ResponseEntity<Object> response = mainService.findAll(MediaModel.class, body.getCollectionName());
 
@@ -72,14 +74,12 @@ public class MediaController {
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteAllById(
-    @RequestBody DeleteManyById body
-  ){
+  public ResponseEntity<Object> deleteAllById(@Valid @RequestBody DeleteManyById body){
     return mainService.deleteManyById(body, MediaModel.class);
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
     DeleteResult result = mongoTemplate.remove(new Query(), MediaModel.class, collectionName);
 
     return ResponseEntity.ok(result);

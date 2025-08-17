@@ -101,7 +101,7 @@ public class GlobalDataModel {
   }
 
   public void setId(String id){
-    if(id != null || id.length() > 10){
+    if(id.length() > 10){
       this.id = id;
     }
   }
