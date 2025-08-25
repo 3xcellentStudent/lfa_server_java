@@ -5,19 +5,20 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public class DeleteManyById {
   
-  @JsonProperty @NotBlank private List<String> id;
-  @JsonProperty @NotBlank private String parentId;
+  @JsonProperty @NotEmpty private List<String> id;
+  @JsonProperty private String parentId;
   @JsonProperty @NotBlank private String collectionName;
 
   DeleteManyById(){}
 
   DeleteManyById(DeleteManyById requestBody){
-    this.id = requestBody.id;
-    this.parentId = requestBody.parentId;
-    this.collectionName = requestBody.collectionName;
+    this.id = requestBody.getId();
+    this.parentId = requestBody.getParentId();
+    this.collectionName = requestBody.getCollectionName();
   }
 
   DeleteManyById(List<String> id, String parentId, String collectionName){
@@ -27,15 +28,15 @@ public class DeleteManyById {
   }
 
   public List<String> getId() {
-    return id;
+    return this.id;
   }
 
   public String getParentId() {
-    return parentId;
+    return this.parentId;
   }
 
   public String getCollectionName() {
-    return collectionName;
+    return this.collectionName;
   }
 
 }

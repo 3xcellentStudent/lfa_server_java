@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class GetOneById {
   
-  @JsonProperty @NotBlank(message = "HELOHELOHELOHELOHELO") private String id;
+  @JsonProperty @NotBlank private String id;
   @JsonProperty @NotBlank private String collectionName;
 
   public String getId() {

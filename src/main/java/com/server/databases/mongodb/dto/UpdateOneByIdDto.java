@@ -8,7 +8,7 @@ public class UpdateOneByIdDto {
   
   @JsonProperty @NotBlank private String id;
   @JsonProperty @NotBlank private String field;
-  @JsonProperty @NotBlank private Object newData;
+  @JsonProperty private Object newData;
   @JsonProperty @NotBlank private String collectionName;
 
   public String getId() {

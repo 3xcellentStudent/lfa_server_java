@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.models.products;
+package com.server.databases.mongodb.models.product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.databases.mongodb.models.media.MediaModel;
-import com.server.databases.mongodb.models.products.variations.ProductVariations;
+import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 
 @Component
-public class ProductsModel {
+public class ProductModel {
 
   @Id
   @JsonProperty private String id;
@@ -23,7 +23,7 @@ public class ProductsModel {
   @JsonProperty private String rating;
   @JsonProperty @NotBlank private String title;
   @JsonProperty private Descriptions descriptions;
-  @JsonProperty private List<ProductVariations> productVariations;
+  @JsonProperty private List<ProductVariationModel> productVariations;
   @JsonProperty private Specifications specifications;
   @JsonProperty private MediaModel mediaContent;
   @JsonProperty private ReviewsSnapshot reviewsSnapshot;
@@ -127,15 +127,15 @@ public class ProductsModel {
     return this.productVariationsIds;
   }
 
-  public List<ProductVariations> getProductVariations(){
+  public List<ProductVariationModel> getProductVariations(){
     return this.productVariations;
   }
 
-  public void setProductVariations(List<ProductVariations> productVariations){
+  public void setProductVariations(List<ProductVariationModel> productVariations){
     this.productVariations = productVariations;
   }
 
-  public void pushProductVariation(ProductVariations productVariation){
+  public void pushProductVariation(ProductVariationModel productVariation){
     this.productVariations.add(productVariation);
   }
 
@@ -174,9 +174,9 @@ public class ProductsModel {
     return this.collectionName;
   }
 
-  public ProductsModel(){}
+  public ProductModel(){}
 
-  public ProductsModel(ProductsModel dataModel){
+  public ProductModel(ProductModel dataModel){
     this.id = dataModel.getId();
     this.reviewsId = dataModel.getReviewsId();
     this.mediaId = dataModel.getMediaId();

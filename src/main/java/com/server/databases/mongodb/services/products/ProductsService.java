@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,11 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.models.media.MediaModel;
-import com.server.databases.mongodb.models.products.ProductsModel;
-import com.server.databases.mongodb.models.products.variations.ProductVariations;
+import com.server.databases.mongodb.models.product.ProductModel;
+import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.media.MediaService;
-import com.server.databases.mongodb.services.uuid.CustomUUID;
 
 @Service
 public class ProductsService {
@@ -35,13 +35,15 @@ public class ProductsService {
   @Value("${mongodb.collections.reviews}")
   private String reviewsCollectionName;
 
-  public ResponseEntity<Object> createOne(ProductsModel body){
-    String id = CustomUUID.fromString(new String[] {body.getTitle(), body.getCollectionName()});
+  public ResponseEntity<Object> createOne(ProductModel body){
+    String id = UUID.nameUUIDFromBytes((body.getTitle() + "-" + body.getCollectionName()).getBytes()).toString();
     Query query = Query.query(Criteria.where("id").is(id));
-    boolean isExists = mongoTemplate.exists(query, ProductsModel.class, body.getCollectionName());
+    boolean isExists = mongoTemplate.exists(query, ProductModel.class, body.getCollectionName());
     
-    if(isExists == false){
-      String mediaId = CustomUUID.fromString(id);
+    if(isExists == true){
+      return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
+    } else {
+      String mediaId = UUID.fromString(id).toString();
 
       long timestamp = System.currentTimeMillis();
 
@@ -54,49 +56,50 @@ public class ProductsService {
       body.setProductVariationsIds(List.of());
       body.setProductVariations(List.of());
 
-      ProductsModel savedObject = mongoTemplate.save(body, body.getCollectionName());
+      ProductModel savedObject = mongoTemplate.save(body, body.getCollectionName());
       
       savedObject.setMediaContent((MediaModel) mediaServiceEntity);
 
       return ResponseEntity.ok(savedObject);
-    } else {
-      return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
     }
   }
 
   public ResponseEntity<Object> findManyRecursiveById(List<String> id, String collectionName){
     Query query = Query.query(Criteria.where("id").in(id));
-    List<ProductsModel> foundObject = mongoTemplate.find(query, ProductsModel.class, collectionName);
-    List<ProductsModel> modifiedObject = addEntitiesToManyProductObjects(foundObject, collectionName);
+    List<ProductModel> foundObject = mongoTemplate.find(query, ProductModel.class, collectionName);
+    List<ProductModel> modifiedObject = addEntitiesToManyProductObjects(foundObject, collectionName);
 
     return ResponseEntity.ok(modifiedObject);
   }
 
   public ResponseEntity<Object> findRecursiveById(String id, String collectionName){
-    ProductsModel foundObject = mongoTemplate.findById(id, ProductsModel.class, collectionName);
+    ProductModel foundObject = mongoTemplate.findById(id, ProductModel.class, collectionName);
 
-    ProductsModel modifiedObject = addEntitiesToOneProductObject(foundObject);
+    ProductModel modifiedObject = addEntitiesToOneProductObject(foundObject);
 
     return ResponseEntity.ok(modifiedObject);
   }
 
   public ResponseEntity<Object> deleteRecursiveById(List<String> id, String productCollectionName){
-    List<ProductsModel> deletedProducts = mongoTemplate
-    .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductsModel.class, productCollectionName);
+    List<ProductModel> deletedProducts = mongoTemplate
+    .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductModel.class, productCollectionName);
+
     List<ReviewsModel> deletedReviews = mongoTemplate
     .findAllAndRemove(
       Query.query(Criteria.where("parentId").in(id)), ReviewsModel.class, reviewsCollectionName + "-" + productCollectionName
     );
+
     List<MediaModel> deletedMedia = mongoTemplate
     .findAllAndRemove(Query.query(
       Criteria.where("parentId").in(id)), MediaModel.class, mediaCollectionName + "-" + productCollectionName
     );
-    List<ProductVariations> deletedProductVariations = mongoTemplate
+
+    List<ProductVariationModel> deletedProductVariations = mongoTemplate
     .findAllAndRemove(
       Query.query(Criteria.where("parentId").in(id)), 
-      ProductVariations.class, 
+      ProductVariationModel.class, 
       variationCollectionName + "-" + productCollectionName
-      );
+    );
 
     Map<String, Object> responseBody = new HashMap<>();
     responseBody.put("products", deletedProducts);
@@ -107,14 +110,14 @@ public class ProductsService {
     return ResponseEntity.ok(responseBody);
   }
 
-  private List<ProductsModel> addEntitiesToManyProductObjects(List<ProductsModel> productsList, String producCollectionName){
-    List<ProductsModel> modifiedProductsList = productsList.stream()
+  private List<ProductModel> addEntitiesToManyProductObjects(List<ProductModel> productsList, String producCollectionName){
+    List<ProductModel> modifiedProductsList = productsList.stream()
     .map(oneObject -> addEntitiesToOneProductObject(oneObject)).filter(Objects::nonNull).toList();
 
     return modifiedProductsList;
   }
 
-  private ProductsModel addEntitiesToOneProductObject(ProductsModel product){
+  private ProductModel addEntitiesToOneProductObject(ProductModel product){
     MediaModel mediaObject = mongoTemplate.findById(
       product.getMediaId(), MediaModel.class, mediaCollectionName + "-" + product.getCollectionName()
     );
@@ -123,8 +126,8 @@ public class ProductsService {
       Criteria.where("parentId").in(product.getId())
     );
 
-    List<ProductVariations> productVatriations = mongoTemplate.find(
-      productVariationsQuery, ProductVariations.class, variationCollectionName + "-" + product.getCollectionName()
+    List<ProductVariationModel> productVatriations = mongoTemplate.find(
+      productVariationsQuery, ProductVariationModel.class, variationCollectionName + "-" + product.getCollectionName()
     );
 
     product.setProductVariations(productVatriations);

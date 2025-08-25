@@ -19,7 +19,7 @@ import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.GetOneById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
-import com.server.databases.mongodb.models.products.ProductsModel;
+import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.products.ProductsService;
 
@@ -36,25 +36,25 @@ public class ProductController {
   private MongoDbMainService mainService;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@Valid @RequestBody ProductsModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody ProductModel body){
     return productsService.createOne(body);
   }
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateNewOneById(body, ProductsModel.class);
+    return mainService.updateNewOneById(body, ProductModel.class);
   }
 
   @GetMapping("/get")
   public ResponseEntity<Object> findAll(@Valid @ModelAttribute GetManyById body){
     if(body.getId() == null || body.getId().isEmpty()){
       ResponseEntity<Object> response = mainService
-      .findAll(ProductsModel.class, body.getCollectionName());
+      .findAll(ProductModel.class, body.getCollectionName());
 
       return response;
     } else {
-      List<ProductsModel> foundProducts = mainService
-      .findManyById("id", body.getId(), ProductsModel.class, body.getCollectionName());
+      List<ProductModel> foundProducts = mainService
+      .findManyById("id", body.getId(), ProductModel.class, body.getCollectionName());
 
       return ResponseEntity.ok(foundProducts);
     }
@@ -72,17 +72,17 @@ public class ProductController {
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteAllById(@Valid @RequestBody DeleteManyById body){
-    return mainService.deleteManyById(body, ProductsModel.class);
+    return mainService.deleteManyById(body, ProductModel.class);
   }
 
   @DeleteMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteAllByIdRecursive(@Valid @RequestBody GetManyById body){
+  public ResponseEntity<Object> deleteAllByIdRecursive(@Valid @RequestBody DeleteManyById body){
     return productsService.deleteRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @DeleteMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
-    return mainService.clearCollection(ProductsModel.class, collectionName);
+    return mainService.clearCollection(ProductModel.class, collectionName);
   }
   
 }

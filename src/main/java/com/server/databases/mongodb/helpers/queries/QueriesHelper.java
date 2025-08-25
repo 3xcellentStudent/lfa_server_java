@@ -34,7 +34,7 @@ public class QueriesHelper {
 
   public static Update getUpdateForArray(String field, Object newData){
     Update update = new Update();
-
+    
     update.push(field).each(newData);
 
     return update;

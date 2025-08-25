@@ -1,5 +1,7 @@
 package com.server.databases.mongodb.services.global;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -12,7 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.databases.mongodb.dto.categories.DeleteCategoriesDto;
 import com.server.databases.mongodb.dto.categories.UpdateCategoriesDto;
 import com.server.databases.mongodb.models.global.GlobalDataModel;
-import com.server.databases.mongodb.services.uuid.CustomUUID;
 
 @Service
 public class GlobalDataService {
@@ -25,7 +26,7 @@ public class GlobalDataService {
   public ResponseEntity<Object> createOne(String requestBodyString){
     try {
       GlobalDataModel requestBodyObject = objectMapper.readValue(requestBodyString, GlobalDataModel.class);
-      String id = CustomUUID.fromString(requestBodyObject.getType());
+      String id = UUID.nameUUIDFromBytes(requestBodyObject.getType().getBytes()).toString();
       Query query = Query.query(Criteria.where("id").is(id));
       boolean isExists = mongoTemplate.exists(query, GlobalDataModel.class);
 

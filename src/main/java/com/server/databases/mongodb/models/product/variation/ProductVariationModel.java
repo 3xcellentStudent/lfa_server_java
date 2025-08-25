@@ -1,16 +1,18 @@
-package com.server.databases.mongodb.models.products.variations;
+package com.server.databases.mongodb.models.product.variation;
 
 import java.util.List;
 
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 
-public class ProductVariations {
+@Component
+public class ProductVariationModel {
 
   @Id
   @JsonProperty private String id;
@@ -91,6 +93,10 @@ public class ProductVariations {
     return this.parentId;
   }
 
+  public void setParentId(String parentId){
+    this.parentId = parentId;
+  }
+
   public List<String> getImages(){
     return this.images;
   }
@@ -103,9 +109,9 @@ public class ProductVariations {
     this.variationName = variationName;
   }
 
-  public ProductVariations(){}
+  public ProductVariationModel(){}
 
-  public ProductVariations(ProductVariations dataModel){
+  public ProductVariationModel(ProductVariationModel dataModel){
     this.id = dataModel.getId();
     this.parentId = dataModel.getParentId();
     this.stockInfo = dataModel.getStockInfo();
