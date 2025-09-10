@@ -5,11 +5,12 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class GetManyById {
   
   @JsonProperty private List<String> id;
-  @JsonProperty @NotBlank private String collectionName;
+  @JsonProperty @NotBlank @Pattern(regexp = ".*-.*", message = "The field must contain '-'") private String collectionName;
 
   public List<String> getId() {
     return id;

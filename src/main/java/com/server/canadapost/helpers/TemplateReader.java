@@ -19,14 +19,14 @@ public class TemplateReader {
   private final Logger logger = LoggerFactory.getLogger(TemplateReader.class);
 	
 	@Value("${delivery.canadapost.templates.common}")
-	private String stringUrl;
+	private String stringPath;
 	@Value("${delivery.canadapost.account.number}")
 	private String accountNumber;
 
   public String getTemplateAsString(String templateName, ShipPriceRequest body){
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
-			URL resource = classLoader.getResource(stringUrl + templateName);
+			URL resource = classLoader.getResource(stringPath + templateName);
 			
 			if (resource == null) {
 				throw new IllegalArgumentException("HTML template not found !");

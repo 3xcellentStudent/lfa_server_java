@@ -3,11 +3,12 @@ package com.server.databases.mongodb.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class GetOneById {
   
   @JsonProperty @NotBlank private String id;
-  @JsonProperty @NotBlank private String collectionName;
+  @JsonProperty @NotBlank @Pattern(regexp = ".*-.*", message = "The field must contain '-'") private String collectionName;
 
   public String getId() {
     return id;

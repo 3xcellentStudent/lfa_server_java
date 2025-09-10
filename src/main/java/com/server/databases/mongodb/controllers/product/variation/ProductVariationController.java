@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +21,16 @@ import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
-import com.server.databases.mongodb.services.products.variation.ProductVariationService;
+import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/product/variation")
 @CrossOrigin("*")
+@Validated
 public class ProductVariationController {
   
   @Autowired
@@ -40,7 +44,10 @@ public class ProductVariationController {
   }
 
   @GetMapping("/get/parent-id")
-  public ResponseEntity<Object> getByParentId(@Valid @RequestParam String id, @RequestParam String collectionName){
+  public ResponseEntity<Object> getByParentId(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "id must contain \"-\"") String id, 
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     List<ProductVariationModel> productVariation = mainService
     .findManyById("parentId", id, ProductVariationModel.class, collectionName);
 
@@ -66,7 +73,9 @@ public class ProductVariationController {
   }
   
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     return mainService.clearCollection(ProductVariationModel.class, collectionName);
   }
 

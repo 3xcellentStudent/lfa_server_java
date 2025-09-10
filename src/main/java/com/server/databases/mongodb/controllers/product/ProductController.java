@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,23 +22,26 @@ import com.server.databases.mongodb.dto.GetOneById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
-import com.server.databases.mongodb.services.products.ProductsService;
+import com.server.databases.mongodb.services.product.ProductService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/product")
 @CrossOrigin("*")
+@Validated
 public class ProductController {
 
   @Autowired
-  private ProductsService productsService;
+  private ProductService productService;
   @Autowired
   private MongoDbMainService mainService;
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@Valid @RequestBody ProductModel body){
-    return productsService.createOne(body);
+    return productService.createOne(body);
   }
 
   @PatchMapping("/update")
@@ -62,12 +66,12 @@ public class ProductController {
 
   @GetMapping("/get/recursive")
   public ResponseEntity<Object> findOneByIdRecursive(@Valid @ModelAttribute GetOneById body){
-    return productsService.findRecursiveById(body.getId(), body.getCollectionName());
+    return productService.findRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @GetMapping("/get/recursive/many")
   public ResponseEntity<Object> findManyByIdRecursive(@Valid @ModelAttribute GetManyById body){
-    return productsService.findManyRecursiveById(body.getId(), body.getCollectionName());
+    return productService.findManyRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @DeleteMapping("/delete")
@@ -77,11 +81,13 @@ public class ProductController {
 
   @DeleteMapping("/delete/recursive")
   public ResponseEntity<Object> deleteAllByIdRecursive(@Valid @RequestBody DeleteManyById body){
-    return productsService.deleteRecursiveById(body.getId(), body.getCollectionName());
+    return productService.deleteRecursiveById(body.getId(), body.getCollectionName());
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     return mainService.clearCollection(ProductModel.class, collectionName);
   }
   

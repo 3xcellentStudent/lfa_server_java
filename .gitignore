@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+src/main/resources/application.yaml
+.env

@@ -6,12 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 
 public class DeleteManyById {
   
   @JsonProperty @NotEmpty private List<String> id;
   @JsonProperty private String parentId;
-  @JsonProperty @NotBlank private String collectionName;
+  @JsonProperty @NotBlank @Pattern(regexp = ".*-.*", message = "The field must contain '-'") private String collectionName;
 
   DeleteManyById(){}
 

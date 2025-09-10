@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.services.products;
+package com.server.databases.mongodb.services.product;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,18 +21,18 @@ import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.media.MediaService;
 
 @Service
-public class ProductsService {
+public class ProductService {
 
   @Autowired
   private MediaService mediaService;
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @Value("${mongodb.collections.media}")
+  @Value("${databases.mongodb.collections.media}")
   private String mediaCollectionName;
-  @Value("${mongodb.collections.product.variation}")
+  @Value("${databases.mongodb.collections.product.variation}")
   private String variationCollectionName;
-  @Value("${mongodb.collections.reviews}")
+  @Value("${databases.mongodb.collections.reviews}")
   private String reviewsCollectionName;
 
   public ResponseEntity<Object> createOne(ProductModel body){

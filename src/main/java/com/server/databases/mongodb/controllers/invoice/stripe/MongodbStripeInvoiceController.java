@@ -3,6 +3,7 @@ package com.server.databases.mongodb.controllers.invoice.stripe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/mongodb/invoice/stripe")
 @CrossOrigin("*")
+@Validated
 public class MongodbStripeInvoiceController {
 
   @Autowired
@@ -29,7 +31,7 @@ public class MongodbStripeInvoiceController {
   @Autowired
   private MongoDbMainService mainService;
 
-  @Value("${mongodb.collections.invoice}")
+  @Value("${databases.mongodb.collections.invoice}")
   private String collectionName;
 
   @PostMapping("/create")

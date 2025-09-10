@@ -1,0 +1,65 @@
+server:
+  port: 5000
+
+myapp:
+  json_key: your_json_key
+
+databases:
+  redis:
+    host: localhost
+    port: 6379
+    password: your_password_if_set
+
+  datasource:
+    paypal_client_id: your_client_id
+    paypal_secret: your_sercer
+
+  mongodb:
+    database: storetest
+    # uri: mongodb://host.docker.internal:27017/storetest
+    collections:
+      global_data: global_data
+      media: media
+      reviews: reviews
+      invoice: invoice
+      product: product
+      product_variation: variation
+
+gmail:
+  transport:
+    protocol: smtp
+  host: smtp.gmail.com
+  smtp:
+    auth: true
+    port: 587
+    starttls:
+      enable: true
+    ssl:
+      trust: smtp.gmail.com
+  username: your_email
+  password: your_password
+
+stripe:
+  api:
+    version: set_api_version_which_you_want
+  token:
+    secret: your_token_secret
+  routes:
+    checkout:
+      create_session: https://api.stripe.com/v1/checkout/sessions
+      return_url: https://miro.medium.com/v2/resize:fit:720/format:webp/0*A7MUqyCLvZDcHkfM.jpg
+
+email:
+  templates:
+    common: folder_with_your_templates
+
+delivery:
+  canadapost:
+    token: put_your_token
+    account:
+      number: your_account_number
+    templates:
+      common: templates/services/canadapost/xml
+    create_shipment: https://ct.soa-gw.canadapost.ca/rs/${DELIVERY_CANADAPOST_ACCOUNT_NUMBER}/ncshipment
+    pickup_availability: https://ct.soa-gw.canadapost.ca/ad/pickup/pickupavailability/
+    ship_price: https://ct.soa-gw.canadapost.ca/rs/ship/price

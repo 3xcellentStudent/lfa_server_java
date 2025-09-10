@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/mongodb/global-data")
 @CrossOrigin("*")
+@Validated
 public class GlobalDataController {
 
   @Autowired
@@ -36,7 +38,7 @@ public class GlobalDataController {
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  @Value("${mongodb.collections.global_data}")
+  @Value("${databases.mongodb.collections.global_data}")
   private String collectionName;
 
   @PostMapping("/create")

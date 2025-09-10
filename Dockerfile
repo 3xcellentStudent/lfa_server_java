@@ -4,5 +4,4 @@ WORKDIR /app
 COPY . .
 RUN chmod +x ./mvnw
 EXPOSE 5000
-# ENTRYPOINT ["java", "-jar", "app.jar"]
 ENTRYPOINT ["./mvnw", "spring-boot:run"]

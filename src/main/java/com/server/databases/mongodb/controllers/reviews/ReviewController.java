@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +30,12 @@ import com.server.databases.mongodb.services.reviews.ReviewsService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/review")
 @CrossOrigin("*")
+@Validated
 public class ReviewController {
   
   @Autowired
@@ -88,7 +91,10 @@ public class ReviewController {
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection
+  (
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     DeleteResult result = mongoTemplate.remove(new Query(), ReviewsModel.class, collectionName);
 
     return ResponseEntity.ok(result);

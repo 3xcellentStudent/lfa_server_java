@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +28,13 @@ import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.MediaService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/media")
 @CrossOrigin("*")
+@Validated
 public class MediaController {
 
   @Autowired
@@ -79,7 +83,9 @@ public class MediaController {
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(@Valid @RequestParam(required = true) String collectionName){
+  public ResponseEntity<Object> clearCollection(
+   @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     DeleteResult result = mongoTemplate.remove(new Query(), MediaModel.class, collectionName);
 
     return ResponseEntity.ok(result);

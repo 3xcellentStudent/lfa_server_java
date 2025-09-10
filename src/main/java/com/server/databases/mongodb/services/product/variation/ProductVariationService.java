@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.services.products.variation;
+package com.server.databases.mongodb.services.product.variation;
 
 import java.util.UUID;
 
