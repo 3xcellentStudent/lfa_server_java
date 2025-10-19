@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pickup-request-details xmlns="http://www.canadapost.ca/ws/pickuprequest">
+	<pickup-type>OnDemand</pickup-type>
+	<pickup-location>
+		<business-address-flag>%s</business-address-flag>
+	</pickup-location>
+	<contact-info>
+		<contact-name>%s</contact-name>
+		<email>%s</email>
+		<contact-phone>%s</contact-phone>
+		<receive-email-updates-flag>%s</receive-email-updates-flag>
+	</contact-info>
+	<location-details>
+		<five-ton-flag>%s</five-ton-flag>
+		<loading-dock-flag>%s</loading-dock-flag>
+		<pickup-instructions>%s</pickup-instructions>
+	</location-details>
+	<items-characteristics>
+		<priority-flag>%s</priority-flag>
+		<returns-flag>%s</returns-flag>
+		<heavy-item-flag>%s</heavy-item-flag>
+	</items-characteristics>
+	<pickup-volume>%s</pickup-volume>
+	<pickup-times>
+		<on-demand-pickup-time>
+			<date>%s</date>
+			<preferred-time>%s</preferred-time>
+			<closing-time>%s</closing-time>
+		</on-demand-pickup-time>
+	</pickup-times>
+</pickup-request-details>

@@ -1,7 +1,6 @@
 package com.server.databases.mongodb.controllers.global;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.client.result.DeleteResult;
@@ -24,6 +24,8 @@ import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.global.GlobalDataService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/global-data")
@@ -38,9 +40,6 @@ public class GlobalDataController {
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  @Value("${databases.mongodb.collections.global_data}")
-  private String collectionName;
-
   @PostMapping("/create")
   public ResponseEntity<Object> create(@Valid @RequestBody String requestBodyString){
     return globalDataService.createOne(requestBodyString);
@@ -52,14 +51,19 @@ public class GlobalDataController {
   }
 
   @GetMapping("/get/{id}")
-  public ResponseEntity<Object> findById(@Valid @PathVariable String id){
+  public ResponseEntity<Object> findById(
+    @Valid @PathVariable(required = true) @NotBlank String id,
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     GlobalDataModel foundObject = mongoTemplate.findById(id, GlobalDataModel.class);
 
     return ResponseEntity.ok(foundObject);
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAll(){
+  public ResponseEntity<Object> findAll(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     return mainService.findAll(GlobalDataModel.class, collectionName);
   }
 
@@ -69,7 +73,9 @@ public class GlobalDataController {
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(){
+  public ResponseEntity<Object> clearCollection(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     DeleteResult result = mongoTemplate.remove(new Query(), GlobalDataModel.class, collectionName);
 
     return ResponseEntity.ok(result);

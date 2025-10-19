@@ -1,7 +1,6 @@
 package com.server.databases.mongodb.controllers.invoice.stripe;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
@@ -19,6 +19,8 @@ import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.invoices.stripe.InvoicesStripeService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/invoice/stripe")
@@ -30,9 +32,6 @@ public class MongodbStripeInvoiceController {
   private InvoicesStripeService invoicesService;
   @Autowired
   private MongoDbMainService mainService;
-
-  @Value("${databases.mongodb.collections.invoice}")
-  private String collectionName;
 
   @PostMapping("/create")
   public ResponseEntity<Object> create(@Valid @RequestBody StripeCheckoutSessionsModel body){
@@ -63,7 +62,9 @@ public class MongodbStripeInvoiceController {
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection(){
+  public ResponseEntity<Object> clearCollection(
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+  ){
     return mainService.clearCollection(StripeCheckoutSessionsModel.class, collectionName);
   }
 

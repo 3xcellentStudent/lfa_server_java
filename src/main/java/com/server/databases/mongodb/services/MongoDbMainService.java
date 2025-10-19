@@ -137,4 +137,9 @@ public class MongoDbMainService {
     return ResponseEntity.ok(result);
   }
 
+  public boolean entityExistingInDatabase(String selector, Object entity, String collectionName){
+    Query query = Query.query(Criteria.where(selector).is(entity));
+    return mongoTemplate.exists(query, collectionName);
+  }
+
 }

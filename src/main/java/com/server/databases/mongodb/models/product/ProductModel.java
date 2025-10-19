@@ -19,16 +19,15 @@ public class ProductModel {
   @JsonProperty private String id;
   @JsonProperty private ArrayList<String> reviewsId = new ArrayList<>();
   @JsonProperty private String mediaId;
-  @JsonProperty private List<String> productVariationsIds;
+  @JsonProperty private List<String> productVariationsId;
   @JsonProperty private String rating;
-  @JsonProperty @NotBlank private String title;
+  @JsonProperty @NotBlank private String productName;
   @JsonProperty private Descriptions descriptions;
   @JsonProperty private List<ProductVariationModel> productVariations;
   @JsonProperty private Specifications specifications;
   @JsonProperty private MediaModel mediaContent;
   @JsonProperty private ReviewsSnapshot reviewsSnapshot;
   @JsonProperty @NotBlank private String collectionName;
-  @JsonProperty @NotBlank private String category;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -107,6 +106,14 @@ public class ProductModel {
     this.updatedAt = newTime;
   }
 
+  public void setReviewsSnapshot(ReviewsSnapshot reviewsSnapshot){
+    this.reviewsSnapshot = reviewsSnapshot;
+  }
+
+  public void setReviewsSnapshot(){
+    this.reviewsSnapshot = new ReviewsSnapshot();
+  }
+
   public MediaModel getMediaContent(){
     return this.mediaContent;
   }
@@ -115,16 +122,16 @@ public class ProductModel {
     this.mediaContent = mediaContent;
   }
 
-  public String getTitle(){
-    return this.title;
+  public String getProductName(){
+    return this.productName;
   }
 
-  public void setProductVariationsIds(List<String> productVariationsIds){
-    this.productVariationsIds = productVariationsIds;
+  public void setProductVariationsId(List<String> productVariationsId){
+    this.productVariationsId = productVariationsId;
   }
 
-  public List<String> getProductVariationsIds(){
-    return this.productVariationsIds;
+  public List<String> getProductVariationsId(){
+    return this.productVariationsId;
   }
 
   public List<ProductVariationModel> getProductVariations(){
@@ -148,10 +155,6 @@ public class ProductModel {
       case "one": return this.reviewsSnapshot.one;
       default: return this.reviewsSnapshot.five;
     }
-  }
-
-  public int getReviewsSnapshotSum(){
-    return this.reviewsSnapshot.getTotal();
   }
 
   public ReviewsSnapshot getReviewsSnapshot(){
@@ -181,9 +184,9 @@ public class ProductModel {
     this.reviewsId = dataModel.getReviewsId();
     this.mediaId = dataModel.getMediaId();
     this.rating = dataModel.getRating();
-    this.title = dataModel.getTitle();
+    this.productName = dataModel.getProductName();
     this.descriptions = dataModel.getDescriptions();
-    this.productVariationsIds = dataModel.getProductVariationsIds();
+    this.productVariationsId = dataModel.getProductVariationsId();
     this.productVariations = dataModel.getProductVariations();
     this.specifications = dataModel.getSpecifications();
     this.mediaContent = dataModel.getMediaContent();

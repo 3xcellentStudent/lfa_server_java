@@ -45,7 +45,7 @@ public class ProductVariationController {
 
   @GetMapping("/get/parent-id")
   public ResponseEntity<Object> getByParentId(
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "id must contain \"-\"") String id, 
+    @RequestParam(required = true) @NotBlank String id, 
     @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
   ){
     List<ProductVariationModel> productVariation = mainService

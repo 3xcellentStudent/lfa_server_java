@@ -6,11 +6,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,7 @@ import com.server.databases.mongodb.models.media.MediaModel;
 import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
+import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.MediaService;
 
 @Service
@@ -26,7 +30,11 @@ public class ProductService {
   @Autowired
   private MediaService mediaService;
   @Autowired
+  private MongoDbMainService mainService;
+  @Autowired
   private MongoTemplate mongoTemplate;
+
+  private Logger logger = LoggerFactory.getLogger(ProductService.class);
 
   @Value("${databases.mongodb.collections.media}")
   private String mediaCollectionName;
@@ -36,12 +44,12 @@ public class ProductService {
   private String reviewsCollectionName;
 
   public ResponseEntity<Object> createOne(ProductModel body){
-    String id = UUID.nameUUIDFromBytes((body.getTitle() + "-" + body.getCollectionName()).getBytes()).toString();
+    String id = UUID.nameUUIDFromBytes((body.getProductName() + "-" + body.getCollectionName()).getBytes()).toString();
     Query query = Query.query(Criteria.where("id").is(id));
     boolean isExists = mongoTemplate.exists(query, ProductModel.class, body.getCollectionName());
     
     if(isExists == true){
-      return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
+      return ResponseEntity.status(409).body("This object with ID: " + id + " is exists !...");
     } else {
       String mediaId = UUID.fromString(id).toString();
 
@@ -51,9 +59,10 @@ public class ProductService {
     
       body.setId(id);
       body.setMediaId(mediaId);
+      body.setReviewsSnapshot();
       body.setCreatedAt(timestamp);
       body.setUpdatedAt(timestamp);
-      body.setProductVariationsIds(List.of());
+      body.setProductVariationsId(List.of());
       body.setProductVariations(List.of());
 
       ProductModel savedObject = mongoTemplate.save(body, body.getCollectionName());
@@ -73,11 +82,22 @@ public class ProductService {
   }
 
   public ResponseEntity<Object> findRecursiveById(String id, String collectionName){
-    ProductModel foundObject = mongoTemplate.findById(id, ProductModel.class, collectionName);
+    // boolean isExists = mainService.entityExistingInDatabase("id", id, collectionName);
 
-    ProductModel modifiedObject = addEntitiesToOneProductObject(foundObject);
+    // if(isExists){
+      // return ResponseEntity.status(404).body(String.format("Document with ID \"%s\" is not exist !", id));
+    // } else {
+      ProductModel foundObject = mongoTemplate.findById(id, ProductModel.class, collectionName);
 
-    return ResponseEntity.ok(modifiedObject);
+      if(foundObject == null){
+        String message = String.format("Document with ID \"%s\" is not exists !", id);
+        logger.warn(message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+      } else {
+        ProductModel modifiedObject = addEntitiesToOneProductObject(foundObject);
+        return ResponseEntity.ok(modifiedObject);
+      }
+    // }
   }
 
   public ResponseEntity<Object> deleteRecursiveById(List<String> id, String productCollectionName){
@@ -118,6 +138,7 @@ public class ProductService {
   }
 
   private ProductModel addEntitiesToOneProductObject(ProductModel product){
+    // System.out.println("PRODUCT: " + product);
     MediaModel mediaObject = mongoTemplate.findById(
       product.getMediaId(), MediaModel.class, mediaCollectionName + "-" + product.getCollectionName()
     );

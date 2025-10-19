@@ -57,7 +57,8 @@ public class ReviewController {
   
   @GetMapping("/get")
   public ResponseEntity<Object> findManyById(
-    @RequestParam(required = false) List<String> id, @NotBlank @RequestParam(required = true) String collectionName
+    @RequestParam(required = false) @NotBlank List<String> id,
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
   ){
     if(id == null || id.isEmpty()){
       ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collectionName);

@@ -1,0 +1,32 @@
+ <authorized-return>
+  <create-public-key>true</create-public-key>
+  <service-code>DOM.EP</service-code>
+  <returner>
+    <name>Jane Doe</name>
+    <company>Capsule Corp.</company>
+    <domestic-address>
+      <address-line-1>2701 Return Avenue</address-line-1>
+      <city>Ottawa</city>
+      <province>ON</province>
+      <postal-code>K1A0B1</postal-code>
+    </domestic-address>
+  </returner>
+  <receiver>
+    <name>John Doe</name>
+    <company>Canada Post Corporation</company>
+    <domestic-address>
+      <address-line-1>2701 Riverside Drive</address-line-1>
+      <city>Ottawa</city>
+      <province>ON</province>
+      <postal-code>K1A0B1</postal-code>
+    </domestic-address>
+  </receiver>
+  <parcel-characteristics>
+    <weight>15</weight>
+  </parcel-characteristics>
+  <print-preferences>
+    <output-format>8.5x11</output-format>
+  </print-preferences>
+  <settlement-info></settlement-info>
+</authorized-return>
+

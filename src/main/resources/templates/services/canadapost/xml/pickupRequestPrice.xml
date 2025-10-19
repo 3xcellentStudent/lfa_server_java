@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pickup-details xmlns="http://www.canadapost.ca/ws/pickuprequest">
+  <date>%s</date>
+  <contract-id>%s</contract-id>
+  <priority-flag>%s</priority-flag>
+</pickup-details>

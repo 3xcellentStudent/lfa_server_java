@@ -1,7 +1,5 @@
 package com.server.config.services.databases.mongodb;
 
-import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +9,7 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.event.ClusterClosedEvent;
 import com.mongodb.event.ClusterDescriptionChangedEvent;
 import com.mongodb.event.ClusterListener;
 
@@ -18,37 +17,36 @@ import com.mongodb.event.ClusterListener;
 public class MongoConfig {
   private int exceptionIndex = 0;
   private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
+  private final String databaseUrl = "mongodb://localhost:27017/test";
 
   @Bean
   public MongoClient mongoClient(){
+    ConnectionString connectionString = new ConnectionString(databaseUrl);
+
     MongoClientSettings settings = MongoClientSettings.builder()
-    .applyConnectionString(new ConnectionString("mongodb://localhost:27017/storetest"))
-    .applyToClusterSettings(builder -> 
-      builder.serverSelectionTimeout(10, TimeUnit.SECONDS)
-      .addClusterListener(new ClusterListener(){
-        @Override
-        public void clusterDescriptionChanged(ClusterDescriptionChangedEvent event){
-          switch (event.getNewDescription().getType()){
-            case UNKNOWN: {
-              if(exceptionIndex > 0){
-                logger.error("MongoDB connection lost!");
+      .applyConnectionString(connectionString)
+      .applyToClusterSettings(builder ->
+        builder.addClusterListener(new ClusterListener() {
+          @Override
+          public void clusterClosed(ClusterClosedEvent event){
+            logger.info(String.format("MongoDB cluster id: \"%s\" closed !", event.getClusterId().getValue()));
+          }
+
+          @Override
+          public void clusterDescriptionChanged(ClusterDescriptionChangedEvent event){
+            String currentClusterId = event.getClusterId().getValue();
+            switch (event.getNewDescription().getType()){
+              case UNKNOWN -> {
+                if(exceptionIndex > 0) logger.warn(String.format("MongoDB connection lost at cluster id: \"%s\" !", currentClusterId));
                 exceptionIndex++;
               }
-
-              exceptionIndex++;
-              break;
-            }
-            case SHARDED:
-            case REPLICA_SET:
-            case STANDALONE: {
-              logger.info("MongoDB cluster status changed: " + event.getNewDescription().getType());
-              break;
+              case STANDALONE -> logger.info(String.format("MongoDB connection available at cluster id: \"%s\" ...", currentClusterId));
+              case REPLICA_SET, SHARDED -> logger.warn("Uknown event ! Add handler ...");
             }
           }
-        }
-    })
-  )
-  .build();
+        })
+      )
+      .build();
 
     return MongoClients.create(settings);
   }

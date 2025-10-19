@@ -60,9 +60,9 @@ public class ReviewsService {
 
   public ResponseEntity<Object> increaseStockInfoFields(String parentId, int rating, String collectionName){
     // int countOfReviews = mongoTemplate.findById(parentId, ProductsModel.class).getStockInfo().countOfReviews;
-    int countOfReviews = mongoTemplate.findById(parentId, ProductModel.class).getReviewsSnapshotSum();
-    UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1, collectionName);
-    mainService.updateNewOneById(updateCountOfReviewsById, ProductModel.class);
+    // int countOfReviews = mongoTemplate.findById(parentId, ProductModel.class).getReviewsSnapshot().getTotal();
+    // UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1, collectionName);
+    // mainService.updateNewOneById(updateCountOfReviewsById, ProductModel.class);
 
     String[] reviewsSnapshotKeys = new String[] {"one", "two", "three", "four", "five"};
 
