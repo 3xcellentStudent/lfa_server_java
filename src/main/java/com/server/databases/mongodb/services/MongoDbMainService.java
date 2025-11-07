@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,15 +30,24 @@ public class MongoDbMainService {
   public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto body, Class<T> someClass){
     long timestamp = System.currentTimeMillis();
 
-    Query query = Query.query(Criteria.where("id").is(body.getId()));
-    Update update = QueriesHelper.getUpdateForNonArray(body.getField(), body.getNewData());
-    FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+    Query queryIsExist = Query.query(Criteria.where("id").is(body.getId()));
 
-    update.set("updatedAt", timestamp);
+    boolean isExists = mongoTemplate.exists(queryIsExist, someClass, body.getCollectionName());
 
-    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
+    if(isExists){
+      Query query = Query.query(Criteria.where("id").is(body.getId()));
+      Update update = QueriesHelper.getUpdateForNonArray(body.getField(), body.getNewData());
+      FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
-    return ResponseEntity.ok(modifiedProduct);
+      update.set("updatedAt", timestamp);
+
+      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
+
+      return ResponseEntity.ok(modifiedProduct);
+    } else {
+      String message = "Document with ID: \"" + body.getId() + "\" not found";
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    }
   }
 
   public <T> ResponseEntity<Object> pushNewOneToArrayById(UpdateOneByIdDto body, Class<T> someClass, String collectionName){
@@ -59,12 +69,10 @@ public class MongoDbMainService {
     String selector = body.getSelector();
     String id = body.getId();
 
-    // 1. Обнуляем указанные индексы (заменяем на null)
     Update update = QueriesHelper.doUnsetForArray(indexes, selector);
     Query query = Query.query(Criteria.where("id").is(id));
     mongoTemplate.updateMulti(query, update, someClass, collectionName);
 
-    // 2. Удаляем все null из массива
     update = new Update().pull(selector, null);
     UpdateResult updatedObject = mongoTemplate.updateMulti(query, update, someClass, collectionName);
 

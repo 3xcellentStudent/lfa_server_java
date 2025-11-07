@@ -22,7 +22,6 @@ public class ProductVariationModel {
   @JsonProperty private List<ProductOption> productOptions;
   @JsonProperty private List<String> images;
   @JsonProperty @NotBlank private String collectionName;
-  @JsonProperty @NotBlank private String category;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -107,6 +106,10 @@ public class ProductVariationModel {
 
   public void setVariationName(String variationName){
     this.variationName = variationName;
+  }
+
+  public void setPrice(String price){
+    this.getStockInfo().price = price;
   }
 
   public ProductVariationModel(){}

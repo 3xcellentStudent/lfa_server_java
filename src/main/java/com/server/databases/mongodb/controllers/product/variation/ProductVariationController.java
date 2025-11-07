@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +54,7 @@ public class ProductVariationController {
     return ResponseEntity.ok(productVariation);
   }
 
-  @GetMapping("/get/by-id")
+  @GetMapping("/get/id")
   public ResponseEntity<Object> getManyById(@Valid @ModelAttribute GetManyById body){
     List<ProductVariationModel> productVariation = mainService
     .findManyById("id", body.getId(), ProductVariationModel.class, body.getCollectionName());
@@ -62,14 +62,14 @@ public class ProductVariationController {
     return ResponseEntity.ok(productVariation);
   }
 
-  @PutMapping("/update")
+  @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     return mainService.updateNewOneById(body, ProductVariationModel.class);
   }
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteById(@Valid @RequestBody DeleteManyById body){
-    return mainService.deleteManyById(body, ProductVariationModel.class);
+    return productVariationService.deteleManyById(body);
   }
   
   @DeleteMapping("/clear-col")

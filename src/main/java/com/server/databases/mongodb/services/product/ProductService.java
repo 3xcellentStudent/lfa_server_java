@@ -21,7 +21,6 @@ import com.server.databases.mongodb.models.media.MediaModel;
 import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
-import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.media.MediaService;
 
 @Service
@@ -29,8 +28,6 @@ public class ProductService {
 
   @Autowired
   private MediaService mediaService;
-  @Autowired
-  private MongoDbMainService mainService;
   @Autowired
   private MongoTemplate mongoTemplate;
 
