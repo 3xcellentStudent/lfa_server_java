@@ -22,7 +22,7 @@ public class ProductModel {
   @JsonProperty private List<String> productVariationsId;
   @JsonProperty private String rating;
   @JsonProperty @NotBlank private String productName;
-  @JsonProperty private Descriptions descriptions;
+  @JsonProperty @NotBlank private Descriptions descriptions;
   @JsonProperty private List<ProductVariationModel> productVariations;
   @JsonProperty private Specifications specifications;
   @JsonProperty private MediaModel mediaContent;

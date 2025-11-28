@@ -127,18 +127,6 @@ public class MongoDbMainService {
     return foundObject;
   }
 
-  // public <T> ResponseEntity<Object> getAsResponseEntity(T someClass){
-  //   try {
-  //     String response = objectMapper.writeValueAsString(someClass);
-
-  //     return ResponseEntity.ok(response);
-  //   } catch(JsonProcessingException error){
-  //     String message = "Error occured while processing JSON !";
-  //     logger.error(message, error);
-  //     return ResponseEntity.internalServerError().body(message);
-  //   }
-  // }
-
   public <T> ResponseEntity<Object> clearCollection(Class<T> someClass, String collectionName){
     DeleteResult result = mongoTemplate.remove(new Query(), someClass, collectionName);
 

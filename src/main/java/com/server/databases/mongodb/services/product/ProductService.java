@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.media.MediaService;
+import com.utils.time.date.HttpDateFormatter;
 
 @Service
 public class ProductService {
@@ -66,7 +68,7 @@ public class ProductService {
       
       savedObject.setMediaContent((MediaModel) mediaServiceEntity);
 
-      return ResponseEntity.ok(savedObject);
+      return ResponseEntity.ok().header(HttpHeaders.LAST_MODIFIED, HttpDateFormatter.formatLastModified(timestamp)).body(savedObject);
     }
   }
 
@@ -75,6 +77,7 @@ public class ProductService {
     List<ProductModel> foundObject = mongoTemplate.find(query, ProductModel.class, collectionName);
     List<ProductModel> modifiedObject = addEntitiesToManyProductObjects(foundObject, collectionName);
 
+    // return ResponseEntity.ok().header(HttpHeaders.LAST_MODIFIED, HttpDateFormatter.formatLastModified(modifiedObject)).body(modifiedObject);
     return ResponseEntity.ok(modifiedObject);
   }
 

@@ -35,7 +35,6 @@ public class ProductVariationService {
       long timestamp = System.currentTimeMillis();
     
       body.setId(id);
-      body.setPrice("0.0");
       body.setCreatedAt(timestamp);
       body.setUpdatedAt(timestamp);
 

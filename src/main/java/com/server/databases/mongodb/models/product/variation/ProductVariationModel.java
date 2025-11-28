@@ -1,9 +1,11 @@
 package com.server.databases.mongodb.models.product.variation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,14 +18,19 @@ public class ProductVariationModel {
 
   @Id
   @JsonProperty private String id;
-  @JsonProperty @NotBlank private String parentId;
-  @JsonProperty private StockInfo stockInfo;
-  @JsonProperty @NotBlank private String variationName;
+  @JsonProperty @NotBlank @NonNull private String parentId;
+  @JsonProperty @NotBlank @NonNull private StockInfo stockInfo;
+  @JsonProperty @NotBlank @NonNull private String variationName;
   @JsonProperty private List<ProductOption> productOptions;
-  @JsonProperty private List<String> images;
+  @JsonProperty private List<Image> image;
   @JsonProperty @NotBlank private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
+
+  public static class Image {
+    public String media;
+    public String src;
+  }
 
   public static class Descriptions {
     public String summary;
@@ -96,8 +103,8 @@ public class ProductVariationModel {
     this.parentId = parentId;
   }
 
-  public List<String> getImages(){
-    return this.images;
+  public List<Image> getImage(){
+    return this.image;
   }
 
   public String getVariationName(){
@@ -108,21 +115,37 @@ public class ProductVariationModel {
     this.variationName = variationName;
   }
 
+  public void setStockInfo(){
+    this.stockInfo = new StockInfo();
+  }
+
   public void setPrice(String price){
     this.getStockInfo().price = price;
   }
 
   public ProductVariationModel(){}
 
-  public ProductVariationModel(ProductVariationModel dataModel){
-    this.id = dataModel.getId();
-    this.parentId = dataModel.getParentId();
-    this.stockInfo = dataModel.getStockInfo();
-    this.productOptions = dataModel.getProductOptions();
-    this.variationName = dataModel.getVariationName();
-    this.images = dataModel.getImages();
-    this.collectionName = dataModel.getCollectionName();
-    this.createdAt = dataModel.getCreatedAt();
-    this.updatedAt = dataModel.getUpdatedAt();
+  public ProductVariationModel(ProductVariationModel body){
+    this.id = null;
+    this.parentId = body.getParentId();
+    this.stockInfo = body.getStockInfo() != null ? body.getStockInfo() : new StockInfo();
+    this.productOptions = body.getProductOptions().isEmpty() ? new ArrayList<ProductOption>() : body.getProductOptions();
+    this.variationName = body.getVariationName();
+    this.image = body.getImage().isEmpty() ? new ArrayList<Image>() : body.getImage();
+    this.collectionName = body.getCollectionName();
+    this.createdAt = body.getCreatedAt();
+    this.updatedAt = body.getUpdatedAt();
   }
+
+  // public ProductVariationModel(ProductVariationModel dataModel){
+  //   this.id = dataModel.getId();
+  //   this.parentId = dataModel.getParentId();
+  //   this.stockInfo = dataModel.getStockInfo();
+  //   this.productOptions = dataModel.getProductOptions();
+  //   this.variationName = dataModel.getVariationName();
+  //   this.image = new ArrayList<Image>();
+  //   this.collectionName = dataModel.getCollectionName();
+  //   this.createdAt = dataModel.getCreatedAt();
+  //   this.updatedAt = dataModel.getUpdatedAt();
+  // }
 }
