@@ -1,31 +1,29 @@
 package com.server.databases.mongodb.models.product;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.databases.mongodb.models.media.MediaModel;
+import com.server.databases.mongodb.dto.product.CreateNewProduct;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
+
+import jakarta.validation.constraints.NotBlank;
 
 @Component
 public class ProductModel {
 
-  @Id
-  @JsonProperty private String id;
+  @Id @JsonProperty private String id;
   @JsonProperty private ArrayList<String> reviewsId = new ArrayList<>();
-  @JsonProperty private String mediaId;
-  @JsonProperty private List<String> productVariationsId;
+  @JsonProperty private ArrayList<String> productVariationsId;
   @JsonProperty private String rating;
   @JsonProperty @NotBlank private String productName;
   @JsonProperty @NotBlank private Descriptions descriptions;
-  @JsonProperty private List<ProductVariationModel> productVariations;
+  @JsonProperty private ArrayList<ProductVariationModel> productVariations;
   @JsonProperty private Specifications specifications;
-  @JsonProperty private MediaModel mediaContent;
+  @JsonProperty private ArrayList<MediaContent> mediaContent;
   @JsonProperty private ReviewsSnapshot reviewsSnapshot;
   @JsonProperty @NotBlank private String collectionName;
   @JsonProperty private long createdAt;
@@ -37,27 +35,22 @@ public class ProductModel {
   }
 
   public static class MediaContent {
-    public TitleContent titleContent;
-    public List<List<Image>> images;
+    public boolean isImage;
+    public ArrayList<MediaObject> mediaArray;
 
-    public static class TitleContent {
-      public String productLogo;
-      public String descriptionVideo;
-    }
-
-    public static class Image {
+    public static class MediaObject {
       public String media;
       public String src;
     }
   }
 
   public static class Specifications {
-      public List<String> titles;
-      public List<Properties> properties;
+    public ArrayList<String> titles;
+    public ArrayList<Properties> properties;
 
     public static class Properties {
       public String name;
-      public List<PropertiesArrayObject> array;
+      public ArrayList<PropertiesArrayObject> array;
     }
 
     public static class PropertiesArrayObject {
@@ -80,14 +73,6 @@ public class ProductModel {
 
   public ArrayList<String> getReviewsId(){
     return this.reviewsId;
-  }
-
-  public void setMediaId(String mediaId){
-    this.mediaId = mediaId;
-  }
-
-  public String getMediaId(){
-    return this.mediaId;
   }
 
   public long getCreatedAt(){
@@ -114,11 +99,11 @@ public class ProductModel {
     this.reviewsSnapshot = new ReviewsSnapshot();
   }
 
-  public MediaModel getMediaContent(){
+  public ArrayList<MediaContent> getMediaContent(){
     return this.mediaContent;
   }
 
-  public void setMediaContent(MediaModel mediaContent){
+  public void setMediaContent(ArrayList<MediaContent> mediaContent){
     this.mediaContent = mediaContent;
   }
 
@@ -126,19 +111,19 @@ public class ProductModel {
     return this.productName;
   }
 
-  public void setProductVariationsId(List<String> productVariationsId){
+  public void setProductVariationsId(ArrayList<String> productVariationsId){
     this.productVariationsId = productVariationsId;
   }
 
-  public List<String> getProductVariationsId(){
+  public ArrayList<String> getProductVariationsId(){
     return this.productVariationsId;
   }
 
-  public List<ProductVariationModel> getProductVariations(){
+  public ArrayList<ProductVariationModel> getProductVariations(){
     return this.productVariations;
   }
 
-  public void setProductVariations(List<ProductVariationModel> productVariations){
+  public void setProductVariations(ArrayList<ProductVariationModel> productVariations){
     this.productVariations = productVariations;
   }
 
@@ -179,21 +164,33 @@ public class ProductModel {
 
   public ProductModel(){}
 
-  public ProductModel(ProductModel dataModel){
-    this.id = dataModel.getId();
-    this.reviewsId = dataModel.getReviewsId();
-    this.mediaId = dataModel.getMediaId();
-    this.rating = dataModel.getRating();
-    this.productName = dataModel.getProductName();
-    this.descriptions = dataModel.getDescriptions();
-    this.productVariationsId = dataModel.getProductVariationsId();
-    this.productVariations = dataModel.getProductVariations();
-    this.specifications = dataModel.getSpecifications();
-    this.mediaContent = dataModel.getMediaContent();
-    this.collectionName = dataModel.getCollectionName();
-    this.reviewsSnapshot = dataModel.getReviewsSnapshot();
-    this.createdAt = dataModel.getCreatedAt();
-    this.updatedAt = dataModel.getUpdatedAt();
+  public ProductModel(CreateNewProduct data){
+    this.reviewsId = new ArrayList<>();
+    this.rating = null;
+    this.productName = data.getProductName();
+    this.descriptions = data.getDescriptions();
+    this.productVariationsId = new ArrayList<>();
+    this.productVariations = new ArrayList<>();
+    this.specifications = data.getSpecifications();
+    this.mediaContent = data.getMediaContent();
+    this.collectionName = data.getCollectionName();
+    this.reviewsSnapshot = new ReviewsSnapshot();
   }
+
+  // public ProductModel(ProductModel data){
+    // this.id = data.getId();
+    // this.reviewsId = data.getReviewsId();
+    // this.rating = data.getRating();
+    // this.productName = data.getProductName();
+    // this.descriptions = data.getDescriptions();
+    // this.productVariationsId = data.getProductVariationsId();
+    // this.productVariations = data.getProductVariations();
+    // this.specifications = data.getSpecifications();
+    // this.mediaContent = data.getMediaContent();
+    // this.collectionName = data.getCollectionName();
+    // this.reviewsSnapshot = data.getReviewsSnapshot();
+    // this.createdAt = data.getCreatedAt();
+    // this.updatedAt = data.getUpdatedAt();
+  // }
 
 }

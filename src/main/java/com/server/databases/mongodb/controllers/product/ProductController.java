@@ -20,6 +20,7 @@ import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.GetOneById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.dto.product.CreateNewProduct;
 import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.ProductService;
@@ -40,7 +41,7 @@ public class ProductController {
   private MongoDbMainService mainService;
 
   @PostMapping("/create")
-  public ResponseEntity<Object> create(@Valid @RequestBody ProductModel body){
+  public ResponseEntity<Object> create(@Valid @RequestBody CreateNewProduct body){
     return productService.createOne(body);
   }
 

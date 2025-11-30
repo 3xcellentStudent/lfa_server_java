@@ -1,28 +1,25 @@
 package com.server.databases.mongodb.models.product.variation;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 @Component
 public class ProductVariationModel {
 
-  @Id
-  @JsonProperty private String id;
-  @JsonProperty @NotBlank @NonNull private String parentId;
-  @JsonProperty @NotBlank @NonNull private StockInfo stockInfo;
-  @JsonProperty @NotBlank @NonNull private String variationName;
-  @JsonProperty private List<ProductOption> productOptions;
-  @JsonProperty private List<Image> image;
+  @Id @JsonProperty private String id;
+  @JsonProperty @NotBlank private String parentId;
+  @JsonProperty @NotBlank private StockInfo stockInfo;
+  @JsonProperty @NotBlank private String variationName;
+  @JsonProperty private ArrayList<ProductOption> productOptions;
+  @JsonProperty private ArrayList<Image> image;
   @JsonProperty @NotBlank private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
@@ -48,7 +45,7 @@ public class ProductVariationModel {
   public static class ProductOption {
     public String name;
     public String type;
-    public List<Item> items;
+    public ArrayList<Item> items;
   }
 
   public static class Item {
@@ -87,7 +84,7 @@ public class ProductVariationModel {
     return this.stockInfo;
   }
 
-  public List<ProductOption> getProductOptions(){
+  public ArrayList<ProductOption> getProductOptions(){
     return this.productOptions;
   }
 
@@ -103,7 +100,7 @@ public class ProductVariationModel {
     this.parentId = parentId;
   }
 
-  public List<Image> getImage(){
+  public ArrayList<Image> getImage(){
     return this.image;
   }
 
@@ -143,7 +140,7 @@ public class ProductVariationModel {
   //   this.stockInfo = dataModel.getStockInfo();
   //   this.productOptions = dataModel.getProductOptions();
   //   this.variationName = dataModel.getVariationName();
-  //   this.image = new ArrayList<Image>();
+  //   this.image = new ArrayArrayList<Image>();
   //   this.collectionName = dataModel.getCollectionName();
   //   this.createdAt = dataModel.getCreatedAt();
   //   this.updatedAt = dataModel.getUpdatedAt();
