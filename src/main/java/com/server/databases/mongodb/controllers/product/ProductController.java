@@ -61,7 +61,7 @@ public class ProductController {
       List<ProductModel> foundProducts = mainService
       .findManyById("id", body.getId(), ProductModel.class, body.getCollectionName());
 
-      return ResponseEntity.ok(foundProducts);
+      return ResponseEntity.ok().body(foundProducts);
     }
   }
 

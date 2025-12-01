@@ -13,18 +13,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.dto.DeleteManyById;
+import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 
 @Service
 public class ProductVariationService {
 
-  private String variationCollectionNamePrefix = "variation-";
+  private String variationCollectionNameHead = "variation-";
 
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  public ResponseEntity<Object> createByParentId(ProductVariationModel body){
+  public ResponseEntity<Object> createByParentId(CreateVariationByParentId body){
     String id = UUID.nameUUIDFromBytes((body.getVariationName() + "-" + body.getCollectionName()).getBytes()).toString();
     Query query = Query.query(Criteria.where("id").is(id));
     boolean isExists = mongoTemplate.exists(query, ProductVariationModel.class, body.getCollectionName());
@@ -33,26 +34,62 @@ public class ProductVariationService {
       return ResponseEntity.status(409).body("This object with ID: " + id + " is exist !...");
     } else {
       long timestamp = System.currentTimeMillis();
-    
-      body.setId(id);
-      body.setCreatedAt(timestamp);
-      body.setUpdatedAt(timestamp);
 
-      String parentCollectionName = body.getCollectionName().substring(variationCollectionNamePrefix.length());
+      ProductVariationModel newVariation = new ProductVariationModel(body);
+    
+      newVariation.setId(id);
+      newVariation.setCreatedAt(timestamp);
+      newVariation.setUpdatedAt(timestamp);
+
+      String parentCollectionName = body.getCollectionName().substring(variationCollectionNameHead.length());
 
       Query parentDocumentQuery = Query.query(Criteria.where("id").is(body.getParentId()));
-      Update parentDocumentUpdate = new Update().push("productVariationsId").value(id);
+      Update parentDocumentUpdate = new Update();
+      parentDocumentUpdate.push("productVariationsId").value(id);
+      parentDocumentUpdate.set("updatedAt", timestamp);
+      // Update parentDocumentUpdate = new Update().push("productVariationsId").value(id);
+      // Update parentDocumentUpdate = new Update().push("productVariationsId").value(id);
 
       mongoTemplate.findAndModify(parentDocumentQuery, parentDocumentUpdate, ProductModel.class, parentCollectionName);
 
-      ProductVariationModel savedObject = mongoTemplate.save(body, body.getCollectionName());
+      ProductVariationModel savedObject = mongoTemplate.save(newVariation, newVariation.getCollectionName());
       
       return ResponseEntity.ok(savedObject);
     }
   }
 
+  // public ResponseEntity<Object> updateOneById(UpdateVariationById body){
+  //   Query variationCollectionQuery = Query.query(Criteria.where("id").is(body.getId()));
+  //   boolean isExists = mongoTemplate.exists(variationCollectionQuery, body.getCollectionName());
+
+  //   if(isExists){
+  //     long timestamp = System.currentTimeMillis();
+
+  //     Update variationDocUpdate = new Update();
+  //     variationDocUpdate.set(body.getField(), body.getNewData());
+  //     variationDocUpdate.set("updatedAt", timestamp);
+
+  //     UpdateResult updatedVariationDoc = mongoTemplate
+  //     .updateFirst(variationCollectionQuery, variationDocUpdate, ProductVariationModel.class, body.getCollectionName());
+
+  //     String parentCollectionName = body.getCollectionName().substring(variationCollectionNameHead.length());
+
+  //     Query parentDocmentQuery = Query.query(Criteria.where("id").is(body.getParentId()));
+  //     UpdateResult updatedParentDoc = mongoTemplate
+  //     .updateFirst(parentDocmentQuery, new Update().set("updatedAt", timestamp), variationCollectionNameHead);
+      
+  //     HashMap<String, Object> responseObject = new HashMap<>();
+  //     responseObject.put("variationDocResult", updatedVariationDoc);
+  //     responseObject.put("parentDocResult", updatedParentDoc);
+
+  //     return ResponseEntity.ok()
+  //   } else {
+
+  //   }
+  // }
+
   public ResponseEntity<Object> deteleManyById(DeleteManyById body){
-    String parentCollectionName = body.getCollectionName().substring(variationCollectionNamePrefix.length());
+    String parentCollectionName = body.getCollectionName().substring(variationCollectionNameHead.length());
 
     Query parentIsExistsQuery = Query.query(Criteria.where("id").is(body.getParentId()));
     boolean parentIsExists = mongoTemplate.exists(parentIsExistsQuery, ProductModel.class, parentCollectionName);

@@ -6,7 +6,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -16,11 +18,11 @@ public class ProductVariationModel {
 
   @Id @JsonProperty private String id;
   @JsonProperty @NotBlank private String parentId;
-  @JsonProperty @NotBlank private StockInfo stockInfo;
+  @JsonProperty @Valid private StockInfo stockInfo;
   @JsonProperty @NotBlank private String variationName;
   @JsonProperty private ArrayList<ProductOption> productOptions;
   @JsonProperty private ArrayList<Image> image;
-  @JsonProperty @NotBlank private String collectionName;
+  @JsonProperty @Pattern(regexp = "^variation-.*$", message = "\"collectionName\" must contain \"variation\" and \"-\" !") private String collectionName;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
 
@@ -36,10 +38,12 @@ public class ProductVariationModel {
 
   public static class StockInfo {
     @Min(0) public int quantityMax;
-    @NotBlank(message = "\"price\" cannot be blank !")
-    @Pattern(regexp = "^[0-9]+$", message = "\"id\" must contain only digits")
-    public String price;
+    @NotBlank(message = "cannot be blank") public String price;
     @Min(0) public int quantityAvailable;
+
+    public String getPrice(){
+      return this.price;
+    }
   }
 
   public static class ProductOption {
@@ -121,6 +125,18 @@ public class ProductVariationModel {
   }
 
   public ProductVariationModel(){}
+
+  public ProductVariationModel(CreateVariationByParentId body){
+    this.id = null;
+    this.parentId = body.getParentId();
+    this.stockInfo = body.getStockInfo();
+    this.productOptions = new ArrayList<ProductOption>();
+    this.variationName = body.getVariationName();
+    this.image = new ArrayList<Image>();
+    this.collectionName = body.getCollectionName();
+    this.createdAt = 0;
+    this.updatedAt = 0;
+  }
 
   public ProductVariationModel(ProductVariationModel body){
     this.id = null;
