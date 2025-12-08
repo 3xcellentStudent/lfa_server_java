@@ -1,5 +1,6 @@
 package com.server.databases.mongodb.models.product.variation;
 
+
 import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
@@ -29,6 +30,7 @@ public class ProductVariationModel {
   public static class Image {
     public String media;
     public String src;
+    public String srcset;
   }
 
   public static class Descriptions {

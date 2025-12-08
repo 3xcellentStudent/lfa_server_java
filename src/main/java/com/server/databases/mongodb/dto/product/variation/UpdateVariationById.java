@@ -3,6 +3,7 @@ package com.server.databases.mongodb.dto.product.variation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class UpdateVariationById {
@@ -11,6 +12,8 @@ public class UpdateVariationById {
   @JsonProperty @NotBlank private String parentId;
   @JsonProperty @NotBlank private String field;
   @JsonProperty private Object newData;
+  @JsonProperty private @NotNull 
+  @Pattern(regexp = "^(push|pull|set|unset)$", message = "Invalid update type. The value has to be: push, pull, set, unset") String operationType;
   @JsonProperty @NotBlank @Pattern(regexp = ".*-.*", message = "The field must contain '-'") private String collectionName;
 
   public String getId() {
@@ -33,6 +36,10 @@ public class UpdateVariationById {
     return this.collectionName;
   }
 
+  public String getOperationType(){
+    return this.operationType;
+  }
+
   public UpdateVariationById(){}
 
   public UpdateVariationById(UpdateVariationById body){
@@ -40,14 +47,8 @@ public class UpdateVariationById {
     this.parentId = body.getParentId();
     this.field = body.getField();
     this.newData = body.getNewData();
+    this.operationType = body.getOperationType();
     this.collectionName = body.getCollectionName();
   }
-
-  // public UpdateVariationById(String id, String field, Object newData, String collectionName){
-  //   this.id = id;
-  //   this.field = field;
-  //   this.newData = newData;
-  //   this.collectionName = collectionName;
-  // }
 
 }
