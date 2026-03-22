@@ -11,7 +11,7 @@ import com.server.coordinator.services.databases.mongodb.invoices.stripe.StripeI
 
 @RestController
 @RequestMapping("/api/coordinator/checkout/stripe")
-public class AfterStripeCheckoutSessionController {
+public class StripeCheckoutMessageReceiver {
 
   @Autowired
   private StripeInvoicesMongodbApi stripeInvoicesServiceApi;

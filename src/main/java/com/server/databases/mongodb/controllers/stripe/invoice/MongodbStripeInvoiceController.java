@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.controllers.invoice.stripe;
+package com.server.databases.mongodb.controllers.stripe.invoice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

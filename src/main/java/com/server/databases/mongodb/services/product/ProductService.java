@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.dto.product.CreateNewProduct;
-import com.server.databases.mongodb.models.product.ProductModel;
+import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 
@@ -39,36 +38,28 @@ public class ProductService {
   private String reviewsCollectionName;
 
   public ResponseEntity<Object> createOne(CreateNewProduct body){
-    String id = UUID.randomUUID().toString();
-    Query query = Query.query(Criteria.where("id").is(id));
-    boolean isExists = mongoTemplate.exists(query, ProductModel.class, body.getCollectionName());
+    ProductParentModel product = new ProductParentModel(body);
+
+    long timestamp = System.currentTimeMillis();
+
+    product.setCreatedAt(timestamp);
+    product.setUpdatedAt(timestamp);
+
+    ProductParentModel savedObject = mongoTemplate.save(product, product.getCollectionName());
     
-    if(isExists == true){
-      return ResponseEntity.status(409).body("This object with ID: " + id + " is exists !...");
-    } else {
-      ProductModel product = new ProductModel(body);
+    savedObject.setMediaContent(body.getMediaContent());
 
-      long timestamp = System.currentTimeMillis();
-
-      product.setId(id);
-      product.setCreatedAt(timestamp);
-      product.setUpdatedAt(timestamp);
-
-      ProductModel savedObject = mongoTemplate.save(product, product.getCollectionName());
-      
-      savedObject.setMediaContent(body.getMediaContent());
-
-      return ResponseEntity.ok().body(savedObject);
-    }
+    return ResponseEntity.ok().body(savedObject);
   }
 
   public ResponseEntity<Object> findManyRecursiveById(List<String> id, String collectionName){
     Query query = Query.query(Criteria.where("id").in(id));
-    List<ProductModel> foundObject = mongoTemplate.find(query, ProductModel.class, collectionName);
-    List<ProductModel> modifiedObject = addEntitiesToManyProductObjects(foundObject, collectionName);
+    List<ProductParentModel> productsList = mongoTemplate.find(query, ProductParentModel.class, collectionName);
+    List<ProductParentModel> filteredObject = productsList.stream()
+    .map(oneObject -> addEntitiesToOneProductObject(oneObject)).filter(Objects::nonNull).toList();
 
     // return ResponseEntity.ok().header(HttpHeaders.LAST_MODIFIED, HttpDateFormatter.formatLastModified(modifiedObject)).body(modifiedObject);
-    return ResponseEntity.ok(modifiedObject);
+    return ResponseEntity.ok(filteredObject);
   }
 
   public ResponseEntity<Object> findRecursiveById(String id, String collectionName){
@@ -77,22 +68,22 @@ public class ProductService {
     // if(isExists){
       // return ResponseEntity.status(404).body(String.format("Document with ID \"%s\" is not exist !", id));
     // } else {
-      ProductModel foundObject = mongoTemplate.findById(id, ProductModel.class, collectionName);
+      ProductParentModel foundObject = mongoTemplate.findById(id, ProductParentModel.class, collectionName);
 
       if(foundObject == null){
         String message = String.format("Document with ID \"%s\" is not exists !", id);
         logger.warn(message);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
       } else {
-        ProductModel modifiedObject = addEntitiesToOneProductObject(foundObject);
+        ProductParentModel modifiedObject = addEntitiesToOneProductObject(foundObject);
         return ResponseEntity.ok().lastModified(modifiedObject.getUpdatedAt()).body(modifiedObject);
       }
     // }
   }
 
   public ResponseEntity<Object> deleteRecursiveById(List<String> id, String productCollectionName){
-    List<ProductModel> deletedProducts = mongoTemplate
-    .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductModel.class, productCollectionName);
+    List<ProductParentModel> deletedProducts = mongoTemplate
+    .findAllAndRemove(Query.query(Criteria.where("id").in(id)), ProductParentModel.class, productCollectionName);
 
     List<ReviewsModel> deletedReviews = mongoTemplate
     .findAllAndRemove(
@@ -114,24 +105,13 @@ public class ProductService {
     return ResponseEntity.ok(responseBody);
   }
 
-  private List<ProductModel> addEntitiesToManyProductObjects(List<ProductModel> productsList, String producCollectionName){
-    List<ProductModel> modifiedProductsList = productsList.stream()
-    .map(oneObject -> addEntitiesToOneProductObject(oneObject)).filter(Objects::nonNull).toList();
+  private ProductParentModel addEntitiesToOneProductObject(ProductParentModel product){
+    Query productVariationsQuery = Query.query(Criteria.where("parentId").in(product.getId()));
 
-    return modifiedProductsList;
-  }
+    List<ProductVariationModel> variationEntities = mongoTemplate
+    .find(productVariationsQuery, ProductVariationModel.class, variationCollectionName + "-" + product.getCollectionName());
 
-  private ProductModel addEntitiesToOneProductObject(ProductModel product){
-    // System.out.println("PRODUCT: " + product);
-    Query productVariationsQuery = Query.query(
-      Criteria.where("parentId").in(product.getId())
-    );
-
-    List<ProductVariationModel> productVatriations = mongoTemplate.find(
-      productVariationsQuery, ProductVariationModel.class, variationCollectionName + "-" + product.getCollectionName()
-    );
-
-    product.setProductVariations(new ArrayList<>(productVatriations));
+    product.setVariationEntities(new ArrayList<>(variationEntities));
     return product;
   }
 

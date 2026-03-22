@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mongodb.client.result.DeleteResult;
 import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
-import com.server.databases.mongodb.models.product.ProductModel;
+import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
@@ -83,7 +83,7 @@ public class ReviewController {
 
       Update update = new Update().pullAll("reviewsId", body.getId().toArray(new String[0]));
       mongoTemplate.updateMulti(new Query(Criteria.where("id")
-      .is(body.getParentId())), update, ProductModel.class, body.getCollectionName());
+      .is(body.getParentId())), update, ProductParentModel.class, body.getCollectionName());
 
       return response;
     });

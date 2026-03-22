@@ -21,7 +21,7 @@ import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.GetOneById;
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.CreateNewProduct;
-import com.server.databases.mongodb.models.product.ProductModel;
+import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.ProductService;
 
@@ -47,19 +47,19 @@ public class ProductController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateNewOneById(body, ProductModel.class);
+    return mainService.updateNewOneById(body, ProductParentModel.class);
   }
 
   @GetMapping("/get")
   public ResponseEntity<Object> findAll(@Valid @ModelAttribute GetManyById body){
     if(body.getId() == null || body.getId().isEmpty()){
       ResponseEntity<Object> response = mainService
-      .findAll(ProductModel.class, body.getCollectionName());
+      .findAll(ProductParentModel.class, body.getCollectionName());
 
       return response;
     } else {
-      List<ProductModel> foundProducts = mainService
-      .findManyById("id", body.getId(), ProductModel.class, body.getCollectionName());
+      List<ProductParentModel> foundProducts = mainService
+      .findManyById("id", body.getId(), ProductParentModel.class, body.getCollectionName());
 
       return ResponseEntity.ok().body(foundProducts);
     }
@@ -77,7 +77,7 @@ public class ProductController {
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteAllById(@Valid @RequestBody DeleteManyById body){
-    return mainService.deleteManyById(body, ProductModel.class);
+    return mainService.deleteManyById(body, ProductParentModel.class);
   }
 
   @DeleteMapping("/delete/recursive")
@@ -89,7 +89,7 @@ public class ProductController {
   public ResponseEntity<Object> clearCollection(
     @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
   ){
-    return mainService.clearCollection(ProductModel.class, collectionName);
+    return mainService.clearCollection(ProductParentModel.class, collectionName);
   }
   
 }

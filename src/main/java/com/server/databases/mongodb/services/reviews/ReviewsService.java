@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.dto.UpdateOneByIdDto;
-import com.server.databases.mongodb.models.product.ProductModel;
+import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 
@@ -55,25 +55,25 @@ public class ReviewsService {
 
   public ResponseEntity<Object> updateReviewsArrayByParentId(String parentId, String id, String collectionName){
     UpdateOneByIdDto updateReviewsById = new UpdateOneByIdDto(parentId, "reviewsId", id, collectionName);
-    return mainService.pushNewOneToArrayById(updateReviewsById, ProductModel.class, collectionName);
+    return mainService.pushNewOneToArrayById(updateReviewsById, ProductParentModel.class, collectionName);
   }
 
   public ResponseEntity<Object> increaseStockInfoFields(String parentId, int rating, String collectionName){
     // int countOfReviews = mongoTemplate.findById(parentId, ProductsModel.class).getStockInfo().countOfReviews;
-    // int countOfReviews = mongoTemplate.findById(parentId, ProductModel.class).getReviewsSnapshot().getTotal();
+    // int countOfReviews = mongoTemplate.findById(parentId, ProductParentModel.class).getReviewsSnapshot().getTotal();
     // UpdateOneByIdDto updateCountOfReviewsById = new UpdateOneByIdDto(parentId, "stockInfo.countOfReviews", countOfReviews + 1, collectionName);
-    // mainService.updateNewOneById(updateCountOfReviewsById, ProductModel.class);
+    // mainService.updateNewOneById(updateCountOfReviewsById, ProductParentModel.class);
 
     String[] reviewsSnapshotKeys = new String[] {"one", "two", "three", "four", "five"};
 
     Query query = Query.query(Criteria.where("id").is(parentId));
 
-    ProductModel productObject = mongoTemplate.findOne(query, ProductModel.class);
+    ProductParentModel productObject = mongoTemplate.findOne(query, ProductParentModel.class);
     int oneStarCounts = productObject.getReviewsSnapshotByFieldName(reviewsSnapshotKeys[rating - 1]);
 
     
     UpdateOneByIdDto updateReviewsSnapshotById = new UpdateOneByIdDto(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1, collectionName);
-    return mainService.updateNewOneById(updateReviewsSnapshotById, ProductModel.class);
+    return mainService.updateNewOneById(updateReviewsSnapshotById, ProductParentModel.class);
   }
 
 }

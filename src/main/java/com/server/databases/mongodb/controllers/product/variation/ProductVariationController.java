@@ -20,11 +20,9 @@ import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.GetManyById;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
-import com.server.databases.mongodb.models.product.ProductModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.variation.ProductVariationService;
-import com.server.databases.mongodb.services.product.variation.ProductVariationUpdateService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -40,8 +38,6 @@ public class ProductVariationController {
   private MongoDbMainService mainService;
   @Autowired
   private ProductVariationService productVariationService;
-  @Autowired
-  private ProductVariationUpdateService productVariationUpdateService;
 
   @PostMapping("/create/parent-id")
   public ResponseEntity<Object> createByParentId(@Valid @RequestBody CreateVariationByParentId body){
@@ -69,7 +65,7 @@ public class ProductVariationController {
 
   @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateVariationById body){
-    return productVariationUpdateService.updateOneById(body, ProductModel.class);
+    return productVariationService.updateOneById(body);
   }
 
   @DeleteMapping("/delete")

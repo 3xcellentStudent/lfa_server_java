@@ -14,22 +14,22 @@ public class CreateVariationByParentId {
   @JsonProperty @NotBlank private String collectionName;
   @JsonProperty @Valid @NotNull private StockInfo stockInfo;
 
-  CreateVariationByParentId(){}
-
   public String getParentId(){
     return this.parentId;
   }
-
+  
   public String getVariationName(){
     return this.variationName;
   }
-
+  
   public String getCollectionName(){
     return this.collectionName;
   }
-
+  
   public StockInfo getStockInfo(){
     return this.stockInfo;
   }
+  
+  CreateVariationByParentId(){}
 
 }

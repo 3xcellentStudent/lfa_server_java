@@ -12,6 +12,7 @@ import com.server.databases.mongodb.dto.product.variation.CreateVariationByParen
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Component
@@ -21,7 +22,8 @@ public class ProductVariationModel {
   @JsonProperty @NotBlank private String parentId;
   @JsonProperty @Valid private StockInfo stockInfo;
   @JsonProperty @NotBlank private String variationName;
-  @JsonProperty private ArrayList<ProductOption> productOptions;
+  // @JsonProperty private ArrayList<VariationOptions> variationOptions;
+  @JsonProperty private VariationOptions variationOptions;
   @JsonProperty private ArrayList<Image> image;
   @JsonProperty @Pattern(regexp = "^variation-.*$", message = "\"collectionName\" must contain \"variation\" and \"-\" !") private String collectionName;
   @JsonProperty private long createdAt;
@@ -39,19 +41,57 @@ public class ProductVariationModel {
   }
 
   public static class StockInfo {
-    @Min(0) public int quantityMax;
-    @NotBlank(message = "cannot be blank") public String price;
-    @Min(0) public int quantityAvailable;
+    @Min(0) public int stockAmountMax;
+    @Min(0) public int stockAmountAvailable;
+    @Min(0) @NotNull public Long priceInCents;
+    @NotBlank(message = "Cannot be blank") public String currency;
 
-    public String getPrice(){
-      return this.price;
+    public int stockAmountMax(){
+      return this.stockAmountMax;
+    }
+
+    public int getStockAmountAvailable(){
+      return this.stockAmountAvailable;
+    }
+
+    public Long getPriceInCents(){
+      return this.priceInCents;
+    }
+
+    public String getCurrency(){
+      return this.currency;
+    }
+
+    public void setStockAmountMax(int newStockAmountMax){
+      this.stockAmountMax = newStockAmountMax;
+    }
+
+    public void setStockAmountAvailable(int newStockAmountAvailable){
+      this.stockAmountAvailable = newStockAmountAvailable;
+    }
+
+    public void setPriceInCents(Long newPriceInCents){
+      this.priceInCents = newPriceInCents;
+    }
+
+    public void setCurrency(String newCurrency){
+      this.currency = newCurrency;
+    }
+
+    public StockInfo(){
+      this.stockAmountMax = 0;
+      this.stockAmountAvailable = 0;
+      this.priceInCents = 0L;
+      this.currency = "CAD";
     }
   }
 
-  public static class ProductOption {
+  public static class VariationOptions {
     public String name;
     public String type;
-    public ArrayList<Item> items;
+    public String value;
+
+    public VariationOptions(){}
   }
 
   public static class Item {
@@ -90,8 +130,9 @@ public class ProductVariationModel {
     return this.stockInfo;
   }
 
-  public ArrayList<ProductOption> getProductOptions(){
-    return this.productOptions;
+  // public ArrayList<VariationOptions> getVariationOptions(){
+  public VariationOptions getVariationOptions(){
+    return this.variationOptions;
   }
 
   public String getCollectionName(){
@@ -122,17 +163,17 @@ public class ProductVariationModel {
     this.stockInfo = new StockInfo();
   }
 
-  public void setPrice(String price){
-    this.getStockInfo().price = price;
+  public void setPrice(Long priceInCents){
+    this.getStockInfo().priceInCents = priceInCents;
   }
 
   public ProductVariationModel(){}
 
   public ProductVariationModel(CreateVariationByParentId body){
-    this.id = null;
     this.parentId = body.getParentId();
-    this.stockInfo = body.getStockInfo();
-    this.productOptions = new ArrayList<ProductOption>();
+    this.stockInfo = body.getStockInfo() != null ? body.getStockInfo() : new StockInfo();
+    // this.variationOptions = new ArrayList<VariationOptions>();
+    this.variationOptions = new VariationOptions();
     this.variationName = body.getVariationName();
     this.image = new ArrayList<Image>();
     this.collectionName = body.getCollectionName();
@@ -141,10 +182,10 @@ public class ProductVariationModel {
   }
 
   public ProductVariationModel(ProductVariationModel body){
-    this.id = null;
     this.parentId = body.getParentId();
     this.stockInfo = body.getStockInfo() != null ? body.getStockInfo() : new StockInfo();
-    this.productOptions = body.getProductOptions().isEmpty() ? new ArrayList<ProductOption>() : body.getProductOptions();
+    // this.variationOptions = body.getVariationOptions().isEmpty() ? new ArrayList<VariationOptions>() : body.getVariationOptions();
+    this.variationOptions = body.getVariationOptions();
     this.variationName = body.getVariationName();
     this.image = body.getImage().isEmpty() ? new ArrayList<Image>() : body.getImage();
     this.collectionName = body.getCollectionName();
@@ -156,7 +197,7 @@ public class ProductVariationModel {
   //   this.id = dataModel.getId();
   //   this.parentId = dataModel.getParentId();
   //   this.stockInfo = dataModel.getStockInfo();
-  //   this.productOptions = dataModel.getProductOptions();
+  //   this.productOptions = dataModel.getVariationOptionss();
   //   this.variationName = dataModel.getVariationName();
   //   this.image = new ArrayArrayList<Image>();
   //   this.collectionName = dataModel.getCollectionName();

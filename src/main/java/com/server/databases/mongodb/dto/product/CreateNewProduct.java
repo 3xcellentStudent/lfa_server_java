@@ -3,9 +3,9 @@ package com.server.databases.mongodb.dto.product;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.databases.mongodb.models.product.ProductModel.Descriptions;
-import com.server.databases.mongodb.models.product.ProductModel.MediaContent;
-import com.server.databases.mongodb.models.product.ProductModel.Specifications;
+import com.server.databases.mongodb.models.product.ProductParentModel.Descriptions;
+import com.server.databases.mongodb.models.product.ProductParentModel.MediaContent;
+import com.server.databases.mongodb.models.product.ProductParentModel.Specifications;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

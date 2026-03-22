@@ -13,15 +13,15 @@ import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 import jakarta.validation.constraints.NotBlank;
 
 @Component
-public class ProductModel {
+public class ProductParentModel {
 
   @Id @JsonProperty private String id;
-  @JsonProperty private ArrayList<String> reviewsId = new ArrayList<>();
-  @JsonProperty private ArrayList<String> productVariationsId;
-  @JsonProperty private String rating;
+  // @JsonProperty private ArrayList<String> reviewsIds = new ArrayList<>();
+  // @JsonProperty private ArrayList<String> variationEntitiesId;
+  @JsonProperty private Integer rating;
   @JsonProperty @NotBlank private String productName;
   @JsonProperty @NotBlank private Descriptions descriptions;
-  @JsonProperty private ArrayList<ProductVariationModel> productVariations;
+  @JsonProperty private ArrayList<ProductVariationModel> variationEntities;
   @JsonProperty private Specifications specifications;
   @JsonProperty private ArrayList<MediaContent> mediaContent;
   @JsonProperty private ReviewsSnapshot reviewsSnapshot;
@@ -67,13 +67,13 @@ public class ProductModel {
     return this.id;
   }
 
-  public void setReviewsId(ArrayList<String> reviewsId){
-    this.reviewsId = reviewsId;
-  }
+  // public void setReviewsId(ArrayList<String> reviewsId){
+  //   this.reviewsIds = reviewsId;
+  // }
 
-  public ArrayList<String> getReviewsId(){
-    return this.reviewsId;
-  }
+  // public ArrayList<String> getReviewsId(){
+  //   return this.reviewsIds;
+  // }
 
   public long getCreatedAt(){
     return this.createdAt;
@@ -111,25 +111,25 @@ public class ProductModel {
     return this.productName;
   }
 
-  public void setProductVariationsId(ArrayList<String> productVariationsId){
-    this.productVariationsId = productVariationsId;
+  // public void setVariationEntitiesId(ArrayList<String> variationEntitiesId){
+  //   this.variationEntitiesId = variationEntitiesId;
+  // }
+
+  // public ArrayList<String> getVariationEntitiesId(){
+  //   return this.variationEntitiesId;
+  // }
+
+  public ArrayList<ProductVariationModel> getVariationEntities(){
+    return this.variationEntities;
   }
 
-  public ArrayList<String> getProductVariationsId(){
-    return this.productVariationsId;
+  public void setVariationEntities(ArrayList<ProductVariationModel> variationEntities){
+    this.variationEntities = variationEntities;
   }
 
-  public ArrayList<ProductVariationModel> getProductVariations(){
-    return this.productVariations;
-  }
-
-  public void setProductVariations(ArrayList<ProductVariationModel> productVariations){
-    this.productVariations = productVariations;
-  }
-
-  public void pushProductVariation(ProductVariationModel productVariation){
-    this.productVariations.add(productVariation);
-  }
+  // public void pushProductVariation(ProductVariationModel productVariation){
+  //   this.variationEntities.add(productVariation);
+  // }
 
   public int getReviewsSnapshotByFieldName(String field){
     switch(field){
@@ -146,7 +146,7 @@ public class ProductModel {
     return this.reviewsSnapshot;
   }
 
-  public String getRating(){
+  public Integer getRating(){
     return this.rating;
   }
 
@@ -162,15 +162,15 @@ public class ProductModel {
     return this.collectionName;
   }
 
-  public ProductModel(){}
+  public ProductParentModel(){}
 
-  public ProductModel(CreateNewProduct data){
-    this.reviewsId = new ArrayList<>();
-    this.rating = null;
+  public ProductParentModel(CreateNewProduct data){
+    // this.reviewsIds = new ArrayList<>();
+    this.rating = 0;
     this.productName = data.getProductName();
     this.descriptions = data.getDescriptions();
-    this.productVariationsId = new ArrayList<>();
-    this.productVariations = new ArrayList<>();
+    // this.variationEntitiesId = new ArrayList<>();
+    this.variationEntities =  new ArrayList<>();
     this.specifications = data.getSpecifications();
     this.mediaContent = data.getMediaContent();
     this.collectionName = data.getCollectionName();
@@ -181,10 +181,10 @@ public class ProductModel {
     // this.id = data.getId();
     // this.reviewsId = data.getReviewsId();
     // this.rating = data.getRating();
-    // this.productName = data.getProductName();
+    // this.mainName = data.getMainName();
     // this.descriptions = data.getDescriptions();
-    // this.productVariationsId = data.getProductVariationsId();
-    // this.productVariations = data.getProductVariations();
+    // this.variationEntitiesId = data.getVariationEntitiesId();
+    // this.variationEntities = data.getVariationEntities();
     // this.specifications = data.getSpecifications();
     // this.mediaContent = data.getMediaContent();
     // this.collectionName = data.getCollectionName();
