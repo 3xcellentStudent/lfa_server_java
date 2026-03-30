@@ -62,7 +62,7 @@ public class ProductVariationService {
   }
 
   public ResponseEntity<Object> updateOneById(UpdateVariationById body){
-    Query variationCollectionQuery = Query.query(Criteria.where("id").is(body.getId()));
+    Query variationCollectionQuery = Query.query(Criteria.where("_id").is(body.getId()));
     boolean isExists = mongoTemplate.exists(variationCollectionQuery, body.getCollectionName());
 
     if(isExists){

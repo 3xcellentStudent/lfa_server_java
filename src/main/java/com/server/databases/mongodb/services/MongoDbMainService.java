@@ -96,22 +96,22 @@ public class MongoDbMainService {
   // }
 
   public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collectionName){
-    List<T> foundObjects = mongoTemplate.findAll(someClass, collectionName).stream()
+    List<T> foundDocs = mongoTemplate.findAll(someClass, collectionName).stream()
     .filter(Objects::nonNull).toList();
 
-    if(foundObjects.isEmpty()){
+    if(foundDocs.isEmpty()){
       return ResponseEntity.status(404).body(new ArrayList<>());
     } else {
-      return ResponseEntity.ok(foundObjects);
+      return ResponseEntity.ok(foundDocs);
     }
   }
 
   public <T> List<T> findManyById(String selector, List<String> id, Class<T> someClass, String collectionName){
     Query query = Query.query(Criteria.where(selector).in(id));
-    List<T> foundObjectsList = mongoTemplate.find(query, someClass, collectionName)
+    List<T> foundDocsList = mongoTemplate.find(query, someClass, collectionName)
     .stream().filter(Objects::nonNull).toList();
 
-    return foundObjectsList;
+    return foundDocsList;
   }
 
   public <T> List<T> findManyById(String selector, String id, Class<T> someClass, String collectionName){

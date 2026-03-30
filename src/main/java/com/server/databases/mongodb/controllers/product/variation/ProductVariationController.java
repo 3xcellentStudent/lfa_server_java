@@ -58,7 +58,7 @@ public class ProductVariationController {
   @GetMapping("/get/id")
   public ResponseEntity<Object> getManyById(@Valid @ModelAttribute GetManyById body){
     List<ProductVariationModel> productVariation = mainService
-    .findManyById("id", body.getId(), ProductVariationModel.class, body.getCollectionName());
+    .findManyById("_id", body.getId(), ProductVariationModel.class, body.getCollectionName());
 
     return ResponseEntity.ok(productVariation);
   }

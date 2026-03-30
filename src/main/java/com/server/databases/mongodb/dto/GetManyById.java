@@ -16,7 +16,7 @@ public class GetManyById {
     return id;
   }
 
-  public String getCollectionName() {
+  public String getCollectionName(){
     return collectionName;
   }
 
