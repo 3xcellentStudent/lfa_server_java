@@ -22,8 +22,9 @@ databases:
       media: media
       reviews: reviews
       invoice: invoice
-      product: product
-      product_variation: variation
+      product: 
+        main: product
+        variation: variation
 
 gmail:
   transport:

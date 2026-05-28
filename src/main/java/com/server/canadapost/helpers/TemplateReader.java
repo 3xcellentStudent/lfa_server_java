@@ -16,7 +16,7 @@ import com.server.canadapost.dto.CreatePickupRequestDto;
 import com.server.canadapost.dto.PickupRequestPriceDto;
 import com.server.canadapost.dto.ShipPriceDto;
 
-@Service
+// @Service
 public class TemplateReader {
 
   private final Logger logger = LoggerFactory.getLogger(TemplateReader.class);

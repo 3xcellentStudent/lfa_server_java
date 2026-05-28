@@ -28,56 +28,63 @@ import jakarta.validation.constraints.NotBlank;
 @Validated
 public class CanadaPostController {
   
-  @Autowired
-  private CanadaPostService canadaPostService;
+  // @Autowired
+  // private CanadaPostService canadaPostService;
 
   @GetMapping("/pickupavailability")
   public ResponseEntity<Object> pickupAvailability(@RequestParam(required = true) @NotBlank String postalCode){
-    ResponseEntity<Object> response = canadaPostService.pickupAvailability(postalCode);
+    // ResponseEntity<Object> response = canadaPostService.pickupAvailability(postalCode);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @PostMapping("/ship/price")
   public ResponseEntity<Object> shipPrice(@RequestBody ShipPriceDto body){
-    ResponseEntity<Object> response = canadaPostService.shipPrice(body);
+    // ResponseEntity<Object> response = canadaPostService.shipPrice(body);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @PostMapping("/create-ncshipment")
   public ResponseEntity<Object> createShipment(@RequestBody CreateNonContractShipmentDto body){
-    ResponseEntity<Object> response = canadaPostService.createNCShipment(body);
+    // ResponseEntity<Object> response = canadaPostService.createNCShipment(body);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @PostMapping("/pickuprequest/price")
   public ResponseEntity<Object> pickupRequestPrice(@RequestBody PickupRequestPriceDto body){
-    ResponseEntity<Object> response = canadaPostService.pickupRequestPrice(body);
+    // ResponseEntity<Object> response = canadaPostService.pickupRequestPrice(body);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @PostMapping("/create-pickuprequest")
   public ResponseEntity<Object> createPickupRequest(@RequestBody CreatePickupRequestDto body){
-    ResponseEntity<Object> response = canadaPostService.createPickupRequest(body);
+    // ResponseEntity<Object> response = canadaPostService.createPickupRequest(body);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @GetMapping("/postoffice/find")
   public ResponseEntity<Object> findPostOffice(@Valid @ModelAttribute FindPostOfficeDto body){
-    ResponseEntity<Object> response = canadaPostService.findPostOffice(body);
+    // ResponseEntity<Object> response = canadaPostService.findPostOffice(body);
 
-    return response;
+    // return response;
+    return null;
   }
 
   @GetMapping("/postoffice/details")
   public ResponseEntity<Object> findPostOfficeDetails(@RequestParam(required = true) @NotBlank String detailsUri){
-    ResponseEntity<Object> response = canadaPostService.findPostOfficeDetails(detailsUri);
+    // ResponseEntity<Object> response = canadaPostService.findPostOfficeDetails(detailsUri);
 
-    return response;
+    // return response;
+    return null;
   }
 
 }
