@@ -1,6 +1,8 @@
 package com.server.stripe.controllers.checkout;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionClientRequestDto;
 // import com.server.stripe.helpers.services.thirdParty.RequestsToServices;
-import com.server.stripe.services.checkout.CheckoutCreateSessionService;
+import com.server.stripe.services.checkout.StripeCheckoutCreateSessionService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/stripe/checkout/sessions")
@@ -18,12 +23,12 @@ import com.server.stripe.services.checkout.CheckoutCreateSessionService;
 public class CheckoutSessionsController {
 
   @Autowired
-  private CheckoutCreateSessionService createSessionService;
-  
+  private StripeCheckoutCreateSessionService createSessionService;
+
   @PostMapping("/create")
-  public ResponseEntity<String> createCheckout(@RequestBody(required = true) String incomingBodyString){
-    System.out.println(incomingBodyString);
-    return createSessionService.create(incomingBodyString);
+  public ResponseEntity<String> createCheckout(@Valid @RequestBody List<CheckoutCreateSessionClientRequestDto> body){
+    // System.out.println(body.data.get(0).unitAmount);
+    return createSessionService.create(body);
   }
 
   // public ResponseEntity<Object> save(@RequestBody String requestBodyString){

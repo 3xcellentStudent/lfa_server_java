@@ -1,22 +1,17 @@
 package com.common.models.stripe.invoices.submodels;
 
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public class CheckoutCreateSessionClientRequestDto {
 
-  public List<DataArray> data;
+    @JsonProperty public @NotBlank String productId;
+    @JsonProperty public @PositiveOrZero int quantity;
+    @JsonProperty public @NotBlank String collectionName;
 
-  public static class DataArray {
-    public String productName;
-    public String productId;
-    public float unitAmount;
-    public String quantity;
-  }
-  
   public CheckoutCreateSessionClientRequestDto(){}
-
-  public CheckoutCreateSessionClientRequestDto(CheckoutCreateSessionClientRequestDto requestBody){
-    this.data = requestBody.data;
-  }
 
 }
