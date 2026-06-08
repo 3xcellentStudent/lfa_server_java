@@ -43,6 +43,7 @@ public class ProductVariationModel {
   public static class StockInfo {
     @Min(0) public int stockAmountMax;
     @Min(0) public int stockAmountAvailable;
+    @Min(0) public int stockAmountReserved;
     @Min(0) @NotNull public Long priceInCents;
     @NotBlank(message = "Cannot be blank") public String currency;
 
@@ -52,6 +53,10 @@ public class ProductVariationModel {
 
     public int getStockAmountAvailable(){
       return this.stockAmountAvailable;
+    }
+
+    public int getStockAmountReserved(){
+      return this.stockAmountReserved;
     }
 
     public Long getPriceInCents(){
@@ -68,6 +73,10 @@ public class ProductVariationModel {
 
     public void setStockAmountAvailable(int newStockAmountAvailable){
       this.stockAmountAvailable = newStockAmountAvailable;
+    }
+
+    public void setStockAmountReserved(int newStockAmountReserved){
+      this.stockAmountReserved = newStockAmountReserved;
     }
 
     public void setPriceInCents(Long newPriceInCents){

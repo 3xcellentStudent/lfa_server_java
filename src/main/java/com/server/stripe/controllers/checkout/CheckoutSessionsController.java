@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionClientRequestDto;
-// import com.server.stripe.helpers.services.thirdParty.RequestsToServices;
-import com.server.stripe.services.checkout.StripeCheckoutCreateSessionService;
+import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
+import com.server.stripe.services.checkout.create.StripeCreateCheckoutSessionService;
+import com.server.stripe.services.checkout.webhooks.completed.StripeCheckoutCompletedWebhookService;
 
 import jakarta.validation.Valid;
 
@@ -23,46 +23,18 @@ import jakarta.validation.Valid;
 public class CheckoutSessionsController {
 
   @Autowired
-  private StripeCheckoutCreateSessionService createSessionService;
+  private StripeCreateCheckoutSessionService createSessionService;
+  @Autowired
+  private StripeCheckoutCompletedWebhookService completedWebhookService;
 
   @PostMapping("/create")
-  public ResponseEntity<String> createCheckout(@Valid @RequestBody List<CheckoutCreateSessionClientRequestDto> body){
-    // System.out.println(body.data.get(0).unitAmount);
+  public ResponseEntity<Object> createCheckout(@Valid @RequestBody List<CheckoutCreateSessionClientRequestDto> body){
     return createSessionService.create(body);
   }
 
-  // public ResponseEntity<Object> save(@RequestBody String requestBodyString){
-  //   try {
-  //     HttpURLConnection mongodbConnection = CreateHttpUrlConnection
-  //     .connect(mongodbSaveDataEndpoint, "POST", "application/json");
-  //     mongodbConnection.setDoInput(true);
-  //     mongodbConnection.setDoOutput(true);
-
-  //     ResponseEntity<Object> mongodbResponse = requestsToServices.saveInDb(mongodbConnection, requestBodyString);
-
-  //     mongodbConnection.disconnect();
-
-  //     return ResponseEntity.ok().build();
-
-  //     // if(mongodbResponse.getStatusCode().value() < 400){
-  //     //   HttpURLConnection connectionCreatePdf = CreateHttpUrlConnection
-  //     //   .connect(pdfCreateEndpoint, "POST", "application/json");
-  //     //   connectionCreatePdf.setDoInput(true);
-  //     //   connectionCreatePdf.setDoOutput(true);
-  
-  //     //   ResponseEntity<Object> pdfServiceResponse = requestsToServices.createPdf(connectionCreatePdf, requestBodyString);
-  
-  //     //   connectionCreatePdf.disconnect();
-
-  //     //   return pdfServiceResponse;
-  //     // } else {
-  //     //   return ResponseEntity.internalServerError().body(mongodbResponse.getBody().toString());
-  //     // }
-  //   } catch (Exception error) {
-  //     System.err.println(error.getMessage());
-  //     error.printStackTrace();
-  //     return ResponseEntity.internalServerError().body(error.getMessage());
-  //   }
-  // }
+  @PostMapping("/webhook/completed")
+  public void getWebhook(@Valid @RequestBody StripeCheckoutCompletedWebhookService body){
+    completedWebhookService.
+  }
 
 }

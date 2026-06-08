@@ -27,26 +27,45 @@ public class MongoDbMainService {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  public <T> ResponseEntity<Object> updateNewOneById(UpdateOneByIdDto body, Class<T> someClass){
+  public <T> ResponseEntity<Object> updateOneById(UpdateOneByIdDto body, Class<T> someClass){
     long timestamp = System.currentTimeMillis();
+    
+    Query query = Query.query(Criteria.where("_id").is(body.getId()));
+    
+    Update update = new Update();
+    update.set(body.getField(), body.getNewData());
+    update.set("updatedAt", timestamp);
+    
+    FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
-    Query queryIsExist = Query.query(Criteria.where("id").is(body.getId()));
+    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
 
-    boolean isExists = mongoTemplate.exists(queryIsExist, someClass, body.getCollectionName());
-
-    if(isExists){
-      Query query = Query.query(Criteria.where("id").is(body.getId()));
-      Update update = QueriesHelper.getUpdateForNonArray(body.getField(), body.getNewData());
-      FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
-
-      update.set("updatedAt", timestamp);
-
-      T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
-
-      return ResponseEntity.ok(modifiedProduct);
-    } else {
-      String message = "Document with ID: \"" + body.getId() + "\" not found";
+    if(modifiedProduct == null){
+      String message = "Document with ID: \"" + body.getId() + "\" was not found";
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    } else {
+      return ResponseEntity.ok(modifiedProduct);
+    }
+  }
+
+  public <T> ResponseEntity<Object> updateOneById(UpdateOneByIdDto body, Update update, Class<T> someClass){
+    // long timestamp = System.currentTimeMillis();
+    
+    Query query = Query.query(Criteria.where("_id").is(body.getId()));
+    
+    // Update update = new Update();
+    // update.set(body.getField(), body.getNewData());
+    // update.set("updatedAt", timestamp);
+    
+    FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
+
+    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
+
+    if(modifiedProduct == null){
+      String message = "Document with ID: \"" + body.getId() + "\" was not found";
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    } else {
+      return ResponseEntity.ok(modifiedProduct);
     }
   }
 

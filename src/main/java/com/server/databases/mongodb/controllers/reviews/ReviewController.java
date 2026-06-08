@@ -52,7 +52,7 @@ public class ReviewController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateNewOneById(body, ReviewsModel.class);
+    return mainService.updateOneById(body, ReviewsModel.class);
   }
   
   @GetMapping("/get")

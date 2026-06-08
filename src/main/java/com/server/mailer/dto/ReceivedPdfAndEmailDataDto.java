@@ -2,7 +2,7 @@ package com.server.mailer.dto;
 
 import org.springframework.stereotype.Component;
 
-import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
+// import com.common.models.stripe.invoices.submodels.StripeCheckoutSessionsDataModel.CollectedInformation.ShippingDetails.Address;
 
 
 @Component
@@ -14,7 +14,7 @@ public class ReceivedPdfAndEmailDataDto {
 
   public class EmailContent {
     public String invoiceId;
-    public Address address;
+    // public Address address;
     public String billingAddress;
     public Integer amountTotal;
     public Long created;

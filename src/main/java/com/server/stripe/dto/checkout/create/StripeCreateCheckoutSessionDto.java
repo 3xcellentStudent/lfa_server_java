@@ -2,11 +2,11 @@ package com.server.stripe.dto.checkout.create;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import com.common.models.stripe.invoices.submodels.CheckoutCreateSessionClientRequestDto;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel.VariationOptions;
+import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 
-public class StripeCheckoutCreateSessionDto {
+public class StripeCreateCheckoutSessionDto {
 
   @Value("stripe.checkout.status.open")
   private String checkoutStatusOpen;
@@ -18,17 +18,13 @@ public class StripeCheckoutCreateSessionDto {
   public String currency;
   public String variationName;
   public VariationOptions variationOptions;
-  public String imageSrc;
   public String collectionName;
   public long createdAt;
   public long updatedAt;
-  public String status;
-  public long transactionTimeStart;
-  public long transactionTimeEnd;
 
-  public StripeCheckoutCreateSessionDto(){}
+  public StripeCreateCheckoutSessionDto(){}
 
-  public StripeCheckoutCreateSessionDto(CheckoutCreateSessionClientRequestDto entity, ProductVariationModel productVariation){
+  public StripeCreateCheckoutSessionDto(CheckoutCreateSessionClientRequestDto entity, ProductVariationModel productVariation){
     this.id = entity.productId;
     this.parentId = productVariation.getParentId();
     this.quantity = entity.quantity;
@@ -39,8 +35,5 @@ public class StripeCheckoutCreateSessionDto {
     this.collectionName = productVariation.getCollectionName();
     this.createdAt = productVariation.getCreatedAt();
     this.updatedAt = productVariation.getUpdatedAt();
-    this.status = this.checkoutStatusOpen;
-    this.transactionTimeStart = System.currentTimeMillis();
-    this.transactionTimeEnd = 0L;
   }
 }

@@ -18,7 +18,7 @@ public class StripeCheckoutMessageReceiver {
   
   @PostMapping("/paid")
   public ResponseEntity<Object> checkoutCompleted(@RequestBody String requestBodyString){
-    stripeInvoicesServiceApi.saveInDatabase(requestBodyString);
+    // stripeInvoicesServiceApi.saveInDatabase(requestBodyString);
 
     return ResponseEntity.ok().build();
   }

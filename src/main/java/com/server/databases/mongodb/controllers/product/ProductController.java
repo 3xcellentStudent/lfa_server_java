@@ -47,7 +47,7 @@ public class ProductController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateNewOneById(body, ProductParentModel.class);
+    return mainService.updateOneById(body, ProductParentModel.class);
   }
 
   @GetMapping("/get")

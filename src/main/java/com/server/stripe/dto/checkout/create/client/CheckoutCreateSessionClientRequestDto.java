@@ -1,4 +1,4 @@
-package com.common.models.stripe.invoices.submodels;
+package com.server.stripe.dto.checkout.create.client;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

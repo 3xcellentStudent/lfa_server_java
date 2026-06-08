@@ -61,27 +61,27 @@ public class ProductVariationService {
     // }
   }
 
-  public ResponseEntity<Object> updateOneById(UpdateVariationById body){
-    Query variationCollectionQuery = Query.query(Criteria.where("_id").is(body.getId()));
-    boolean isExists = mongoTemplate.exists(variationCollectionQuery, body.getCollectionName());
+  // public ResponseEntity<Object> updateOneById(UpdateVariationById body){
+  //   Query variationCollectionQuery = Query.query(Criteria.where("_id").is(body.getId()));
+  //   boolean isExists = mongoTemplate.exists(variationCollectionQuery, body.getCollectionName());
 
-    if(isExists){
-      long timestamp = System.currentTimeMillis();
+  //   if(isExists){
+  //     long timestamp = System.currentTimeMillis();
 
-      Update variationDocUpdate = new Update();
-      variationDocUpdate.set(body.getField(), body.getNewData());
-      variationDocUpdate.set("updatedAt", timestamp);
+  //     Update variationDocUpdate = new Update();
+  //     variationDocUpdate.set(body.getField(), body.getNewData());
+  //     variationDocUpdate.set("updatedAt", timestamp);
 
-      UpdateResult updatedVariationDoc = mongoTemplate
-      .updateFirst(variationCollectionQuery, variationDocUpdate, ProductVariationModel.class, body.getCollectionName());
+  //     UpdateResult updatedVariationDoc = mongoTemplate
+  //     .updateFirst(variationCollectionQuery, variationDocUpdate, ProductVariationModel.class, body.getCollectionName());
 
-      return ResponseEntity.ok(updatedVariationDoc);
-    } else {
-      String message = "Variation entity with ID: " + body.getId() + " was not founded in database !";
-      logger.error(message);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-    }
-  }
+  //     return ResponseEntity.ok(updatedVariationDoc);
+  //   } else {
+  //     String message = "Variation entity with ID: " + body.getId() + " was not founded in database !";
+  //     logger.error(message);
+  //     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+  //   }
+  // }
 
   public ResponseEntity<Object> deteleManyById(DeleteManyById body){
     // String parentCollectionName = body.getCollectionName().substring(variationCollectionNameHead.length());

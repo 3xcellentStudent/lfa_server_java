@@ -39,7 +39,7 @@ public class PdfMainService {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     // try(Document document = new Document();){
       Document document = new Document();
-      logger.info(String.format("Creating the PDF document with ID %s...", dto.invoiceId));
+      // logger.info(String.format("Creating the PDF document with ID %s...", dto.invoiceId));
       final PdfWriter instance = PdfWriter.getInstance(document, outputStream);
 
       metadata(instance);
@@ -58,7 +58,7 @@ public class PdfMainService {
       document.close();
 
       // Files.write(Path.of(String.format("/home/andrew/Desktop/newfile-%d.pdf", System.currentTimeMillis())), outputStream.toByteArray());
-      logger.info(String.format("The PDF document with ID %s successfuly created !", dto.invoiceId));
+      // logger.info(String.format("The PDF document with ID %s successfuly created !", dto.invoiceId));
 
       String fileName = String.format("newfile-%d.pdf", System.currentTimeMillis());
 
@@ -96,7 +96,7 @@ public class PdfMainService {
     String[] content = {"Company Name", "My name", "My email"};
     String[][] innerMainContent = {
       {"Invoce#", "Creation date", "Currency"},
-      {dto.invoiceId, dto.created.toString(), dto.currency}
+      // {dto.invoiceId, dto.created.toString(), dto.currency}
     };
 
     for(int i = 0; i < content.length; i++){
@@ -122,12 +122,12 @@ public class PdfMainService {
         "City/Town:"
       },
       {
-        dto.customerName, 
-        dto.customerEmail, 
-        dto.address.line1,
-        dto.address.line2,
-        dto.address.state,
-        dto.address.postalCode
+        // dto.customerName, 
+        // dto.customerEmail, 
+        // dto.address.line1,
+        // dto.address.line2,
+        // dto.address.state,
+        // dto.address.postalCode
       }
     };
 

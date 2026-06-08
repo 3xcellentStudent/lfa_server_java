@@ -73,7 +73,7 @@ public class ReviewsService {
 
     
     UpdateOneByIdDto updateReviewsSnapshotById = new UpdateOneByIdDto(parentId, "stockInfo.reviewsSnapshot." + reviewsSnapshotKeys[rating - 1], oneStarCounts + 1, collectionName);
-    return mainService.updateNewOneById(updateReviewsSnapshotById, ProductParentModel.class);
+    return mainService.updateOneById(updateReviewsSnapshotById, ProductParentModel.class);
   }
 
 }

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Pattern;
 public class UpdateVariationById {
     
   @JsonProperty @NotBlank private String id;
-  // @JsonProperty @NotBlank private String parentId;
   @JsonProperty @NotBlank private String field;
   @JsonProperty private Object newData;
   @JsonProperty @NotBlank @Pattern(regexp = ".*-.*", message = "The field must contain '-'") private String collectionName;

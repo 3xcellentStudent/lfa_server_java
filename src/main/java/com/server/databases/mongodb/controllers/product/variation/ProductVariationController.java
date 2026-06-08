@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.dto.DeleteManyById;
 import com.server.databases.mongodb.dto.GetManyById;
+import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
@@ -64,8 +65,8 @@ public class ProductVariationController {
   }
 
   @PatchMapping("/update/id")
-  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateVariationById body){
-    return productVariationService.updateOneById(body);
+  public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
+    return mainService.updateOneById(body, ProductVariationModel.class);
   }
 
   @DeleteMapping("/delete")
@@ -73,7 +74,7 @@ public class ProductVariationController {
     return productVariationService.deteleManyById(body);
   }
   
-  @DeleteMapping("/clear-col")
+  @DeleteMapping("/clear")
   public ResponseEntity<Object> clearCollection(
     @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
   ){

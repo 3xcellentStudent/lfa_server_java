@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 public class CreateVariationByParentId {
   
   @JsonProperty @NotBlank private String parentId;
-  @JsonProperty private String variationName;
+  @JsonProperty @NotBlank private String variationName;
   @JsonProperty @NotBlank private String collectionName;
   @JsonProperty @Valid @NotNull private StockInfo stockInfo;
 
