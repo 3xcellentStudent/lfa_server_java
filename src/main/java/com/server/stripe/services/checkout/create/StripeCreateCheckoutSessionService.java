@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.server.databases.mongodb.dto.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.stripe.dto.checkout.create.StripeCreateCheckoutSessionDto;
@@ -52,32 +51,26 @@ public class StripeCreateCheckoutSessionService {
   public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
     
     try {
-      // CheckoutCreateSessionClientRequestDto requestBodyObject = objectMapper.
-      // readValue(body, CheckoutCreateSessionClientRequestDto.class);
-
-      // List<CheckoutCreateSessionClientRequestDto.DataArray> dataArray = body.data;
-
       String returnUrl = URLEncoder.encode(stripeCheckoutReturnUrl, encodingType);
 
       List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
       .map(entity -> {
-        ProductVariationModel productVariation = mongoDbMainService
+        ProductVariationModel variation = mongoDbMainService
         .findById(entity.productId, ProductVariationModel.class, entity.collectionName);
-        // logger.error("Product variation document with ID: " + entity.productId + " was not found !");
         logger.info("Product variation document with ID: " + entity.productId + " was found !");
 
-        if(productVariation == null){
+        if(variation == null){
           return null;
         }
 
         Map<String, Integer> amountStockMap = new HashMap<>();
-        amountStockMap.put(stockAmountAvailable, productVariation.getStockInfo().stockAmountAvailable - entity.quantity);
-        amountStockMap.put(stockAmountReserved, productVariation.getStockInfo().getStockAmountReserved() + entity.quantity);
+        amountStockMap.put(stockAmountAvailable, variation.getStockInfo().stockAmountAvailable - entity.quantity);
+        amountStockMap.put(stockAmountReserved, variation.getStockInfo().getStockAmountReserved() + entity.quantity);
 
-        ResponseEntity<Object> response = updateDatabase(productVariation.getId(), amountStockMap, productVariation.getCollectionName());
+        ResponseEntity<Object> response = updateDatabase(variation.getId(), variation.getCollectionName(), amountStockMap);
 
         if(response.getStatusCode().isSameCodeAs(HttpStatus.OK)){
-          return new StripeCreateCheckoutSessionDto(entity, productVariation);
+          return new StripeCreateCheckoutSessionDto(entity, variation);
         } else {
           return null;
         }
@@ -170,14 +163,13 @@ public class StripeCreateCheckoutSessionService {
     }
   }
 
-  private ResponseEntity<Object> updateDatabase(String id, Map<String, Integer> newData, String collectionName){
-    UpdateOneByIdDto updateOneByIdDto = new UpdateOneByIdDto(id, "", newData, collectionName);
+  private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Map<String, Integer> newData){
 
     Update update = new Update();
     update.set("stockInfo." + stockAmountAvailable, newData.get(stockAmountReserved));
     update.set("stockInfo." + stockAmountReserved, newData.get(stockAmountReserved));
 
-    return mongoDbMainService.updateOneById(updateOneByIdDto, update, CheckoutSessionObjectModel.class);
+    return mongoDbMainService.updateOneById(id, collectionName, update, CheckoutSessionObjectModel.class);
   }
 
   public StripeCreateCheckoutSessionService(){}

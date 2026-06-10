@@ -48,10 +48,10 @@ public class MongoDbMainService {
     }
   }
 
-  public <T> ResponseEntity<Object> updateOneById(UpdateOneByIdDto body, Update update, Class<T> someClass){
+  public <T> ResponseEntity<Object> updateOneById(String id, String collectionName, Update update, Class<T> someClass){
     // long timestamp = System.currentTimeMillis();
     
-    Query query = Query.query(Criteria.where("_id").is(body.getId()));
+    Query query = Query.query(Criteria.where("_id").is(id));
     
     // Update update = new Update();
     // update.set(body.getField(), body.getNewData());
@@ -59,10 +59,10 @@ public class MongoDbMainService {
     
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
-    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
+    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collectionName);
 
     if(modifiedProduct == null){
-      String message = "Document with ID: \"" + body.getId() + "\" was not found";
+      String message = "Document with ID: \"" + id + "\" was not found";
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     } else {
       return ResponseEntity.ok(modifiedProduct);
