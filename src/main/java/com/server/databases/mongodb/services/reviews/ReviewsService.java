@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;

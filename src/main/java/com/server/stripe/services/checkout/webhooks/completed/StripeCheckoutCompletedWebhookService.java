@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.services.MongoDbMainService;
-import com.server.stripe.dto.checkout.webhook.completed.event.StripeCheckoutWebhookEventCompletedDto;
+import com.server.stripe.dto.webhook.completed.event.StripeCheckoutWebhookEventCompletedDto;
 
 @Service
 public class StripeCheckoutCompletedWebhookService {

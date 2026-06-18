@@ -7,10 +7,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-// import com.common.models.stripe.invoices.StripeCheckoutSessionsModel;
-// import com.common.models.stripe.invoices.StripeCheckoutSessionsWrapperModel;
-import com.server.databases.mongodb.dto.DeleteManyById;
-import com.server.databases.mongodb.dto.GetManyById;
+import com.server.databases.mongodb.dto.main.DeleteManyById;
+import com.server.databases.mongodb.dto.main.GetManyById;
 import com.server.databases.mongodb.services.MongoDbMainService;
 
 import jakarta.validation.Valid;

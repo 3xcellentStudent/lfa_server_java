@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.dto;
+package com.server.databases.mongodb.dto.main;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

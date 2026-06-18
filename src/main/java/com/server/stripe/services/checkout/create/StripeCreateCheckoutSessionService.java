@@ -23,9 +23,8 @@ import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
-import com.server.stripe.dto.checkout.create.StripeCreateCheckoutSessionDto;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.checkout.webhook.completed.object.CheckoutSessionObjectModel;
+import com.server.stripe.dto.checkout.create.request.StripeCreateCheckoutSessionDto;
 
 @Service
 public class StripeCreateCheckoutSessionService {
@@ -64,7 +63,7 @@ public class StripeCreateCheckoutSessionService {
         }
 
         Map<String, Integer> amountStockMap = new HashMap<>();
-        amountStockMap.put(stockAmountAvailable, variation.getStockInfo().stockAmountAvailable - entity.quantity);
+        amountStockMap.put(stockAmountAvailable, variation.getStockInfo().getStockAmountAvailable() - entity.quantity);
         amountStockMap.put(stockAmountReserved, variation.getStockInfo().getStockAmountReserved() + entity.quantity);
 
         ResponseEntity<Object> response = updateDatabase(variation.getId(), variation.getCollectionName(), amountStockMap);
@@ -78,27 +77,7 @@ public class StripeCreateCheckoutSessionService {
       .filter(entity -> entity != null).toList();
 
       String stringRequestBody = createRequest(afterDtoArray, returnUrl);
-
-
       
-      // https://vitruvi.com/cdn/shop/files/pdp_stone-diffuser_front_white_gallery_1_v9_image.png?v=1740101659&width=320
-
-      // HttpRequest request = HttpRequest.newBuilder()
-      // .uri(new URI(stripeCheckoutEndpoint))
-      // .header("Authorization", "Bearer " + tokenSecret)
-      // .header("Stripe-Version", "2025-03-31.basil")
-      // .header("Content-Type", "application/x-www-form-urlencoded")
-      // .POST(HttpRequest.BodyPublishers.ofString(stringRequestBody))
-      // .build();
-
-      // CompletableFuture<HttpResponse<String>> response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-      // String responseString = response.thenApply(HttpResponse::body).join();
-
-      // System.out.println(responseString);
-
-      // return ResponseEntity.ok(responseString);
-
       ResponseEntity<Object> response = sendRequest(stringRequestBody);
 
       return response;
@@ -106,13 +85,6 @@ public class StripeCreateCheckoutSessionService {
       String message = "The named encoding type " + "\"" + encodingType + "\"" + " is not supported !";
       logger.error(message, error);
       return ResponseEntity.badRequest().body(message);
-    // } catch(URISyntaxException error){
-    //   logger.error("Invalid URI syntax or parcing from string to URI !", error);
-    //   return ResponseEntity.internalServerError().body(error.getMessage());
-    // } catch(JsonProcessingException error){
-    //   String message = "Error occured while parsing request body !";
-    //   logger.error(message, error);
-    //   return ResponseEntity.badRequest().body(message);
     }
   }
 
@@ -128,7 +100,6 @@ public class StripeCreateCheckoutSessionService {
 
     for(int i = 0; i < dataArray.size(); i++){
       StripeCreateCheckoutSessionDto entity = dataArray.get(i);
-      // System.out.println("Price in cents: " + entity.priceInCents);
 
       requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.currency);
       requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.variationName);
@@ -164,12 +135,11 @@ public class StripeCreateCheckoutSessionService {
   }
 
   private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Map<String, Integer> newData){
-
     Update update = new Update();
-    update.set("stockInfo." + stockAmountAvailable, newData.get(stockAmountReserved));
+    update.set("stockInfo." + stockAmountAvailable, newData.get(stockAmountAvailable));
     update.set("stockInfo." + stockAmountReserved, newData.get(stockAmountReserved));
 
-    return mongoDbMainService.updateOneById(id, collectionName, update, CheckoutSessionObjectModel.class);
+    return mongoDbMainService.updateOneById(id, collectionName, update, ProductVariationModel.class);
   }
 
   public StripeCreateCheckoutSessionService(){}

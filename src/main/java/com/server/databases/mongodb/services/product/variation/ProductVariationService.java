@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.UpdateResult;
-import com.server.databases.mongodb.dto.DeleteManyById;
+import com.server.databases.mongodb.dto.main.DeleteManyById;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
 import com.server.databases.mongodb.models.product.ProductParentModel;

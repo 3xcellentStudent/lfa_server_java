@@ -1,6 +1,4 @@
-package com.server.stripe.dto.checkout.create;
-
-import org.springframework.beans.factory.annotation.Value;
+package com.server.stripe.dto.checkout.create.request;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel.VariationOptions;
@@ -8,9 +6,6 @@ import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientR
 
 public class StripeCreateCheckoutSessionDto {
 
-  @Value("stripe.checkout.status.open")
-  private String checkoutStatusOpen;
-  
   public String id;
   public String parentId;
   public int quantity;

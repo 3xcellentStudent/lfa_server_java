@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.server.databases.mongodb.dto.DeleteManyById;
-import com.server.databases.mongodb.dto.DeleteManyFromArray;
-import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.dto.main.DeleteManyById;
+import com.server.databases.mongodb.dto.main.DeleteManyFromArray;
+import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 
 @Service

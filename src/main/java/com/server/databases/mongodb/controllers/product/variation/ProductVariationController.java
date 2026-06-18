@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.databases.mongodb.dto.DeleteManyById;
-import com.server.databases.mongodb.dto.GetManyById;
-import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.dto.main.DeleteManyById;
+import com.server.databases.mongodb.dto.main.GetManyById;
+import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;

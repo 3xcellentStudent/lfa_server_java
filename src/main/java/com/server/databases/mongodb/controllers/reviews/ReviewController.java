@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.client.result.DeleteResult;
-import com.server.databases.mongodb.dto.DeleteManyById;
-import com.server.databases.mongodb.dto.UpdateOneByIdDto;
+import com.server.databases.mongodb.dto.main.DeleteManyById;
+import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
