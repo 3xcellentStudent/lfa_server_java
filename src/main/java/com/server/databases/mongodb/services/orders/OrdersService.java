@@ -41,10 +41,13 @@ public class OrdersService {
   }
 
   public ResponseEntity<Object> updateOneById(OrdersFindOneAndModifyDto body){
-    Query query = Query.query(Criteria.where(checkoutIdKey).is(body.getCheckoutId()));
+    // Query query = Query.query(Criteria.where(checkoutIdKey).is(body.getCheckoutId()).where("status").is(""));
+    Criteria criteria = Criteria.where(checkoutIdKey).is(body.getCheckoutId()).and("status").in("open");
+    Query query = Query.query(criteria);
 
-    Update update = new Update()
-    .set(invoiceIdKey, body.getInvoiceId());
+    Update update = new Update();
+    update.set(invoiceIdKey, body.getInvoiceId());
+    update.set("status", body.getStatus());
 
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
@@ -59,11 +62,12 @@ public class OrdersService {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
   }
 
-  public ResponseEntity<Object> removeOneById(String id){
+  public ResponseEntity<Object> findAllByIdAndRemove(List<String> id){
     try {
-      Query query = Query.query(Criteria.where("id").is(id));
-      MainOrderModel removedDocument = mongoTemplate.findAndRemove(query, MainOrderModel.class);
+      Query query = Query.query(Criteria.where("_id").in(id));
+      List<MainOrderModel> removedDocument = mongoTemplate.findAllAndRemove(query, MainOrderModel.class, collectionName);
 
+      System.out.println(removedDocument.size());
       return ResponseEntity.ok(removedDocument);
     } catch(MongoSocketOpenException error){
       String message = "Lost connection to Mongo database occurred processing request !";

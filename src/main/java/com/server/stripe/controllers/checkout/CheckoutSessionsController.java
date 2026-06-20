@@ -81,19 +81,35 @@ public class CheckoutSessionsController {
   }
 
   @PostMapping("/webhook/completed")
-  public void getWebhook(@Valid @RequestBody StripeCheckoutWebhookEventCompletedDto body){
-  // public void getWebhook(@Valid @RequestBody String body){
-    // System.out.println("Invoice ID: " + body.getInvoiceObject().getClientSecret());
-    System.out.println("Invoice ID: " + body.data.object.getInvoiceId());
+  // public ResponseEntity<Object> getWebhook(@Valid @RequestBody StripeCheckoutWebhookEventCompletedDto body){
+  public ResponseEntity<Object> getWebhook(@Valid @RequestBody String model){
+    try {
+      System.out.println(model);
+      StripeCheckoutWebhookEventCompletedDto body = objectMapper.readValue(model, StripeCheckoutWebhookEventCompletedDto.class);
 
-    // OrdersFindOneAndModifyDto updateDto = new OrdersFindOneAndModifyDto(body.getData()); // -> Change OrdersFindOneAndModifyDto to local same class for REST API
+    OrdersFindOneAndModifyDto updateDto = new OrdersFindOneAndModifyDto(body.getInvoiceObject()); // -> Change OrdersFindOneAndModifyDto to local same class for REST API
+
+    ResponseEntity<Object> response = ordersService.updateOneById(updateDto);
+    return ResponseEntity.badRequest().build();
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    // System.out.println("Invoice ID: " + body.getInvoiceObject().getId());
+
+    // OrdersFindOneAndModifyDto updateDto = new OrdersFindOneAndModifyDto(body.getInvoiceObject()); // -> Change OrdersFindOneAndModifyDto to local same class for REST API
 
     // ResponseEntity<Object> response = ordersService.updateOneById(updateDto);
 
+    // return ResponseEntity.badRequest().build();
     // if(response.getStatusCode().equals(HttpStatus.OK)){
-    //   logger.info("Order ID: " + body.getData().getId() + " successfuly updated !");
+    //   String message = "Order ID: " + body.getInvoiceObject().getId() + " successfuly updated !";
+    //   logger.info(message);
+    //   return response;
     // } else {
-    //   logger.info("Order ID: " + body.getData().getId() + " failed to update !");
+    //   String message = "Order ID: " + body.getInvoiceObject().getId() + " failed to update !";
+    //   logger.info(message);
+    //   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     // }
   }
 
