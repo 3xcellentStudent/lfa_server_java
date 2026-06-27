@@ -1,9 +1,12 @@
-package com.server.config.services.databases.mongodb;
+package com.server.config.databases.mongodb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.MongoTransactionManager;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -17,7 +20,9 @@ import com.mongodb.event.ClusterListener;
 public class MongoConfig {
   private int exceptionIndex = 0;
   private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
-  private final String databaseUrl = "mongodb://localhost:27017/test";
+  // private final String databaseUrl = "mongodb://localhost:27017/test";
+  @Value("${databases.mongodb.uri}")
+  private String databaseUrl;
 
   @Bean
   public MongoClient mongoClient(){
@@ -36,12 +41,14 @@ public class MongoConfig {
           public void clusterDescriptionChanged(ClusterDescriptionChangedEvent event){
             String currentClusterId = event.getClusterId().getValue();
             switch (event.getNewDescription().getType()){
-              case UNKNOWN -> {
+              case UNKNOWN: {
                 if(exceptionIndex > 0) logger.warn(String.format("MongoDB connection lost at cluster id: \"%s\" !", currentClusterId));
                 exceptionIndex++;
+              } case STANDALONE: {
+                logger.info(String.format("MongoDB connection available at cluster id: \"%s\" ...", currentClusterId));
+              } case REPLICA_SET, SHARDED: {
+                logger.warn("Uknown event ! Add handler ...");
               }
-              case STANDALONE -> logger.info(String.format("MongoDB connection available at cluster id: \"%s\" ...", currentClusterId));
-              case REPLICA_SET, SHARDED -> logger.warn("Uknown event ! Add handler ...");
             }
           }
         })
@@ -49,6 +56,11 @@ public class MongoConfig {
       .build();
 
     return MongoClients.create(settings);
+  }
+
+  @Bean
+  public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
+      return new MongoTransactionManager(dbFactory);
   }
 
 }

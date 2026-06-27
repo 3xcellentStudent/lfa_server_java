@@ -7,7 +7,7 @@ import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class StripeCheckoutWebhookEventCompletedDto {
+public class StripeCheckoutWebhookEventDto {
   
   public String id;
   public String object;

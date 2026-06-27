@@ -44,8 +44,8 @@ public class StripeCreateCheckoutSessionService {
   private HttpClient httpClient = HttpClient.newHttpClient();
   
   private final String encodingType = "UTF-8";
-  private final String stockAmountAvailable = "stockAmountAvailable";
-  private final String stockAmountReserved = "stockAmountReserved";
+private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
+  private final String stockAmountReservedKey = "stockInfo.stockAmountReserved";
 
   public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
     
@@ -58,21 +58,13 @@ public class StripeCreateCheckoutSessionService {
         .findById(entity.productId, ProductVariationModel.class, entity.collectionName);
         logger.info("Product variation document with ID: " + entity.productId + " was found !");
 
-        if(variation == null){
-          return null;
-        }
+        Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity;
+        Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity;
 
-        Map<String, Integer> amountStockMap = new HashMap<>();
-        amountStockMap.put(stockAmountAvailable, variation.getStockInfo().getStockAmountAvailable() - entity.quantity);
-        amountStockMap.put(stockAmountReserved, variation.getStockInfo().getStockAmountReserved() + entity.quantity);
+        // Updating database inventory.
+        updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
 
-        ResponseEntity<Object> response = updateDatabase(variation.getId(), variation.getCollectionName(), amountStockMap);
-
-        if(response.getStatusCode().isSameCodeAs(HttpStatus.OK)){
-          return new StripeCreateCheckoutSessionDto(entity, variation);
-        } else {
-          return null;
-        }
+        return new StripeCreateCheckoutSessionDto(entity, variation);
       })
       .filter(entity -> entity != null).toList();
 
@@ -134,10 +126,10 @@ public class StripeCreateCheckoutSessionService {
     }
   }
 
-  private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Map<String, Integer> newData){
+  private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Integer stockAmountAvailable, Integer stockAmountReserved){
     Update update = new Update();
-    update.set("stockInfo." + stockAmountAvailable, newData.get(stockAmountAvailable));
-    update.set("stockInfo." + stockAmountReserved, newData.get(stockAmountReserved));
+    update.set(stockAmountAvailableKey, stockAmountAvailable);
+    update.set(stockAmountReservedKey, stockAmountReserved);
 
     return mongoDbMainService.updateOneById(id, collectionName, update, ProductVariationModel.class);
   }

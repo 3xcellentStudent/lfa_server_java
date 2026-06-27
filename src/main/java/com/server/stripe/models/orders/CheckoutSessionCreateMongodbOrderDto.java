@@ -1,4 +1,4 @@
-package com.server.stripe.models.mongodb.orders;
+package com.server.stripe.models.orders;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

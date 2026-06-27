@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.dto.orders.request.OrdersFindOneAndModifyDto;
 import com.server.databases.mongodb.dto.orders.request.OrdersGetOneByIdDto;
+import com.server.databases.mongodb.models.orders.types.OrderStatusTypes;
 import com.server.databases.mongodb.services.orders.OrdersService;
 
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class OrderController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> findOneAndUpdate(@Valid @RequestBody OrdersFindOneAndModifyDto body){
-    return ordersService.updateOneById(body);
+    return ordersService.updateOneById(body, OrderStatusTypes.values().toString());
   }
 
   @DeleteMapping("/delete")
