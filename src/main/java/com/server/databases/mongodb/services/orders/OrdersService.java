@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.DuplicateKeyException;
 import com.server.databases.mongodb.dto.orders.request.OrdersFindOneAndModifyDto;
 import com.server.databases.mongodb.dto.orders.request.OrdersGetOneByIdDto;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
@@ -31,29 +30,18 @@ public class OrdersService {
   private MongoTemplate mongoTemplate;
 
   public ResponseEntity<Object> create(MainOrderModel body){
-    // try {
-      MainOrderModel createdDocument = mongoTemplate.insert(body, collectionName);
-  
-      return ResponseEntity.ok(createdDocument);
+    MainOrderModel createdDocument = mongoTemplate.insert(body, collectionName);
 
-      // ###### НАСТРОИТЬ ГЛОБАЛЬНУЮ ОБРАБОТКУ ОШИБОК
-
-    // } catch(DataAccessResourceFailureException error){
-    //   String message = "Lost connection to Mongo database occurred processing request !";
-    //   return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(message);
-    // } catch(DuplicateKeyException error){
-    //   String message = "Document with ID: " + body.getCheckoutId() + " already exist in database !";
-    //   return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
-    // }
+    return ResponseEntity.ok(createdDocument);
   }
 
   public ResponseEntity<Object> updateOneById(OrdersFindOneAndModifyDto body, String status){
-    Criteria criteria = Criteria.where(checkoutIdKey).is(body.getCheckoutId()).and("status").in(status);
+    Criteria criteria = Criteria.where(checkoutIdKey).is(body.checkoutId()).and("status").in(status);
     Query query = Query.query(criteria);
 
     Update update = new Update();
-    update.set(invoiceIdKey, body.getInvoiceId());
-    update.set("status", body.getStatus());
+    update.set(invoiceIdKey, body.invoiceId());
+    update.set("status", body.status());
 
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
@@ -65,7 +53,7 @@ public class OrdersService {
     if(updatedDoc != null){
       return ResponseEntity.ok(updatedDoc);
     } else {
-      String message = "Document with ID: " + body.getCheckoutId() + " was not found !";
+      String message = "Document with ID: " + body.checkoutId() + " was not found !";
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 

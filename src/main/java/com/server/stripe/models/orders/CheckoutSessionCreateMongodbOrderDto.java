@@ -9,19 +9,19 @@ import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel
 
 @Document
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CheckoutSessionCreateMongodbOrderDto {
+public record CheckoutSessionCreateMongodbOrderDto(String checkoutId, String invoiceId, String status, long expiresAt, long created){
 
-  @Id private String checkoutId;
-  private String invoiceId;
-  private String status;
-  private long expiresAt;
-  private long created;
+  // @Id private String checkoutId;
+  // private String invoiceId;
+  // private String status;
+  // private long expiresAt;
+  // private long created;
 
-  public CheckoutSessionCreateMongodbOrderDto(CheckoutSessionObjectModel data){
-    this.checkoutId = data.getId();
-    this.invoiceId = data.getInvoiceId();
-    this.status = data.getStatus();
-    this.expiresAt = data.getExpiresAt();
-    this.created = data.getCreated();
-  }
+  // public CheckoutSessionCreateMongodbOrderDto(CheckoutSessionObjectModel data){
+    // this.checkoutId = data.getId();
+    // this.invoiceId = data.getInvoiceId();
+    // this.status = data.getStatus();
+    // this.expiresAt = data.getExpiresAt();
+    // this.created = data.getCreated();
+  // }
 }

@@ -7,9 +7,9 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,7 @@ import com.server.stripe.dto.checkout.create.request.StripeCreateCheckoutSession
 @Service
 public class StripeCreateCheckoutSessionService {
   @Value("${stripe.routes.checkout.create_session}")
-  private String stripeCheckoutEndpoint;
+  private String stripeCreateCheckoutEndpoint;
   @Value("${stripe.routes.checkout.return_url}")
   private String stripeCheckoutReturnUrl;
   @Value("${stripe.token.secret}")
@@ -44,7 +43,7 @@ public class StripeCreateCheckoutSessionService {
   private HttpClient httpClient = HttpClient.newHttpClient();
   
   private final String encodingType = "UTF-8";
-private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
+  private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
   private final String stockAmountReservedKey = "stockInfo.stockAmountReserved";
 
   public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
@@ -55,16 +54,21 @@ private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
       List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
       .map(entity -> {
         ProductVariationModel variation = mongoDbMainService
-        .findById(entity.productId, ProductVariationModel.class, entity.collectionName);
-        logger.info("Product variation document with ID: " + entity.productId + " was found !");
+        .findById(entity.productId(), ProductVariationModel.class, entity.collectionName());
 
-        Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity;
-        Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity;
-
-        // Updating database inventory.
-        updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
-
-        return new StripeCreateCheckoutSessionDto(entity, variation);
+        if(variation == null){
+          return null;
+        } else {
+          logger.info("Product variation document with ID: " + entity.productId() + " was found !");
+  
+          Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity();
+          Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity();
+  
+          // Updating database inventory.
+          updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
+  
+          return new StripeCreateCheckoutSessionDto(entity, variation);
+        }
       })
       .filter(entity -> entity != null).toList();
 
@@ -83,12 +87,15 @@ private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
   private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
     StringBuilder requestBody = new StringBuilder();
 
+    Instant expireTime = Instant.now().plus(30, ChronoUnit.MINUTES);
+
     requestBody.append("payment_method_types[]=card");
     requestBody.append("&mode=payment");
     requestBody.append("&ui_mode=embedded");
     requestBody.append("&invoice_creation[enabled]=true");
     requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
     requestBody.append("&return_url=").append(returnUrl);
+    requestBody.append("&expires_at=").append(expireTime.getEpochSecond());
 
     for(int i = 0; i < dataArray.size(); i++){
       StripeCreateCheckoutSessionDto entity = dataArray.get(i);
@@ -105,7 +112,7 @@ private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
   private ResponseEntity<Object> sendRequest(String stringRequestBody){
     try {
       HttpRequest request = HttpRequest.newBuilder()
-      .uri(new URI(stripeCheckoutEndpoint))
+      .uri(new URI(stripeCreateCheckoutEndpoint))
       .header("Authorization", "Bearer " + tokenSecret)
       .header("Stripe-Version", stripeApiVersion)
       .header("Content-Type", "application/x-www-form-urlencoded")

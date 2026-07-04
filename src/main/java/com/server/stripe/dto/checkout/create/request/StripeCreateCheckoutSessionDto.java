@@ -20,9 +20,9 @@ public class StripeCreateCheckoutSessionDto {
   public StripeCreateCheckoutSessionDto(){}
 
   public StripeCreateCheckoutSessionDto(CheckoutCreateSessionClientRequestDto entity, ProductVariationModel productVariation){
-    this.id = entity.productId;
+    this.id = entity.productId();
     this.parentId = productVariation.getParentId();
-    this.quantity = entity.quantity;
+    this.quantity = entity.quantity();
     this.priceInCents = productVariation.getStockInfo().getPriceInCents();
     this.currency = productVariation.getStockInfo().getCurrency();
     this.variationName = productVariation.getVariationName();

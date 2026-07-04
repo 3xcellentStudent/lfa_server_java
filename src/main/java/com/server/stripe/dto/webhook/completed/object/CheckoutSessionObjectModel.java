@@ -9,9 +9,10 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @Document
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 // @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-public class CheckoutSessionObjectModel {
+public record CheckoutSessionObjectModel(@Id String id, String clientSecret, Long created, Long expiresAt, String invoice, String status) {
 
-  @Id public String id;
+  // @Id public String id;
+
   // public String object;
   // public AdaptivePricing adaptivePricing;
   // public Object afterExpiration;
@@ -23,11 +24,15 @@ public class CheckoutSessionObjectModel {
   // public BrandingSettings brandingSettings;
   // public String cancelUrl;
   // public String clientReferenceId;
-  public String clientSecret;
+  
+  // public String clientSecret;
+
   // public Object collectedInformation;
   // public Object consent;
   // public Object consentCollection;
-  public Long created;
+  
+  // public Long created;
+
   // public String currency;
   // public Object currencyConversion;
   // public List<Object> customFields;
@@ -40,10 +45,12 @@ public class CheckoutSessionObjectModel {
   // public List<Object> discounts;
 
   // @Indexed
-  public Long expiresAt; // Из "expires_at", в Mongo запишется как expiresAt
+  // public Long expiresAt; // Из "expires_at", в Mongo запишется как expiresAt
 
   // public String integrationIdentifier;
-  public String invoice;
+  
+  // public String invoice;
+
   // public InvoiceCreation invoiceCreation;
   // public Boolean livemode;
   // public String locale;
@@ -68,7 +75,9 @@ public class CheckoutSessionObjectModel {
   // public ShippingAddressCollection shippingAddressCollection;
   // public Object shippingCost;
   // public List<Object> shippingOptions;
-  public String status;
+  
+  // public String status;
+
   // public String submitType;
   // public String subscription;
   // public String successUrl;
@@ -164,28 +173,28 @@ public class CheckoutSessionObjectModel {
   //   public Long amountTax;
   // }
 
-  public String getClientSecret(){
-    return this.clientSecret;
-  }
+  // public String getClientSecret(){
+  //   return this.clientSecret;
+  // }
 
-  public String getStatus(){
-    return this.status;
-  }
+  // public String getStatus(){
+  //   return this.status;
+  // }
 
-  public String getId(){
-    return this.id;
-  }
+  // public String getId(){
+  //   return this.id;
+  // }
 
-  public Long getCreated(){
-    return this.created;
-  }
+  // public Long getCreated(){
+  //   return this.created;
+  // }
 
-  public Long getExpiresAt(){
-    return this.expiresAt;
-  }
+  // public Long getExpiresAt(){
+  //   return this.expiresAt;
+  // }
 
-  public String getInvoiceId(){
-    return this.invoice;
-  }
+  // public String getInvoiceId(){
+  //   return this.invoice;
+  // }
 
 }
