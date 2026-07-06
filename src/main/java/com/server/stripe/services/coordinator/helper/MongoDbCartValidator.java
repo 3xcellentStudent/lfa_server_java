@@ -12,9 +12,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.server.common.models.stripe.checkout.validation.cart.CartValidationErrorEntityDto;
+import com.server.common.types.stripe.checkout.validation.cart.CartValidationErrorType;
+import com.server.config.api.exceptions.validation.cart.CartValidationException;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.checkout.create.validate.CartValidationErrorEntityDto;
 
 public class MongoDbCartValidator {
 
@@ -35,14 +37,16 @@ public class MongoDbCartValidator {
     body.forEach(entity -> {
       String id = entity.productId();
       if(!productsMap.containsKey(id)){
-        errorsArray.add(new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), 0));
+        errorsArray.add(new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), 0, CartValidationErrorType.NOT_EXISTING));
       } else if(productsMap.get(id).getStockInfo().stockAmountAvailable - entity.quantity() < 0){
-        errorsArray.add(new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), productsMap.get(id).getStockInfo().stockAmountAvailable));
+        errorsArray.add(
+          new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), productsMap.get(id).getStockInfo().stockAmountAvailable, CartValidationErrorType.WRONG_QUANTITY)
+        );
       }
     });
 
     if(errorsArray.size() > 0){
-      return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorsArray);
+      throw new CartValidationException(errorsArray);
     } else {
       return ResponseEntity.ok().body(productsEntities);
     }

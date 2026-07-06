@@ -85,10 +85,11 @@ public class StripeCreateCheckoutSessionService {
   }
 
   private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
+    
     StringBuilder requestBody = new StringBuilder();
-
+    
     Instant expireTime = Instant.now().plus(30, ChronoUnit.MINUTES);
-
+    
     requestBody.append("payment_method_types[]=card");
     requestBody.append("&mode=payment");
     requestBody.append("&ui_mode=embedded");
@@ -96,13 +97,14 @@ public class StripeCreateCheckoutSessionService {
     requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
     requestBody.append("&return_url=").append(returnUrl);
     requestBody.append("&expires_at=").append(expireTime.getEpochSecond());
-
+    
     for(int i = 0; i < dataArray.size(); i++){
       StripeCreateCheckoutSessionDto entity = dataArray.get(i);
+      System.out.println(entity.priceInCents + " + " + entity.quantity + " = " + entity.quantity * entity.priceInCents);
 
       requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.currency);
       requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.variationName);
-      requestBody.append("&line_items[" + i + "][price_data][unit_amount]=" + entity.priceInCents * entity.quantity);
+      requestBody.append("&line_items[" + i + "][price_data][unit_amount]=" + entity.priceInCents);
       requestBody.append("&line_items[" + i + "][quantity]=" + entity.quantity);
     }
 

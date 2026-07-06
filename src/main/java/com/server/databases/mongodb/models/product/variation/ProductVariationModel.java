@@ -96,9 +96,9 @@ public class ProductVariationModel {
   }
 
   public static class VariationOptions {
-    public String name;
-    public String type;
-    public String value;
+    public String name = "";
+    public String type = "";
+    public String value = "";
 
     public VariationOptions(){}
   }
