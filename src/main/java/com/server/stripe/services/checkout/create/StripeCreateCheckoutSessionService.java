@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
+import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 import com.server.stripe.dto.checkout.create.request.StripeCreateCheckoutSessionDto;
 
@@ -36,8 +37,10 @@ public class StripeCreateCheckoutSessionService {
   @Value("${stripe.api.version}")
   private String stripeApiVersion;
 
+  // @Autowired
+  // private MongoDbMainService mongoDbMainService;
   @Autowired
-  private MongoDbMainService mongoDbMainService;
+  private ProductVariationService productVariationService;
 
   private Logger logger = LoggerFactory.getLogger(StripeCreateCheckoutSessionService.class);
   private HttpClient httpClient = HttpClient.newHttpClient();
@@ -46,45 +49,47 @@ public class StripeCreateCheckoutSessionService {
   private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
   private final String stockAmountReservedKey = "stockInfo.stockAmountReserved";
 
-  public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
-    
+  // public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
+  public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
     try {
       String returnUrl = URLEncoder.encode(stripeCheckoutReturnUrl, encodingType);
 
-      List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
-      .map(entity -> {
-        ProductVariationModel variation = mongoDbMainService
-        .findById(entity.productId(), ProductVariationModel.class, entity.collectionName());
+      productVariationService.bulkOpsInventoryUpdate(cart, validatedArray);
+      // List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
+      // .map(entity -> {
+      //   ProductVariationModel variation = mongoDbMainService
+      //   .findById(entity.productId(), ProductVariationModel.class, entity.collectionName());
 
-        if(variation == null){
-          return null;
-        } else {
-          logger.info("Product variation document with ID: " + entity.productId() + " was found !");
+      //   if(variation == null){
+      //     return null;
+      //   } else {
+      //     logger.info("Product variation document with ID: " + entity.productId() + " was found !");
   
-          Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity();
-          Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity();
+          // Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity();
+          // Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity();
   
-          // Updating database inventory.
-          updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
+      //     // Updating database inventory.
+      //     updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
   
-          return new StripeCreateCheckoutSessionDto(entity, variation);
-        }
-      })
-      .filter(entity -> entity != null).toList();
+      //     return new StripeCreateCheckoutSessionDto(entity, variation);
+      //   }
+      // })
+      // .filter(entity -> entity != null).toList();
 
-      String stringRequestBody = createRequest(afterDtoArray, returnUrl);
+      String stringRequestBody = createRequest(validatedArray, returnUrl);
       
       ResponseEntity<Object> response = sendRequest(stringRequestBody);
 
       return response;
-    } catch(UnsupportedEncodingException error){
+    } catch(UnsupportedEncodingException ex){
       String message = "The named encoding type " + "\"" + encodingType + "\"" + " is not supported !";
-      logger.error(message, error);
-      return ResponseEntity.badRequest().body(message);
+      logger.error(message, ex);
+      throw new RuntimeException(message, ex);
     }
   }
 
-  private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
+  // private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
+  private String createRequest(List<ProductVariationModel> dataArray, String returnUrl){
     
     StringBuilder requestBody = new StringBuilder();
     
@@ -99,13 +104,12 @@ public class StripeCreateCheckoutSessionService {
     requestBody.append("&expires_at=").append(expireTime.getEpochSecond());
     
     for(int i = 0; i < dataArray.size(); i++){
-      StripeCreateCheckoutSessionDto entity = dataArray.get(i);
-      System.out.println(entity.priceInCents + " + " + entity.quantity + " = " + entity.quantity * entity.priceInCents);
+      ProductVariationModel entity = dataArray.get(i);
 
-      requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.currency);
-      requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.variationName);
-      requestBody.append("&line_items[" + i + "][price_data][unit_amount]=" + entity.priceInCents);
-      requestBody.append("&line_items[" + i + "][quantity]=" + entity.quantity);
+      requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.getStockInfo().getCurrency());
+      requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.getVariationName());
+      requestBody.append("&line_items[" + i + "][price_data][unit_amount]=" + entity.getStockInfo().getPriceInCents());
+      requestBody.append("&line_items[" + i + "][quantity]=" + entity.getStockInfo().getStockAmountAvailable());
     }
 
     return requestBody.toString();
@@ -135,13 +139,13 @@ public class StripeCreateCheckoutSessionService {
     }
   }
 
-  private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Integer stockAmountAvailable, Integer stockAmountReserved){
-    Update update = new Update();
-    update.set(stockAmountAvailableKey, stockAmountAvailable);
-    update.set(stockAmountReservedKey, stockAmountReserved);
+  // private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Integer stockAmountAvailable, Integer stockAmountReserved){
+  //   Update update = new Update();
+  //   update.set(stockAmountAvailableKey, stockAmountAvailable);
+  //   update.set(stockAmountReservedKey, stockAmountReserved);
 
-    return mongoDbMainService.updateOneById(id, collectionName, update, ProductVariationModel.class);
-  }
+  //   return mongoDbMainService.updateOneById(id, collectionName, update, ProductVariationModel.class);
+  // }
 
   public StripeCreateCheckoutSessionService(){}
 

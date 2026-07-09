@@ -1,4 +1,4 @@
-package com.server.config.api.exceptions;
+package com.server.common.api.exceptions;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -20,7 +20,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.mongodb.MongoException;
-import com.server.config.api.exceptions.validation.cart.CartValidationException;
+import com.server.common.api.exceptions.api.data.json.runtime.ExternalApiResponseMappingException;
+import com.server.common.api.exceptions.validation.cart.CartValidationException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -115,6 +116,11 @@ public class GlobalControllersExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(ExternalApiResponseMappingException.class)
+  public ResponseEntity<?> externalApiResponseMappingException(ExternalApiResponseMappingException ex){
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), ex, null);
+  }
+
     // =========================================================================
     // 4. FINAL BACKUP CATCH (Catch-All)
     // =========================================================================
@@ -126,6 +132,8 @@ public class GlobalControllersExceptionHandler {
 
   @ExceptionHandler(CartValidationException.class)
   public ResponseEntity<?> cartValidationException(CartValidationException ex){
-    return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "Some items in your cart are out of stock or unavailable.", ex, ex.getConflicts());
+    return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex, ex.getConflicts());
   }
+
+
 }

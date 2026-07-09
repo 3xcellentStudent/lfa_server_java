@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -49,13 +51,7 @@ public class MongoDbMainService {
   }
 
   public <T> ResponseEntity<Object> updateOneById(String id, String collectionName, Update update, Class<T> someClass){
-    // long timestamp = System.currentTimeMillis();
-    
     Query query = Query.query(Criteria.where("_id").is(id));
-    
-    // Update update = new Update();
-    // update.set(body.getField(), body.getNewData());
-    // update.set("updatedAt", timestamp);
     
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 

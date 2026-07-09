@@ -30,22 +30,42 @@ public class ProductVariationModel {
   @JsonProperty private long updatedAt;
 
   public static class Image {
-    public String media;
-    public String src;
-    public String srcset;
+    private String media;
+    private String src;
+    private String srcset;
+
+    public String getMedia(){
+      return this.media;
+    }
+
+    public String getSrc(){
+      return this.src;
+    }
+
+    public String getSrcset(){
+      return this.srcset;
+    }
   }
 
   public static class Descriptions {
-    public String summary;
-    public String[] presentable;
+    private String summary;
+    private String[] presentable;
+
+    public String getSummary(){
+      return this.summary;
+    }
+
+    public String[] getPresentable(){
+      return this.presentable;
+    }
   }
 
   public static class StockInfo {
-    @Min(0) public int stockAmountMax;
-    @Min(0) public int stockAmountAvailable;
-    @Min(0) public int stockAmountReserved;
-    @Min(0) @NotNull public Long priceInCents;
-    @NotBlank(message = "Cannot be blank") public String currency;
+    @Min(0) private int stockAmountMax;
+    @Min(0) private int stockAmountAvailable;
+    @Min(0) private int stockAmountReserved;
+    @Min(0) @NotNull private Long priceInCents;
+    @NotBlank(message = "Cannot be blank") private String currency;
 
     public int stockAmountMax(){
       return this.stockAmountMax;
@@ -96,19 +116,51 @@ public class ProductVariationModel {
   }
 
   public static class VariationOptions {
-    public String name = "";
-    public String type = "";
-    public String value = "";
+    private String name = "";
+    private String type = "";
+    private String value = "";
+
+    public String getName(){
+      return this.name;
+    }
+
+    public String getType(){
+      return this.type;
+    }
+
+    public String getValue(){
+      return this.value;
+    }
 
     public VariationOptions(){}
   }
 
   public static class Item {
-    public String value;
-    public String fill;
-    public String stroke;
-    public boolean stockStatus;
-    public int mediaIndex;
+    private String value;
+    private String fill;
+    private String stroke;
+    private Boolean stockStatus;
+    private Integer mediaIndex;
+
+    public String getValue(){
+      return this.value;
+    }
+
+    public String getFill(){
+      return this.fill;
+    }
+
+    public String getStroke(){
+      return this.stroke;
+    }
+
+    public Boolean getStockStatus(){
+      return this.stockStatus;
+    }
+
+    public Integer getMediaIndex(){
+      return this.mediaIndex;
+    }
   }
 
   public void setId(String id){
@@ -202,15 +254,4 @@ public class ProductVariationModel {
     this.updatedAt = body.getUpdatedAt();
   }
 
-  // public ProductVariationModel(ProductVariationModel dataModel){
-  //   this.id = dataModel.getId();
-  //   this.parentId = dataModel.getParentId();
-  //   this.stockInfo = dataModel.getStockInfo();
-  //   this.productOptions = dataModel.getVariationOptionss();
-  //   this.variationName = dataModel.getVariationName();
-  //   this.image = new ArrayArrayList<Image>();
-  //   this.collectionName = dataModel.getCollectionName();
-  //   this.createdAt = dataModel.getCreatedAt();
-  //   this.updatedAt = dataModel.getUpdatedAt();
-  // }
 }
