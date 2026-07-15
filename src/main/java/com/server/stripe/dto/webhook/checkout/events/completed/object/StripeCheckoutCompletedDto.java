@@ -1,15 +1,13 @@
-package com.server.stripe.dto.webhook.completed.object;
+package com.server.stripe.dto.webhook.checkout.events.completed.object;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-@Document
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 // @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-public record CheckoutSessionObjectModel(@Id String id, String clientSecret, Long created, Long expiresAt, String invoice, String status) {
+public record StripeCheckoutCompletedDto(@Id String id, String clientSecret, Long created, Long expiresAt, String invoice, String status) {
 
   // @Id public String id;
 

@@ -1,11 +1,9 @@
 package com.server.stripe.models.orders;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel;
 
 @Document
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

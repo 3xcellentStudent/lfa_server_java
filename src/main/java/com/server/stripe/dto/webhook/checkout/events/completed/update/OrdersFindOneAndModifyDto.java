@@ -1,7 +1,4 @@
-package com.server.stripe.dto.webhook.completed.update;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel;
+package com.server.stripe.dto.webhook.checkout.events.completed.update;
 
 public record OrdersFindOneAndModifyDto(String checkoutId, String invoiceId, String status){
 

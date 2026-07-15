@@ -110,6 +110,7 @@ public class ProductVariationModel {
     public StockInfo(){
       this.stockAmountMax = 0;
       this.stockAmountAvailable = 0;
+      this.stockAmountReserved = 0;
       this.priceInCents = 0L;
       this.currency = "CAD";
     }

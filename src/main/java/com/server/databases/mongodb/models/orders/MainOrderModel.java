@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel;
+import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 
 @Document
 public class MainOrderModel {
@@ -56,7 +56,7 @@ public class MainOrderModel {
   //   this.created = data.created();
   // }
 
-  public MainOrderModel(CheckoutSessionObjectModel data, List<CheckoutCreateSessionClientRequestDto> productList){
+  public MainOrderModel(StripeCheckoutCompletedDto data, List<CheckoutCreateSessionClientRequestDto> productList){
     this.checkoutId = data.id();
     this.invoiceId = data.invoice();
     this.status = data.status();

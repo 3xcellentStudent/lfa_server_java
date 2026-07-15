@@ -13,15 +13,14 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.server.databases.mongodb.dto.orders.request.OrdersFindOneAndModifyDto;
-import com.server.databases.mongodb.dto.orders.request.OrdersGetOneByIdDto;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
 
 @Service
+@Transactional
 public class OrdersService {
-  private final String invoiceIdKey = "invoiceId";
-  private final String checkoutIdKey = "checkoutId";
 
   @Value("${databases.mongodb.collections.orders}")
   private String collectionName;
@@ -35,20 +34,19 @@ public class OrdersService {
     return ResponseEntity.ok(createdDocument);
   }
 
+  @Transactional
   public ResponseEntity<Object> updateOneById(OrdersFindOneAndModifyDto body, String status){
-    Criteria criteria = Criteria.where(checkoutIdKey).is(body.checkoutId()).and("status").in(status);
+    Criteria criteria = Criteria.where("checkoutId").is(body.checkoutId()).and("status").is(status.toLowerCase());
     Query query = Query.query(criteria);
 
     Update update = new Update();
-    update.set(invoiceIdKey, body.invoiceId());
+    update.set("invoiceId", body.invoiceId());
     update.set("status", body.status());
 
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
     MainOrderModel updatedDoc = mongoTemplate
     .findAndModify(query, update, options, MainOrderModel.class, collectionName);
-
-    // System.out.println("Status after expire: " + updatedDoc.getStatus());
 
     if(updatedDoc != null){
       return ResponseEntity.ok(updatedDoc);
@@ -59,6 +57,7 @@ public class OrdersService {
 
   }
 
+  @Transactional
   public ResponseEntity<Object> findAllByIdAndRemove(List<String> id){
     try {
       Query query = Query.query(Criteria.where("_id").in(id));
@@ -72,21 +71,24 @@ public class OrdersService {
     }
   }
 
-  public ResponseEntity<Object> getOneById(OrdersGetOneByIdDto body){
-    MainOrderModel foundedDoc = mongoTemplate.findById(body.getCheckoutId(), MainOrderModel.class, collectionName);
+  public MainOrderModel getOneById(String id){
+    MainOrderModel foundDoc = mongoTemplate.findById(id, MainOrderModel.class, collectionName);
 
-    if(foundedDoc == null){
-      String message = "Document with ID: " + body.getCheckoutId() + " was not found !";
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-    }
-    
-    return ResponseEntity.ok(foundedDoc);
+    return foundDoc;
   }
 
-  public ResponseEntity<Object> getAll(){
+  public List<MainOrderModel> getAll(){
     List<MainOrderModel> docList = mongoTemplate.findAll(MainOrderModel.class, collectionName);
 
-    return ResponseEntity.ok(docList);
+    return docList;
+  }
+
+  public List<MainOrderModel> getAllBySelector(String selector, List<String> status){
+    Query query = Query.query(Criteria.where(selector).in(status));
+
+    List<MainOrderModel> foundDocs = mongoTemplate.find(query, MainOrderModel.class, collectionName);
+
+    return foundDocs;
   }
 
 }

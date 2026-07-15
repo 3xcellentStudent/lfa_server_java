@@ -23,35 +23,69 @@ public class MongoDbCartValidator {
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  public List<ProductVariationModel> validate(List<CheckoutCreateSessionClientRequestDto> cart){
+  public List<ProductVariationModel> validator(List<CheckoutCreateSessionClientRequestDto> cart){
     ArrayList<CartValidationErrorEntityDto> errorsArray = new ArrayList<>();
+    ArrayList<ProductVariationModel> allFoundProductsArray = new ArrayList<>();
 
-    List<String> listOfId = cart.stream().map(entity -> entity.productId()).toList();
+    Map<String, List<CheckoutCreateSessionClientRequestDto>> cartMapByCollectionName = cart.stream()
+    .collect(Collectors.groupingBy(entity -> entity.collectionName()));
 
-    // matchesFound
-    Query query = Query.query(Criteria.where("id").in(listOfId));
-    List<ProductVariationModel> productVariations = mongoTemplate.find(query, ProductVariationModel.class, collectiuonName);
+    cartMapByCollectionName.forEach((collectionName, items) -> {
+      List<String> ids = items.stream().map(entity -> entity.productId()).toList();
 
-    Map<String, ProductVariationModel> productsMap = productVariations.stream().collect(Collectors.toMap(ProductVariationModel::getId, product -> product));
+      Query query = Query.query(Criteria.where("_id").in(ids));
 
-    cart.forEach(entity -> {
-      String id = entity.productId();
-      System.out.println(id + " " + productsMap.containsKey(id));
-      if(!productsMap.containsKey(id)){
-        errorsArray.add(new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), 0, CartValidationErrorType.NOT_EXISTING));
-      } else if(productsMap.get(id).getStockInfo().getStockAmountAvailable() - entity.quantity() < 0){
-        errorsArray.add(
-          new CartValidationErrorEntityDto(id, entity.collectionName(), entity.quantity(), productsMap.get(id).getStockInfo().getStockAmountAvailable(), CartValidationErrorType.WRONG_QUANTITY)
-        );
-      }
+      List<ProductVariationModel> foundProducts = mongoTemplate.find(query, ProductVariationModel.class, collectionName);
+
+      allFoundProductsArray.addAll(foundProducts);
     });
+    
+    Map<String, ProductVariationModel> allFoundProductsMap = allFoundProductsArray.stream()
+    .collect(Collectors.toMap(ProductVariationModel::getId, product -> product));
+
+    cartValidation(cart, allFoundProductsMap, errorsArray);
 
     if(errorsArray.size() > 0){
       throw new CartValidationException(errorsArray);
     } else {
-      return productVariations;
+      return allFoundProductsArray;
     }
+  }
 
+  private void cartValidation(
+    List<CheckoutCreateSessionClientRequestDto> cart, 
+    Map<String, ProductVariationModel> allFoundProductsMap, 
+    ArrayList<CartValidationErrorEntityDto> errorsArray
+  ){
+    cart.forEach(entity -> {
+      String id = entity.productId();
+      System.out.println(id + " " + allFoundProductsMap.containsKey(id));
+      if(!allFoundProductsMap.containsKey(id)){
+        errorsArray.add(new CartValidationErrorEntityDto(
+          id, 
+          entity.collectionName(), 
+          entity.quantity(), 
+          0, 
+          CartValidationErrorType.NOT_EXISTING
+        ));
+      } else if(allFoundProductsMap.get(id).getStockInfo().getStockAmountAvailable() <= 0){
+        errorsArray.add(new CartValidationErrorEntityDto(
+          id, 
+          entity.collectionName(), 
+          entity.quantity(), 
+          allFoundProductsMap.get(id).getStockInfo().getStockAmountAvailable(), 
+          CartValidationErrorType.OUT_OF_STOCK
+        ));
+      } else if(allFoundProductsMap.get(id).getStockInfo().getStockAmountAvailable() - entity.quantity() < 0){
+        errorsArray.add(new CartValidationErrorEntityDto(
+          id, 
+          entity.collectionName(), 
+          entity.quantity(), 
+          allFoundProductsMap.get(id).getStockInfo().getStockAmountAvailable(), 
+          CartValidationErrorType.WRONG_QUANTITY
+        ));
+      }
+    });
   }
 
 }

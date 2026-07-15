@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
@@ -46,15 +47,12 @@ public class StripeCreateCheckoutSessionService {
   private HttpClient httpClient = HttpClient.newHttpClient();
   
   private final String encodingType = "UTF-8";
-  private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
-  private final String stockAmountReservedKey = "stockInfo.stockAmountReserved";
 
   // public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
+  @Transactional
   public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
     try {
       String returnUrl = URLEncoder.encode(stripeCheckoutReturnUrl, encodingType);
-
-      productVariationService.bulkOpsInventoryUpdate(cart, validatedArray);
       // List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
       // .map(entity -> {
       //   ProductVariationModel variation = mongoDbMainService
@@ -77,6 +75,8 @@ public class StripeCreateCheckoutSessionService {
       // .filter(entity -> entity != null).toList();
 
       String stringRequestBody = createRequest(validatedArray, returnUrl);
+
+      productVariationService.bulkOpsInventoryUpdate(cart);
       
       ResponseEntity<Object> response = sendRequest(stringRequestBody);
 
@@ -89,7 +89,7 @@ public class StripeCreateCheckoutSessionService {
   }
 
   // private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
-  private String createRequest(List<ProductVariationModel> dataArray, String returnUrl){
+  private String createRequest(List<ProductVariationModel> validatedArray, String returnUrl){
     
     StringBuilder requestBody = new StringBuilder();
     
@@ -103,8 +103,8 @@ public class StripeCreateCheckoutSessionService {
     requestBody.append("&return_url=").append(returnUrl);
     requestBody.append("&expires_at=").append(expireTime.getEpochSecond());
     
-    for(int i = 0; i < dataArray.size(); i++){
-      ProductVariationModel entity = dataArray.get(i);
+    for(int i = 0; i < validatedArray.size(); i++){
+      ProductVariationModel entity = validatedArray.get(i);
 
       requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.getStockInfo().getCurrency());
       requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.getVariationName());
@@ -129,7 +129,7 @@ public class StripeCreateCheckoutSessionService {
 
       String response = httpResponse.thenApply(HttpResponse::body).join();
 
-      System.out.println("Response: " + response);
+      // System.out.println("Response: " + response);
 
       return ResponseEntity.ok(response);
     } catch (URISyntaxException error) {

@@ -13,22 +13,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.client.result.UpdateResult;
+import com.mongodb.bulk.BulkWriteResult;
 import com.server.databases.mongodb.dto.main.DeleteManyById;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
-import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
-import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 
 @Service
 public class ProductVariationService {
 
-  private final String variationCollectionNameHead = "variation-";
+  // private final String variationCollectionNameHead = "variation-";
   
   private final String stockAmountAvailableKey = "stockInfo.stockAmountAvailable";
   private final String stockAmountReservedKey = "stockInfo.stockAmountReserved";
@@ -63,7 +60,7 @@ public class ProductVariationService {
 
       // mongoTemplate.findAndModify(parentDocumentQuery, parentDocumentUpdate, ProductModel.class, parentCollectionName);
 
-      ProductVariationModel savedObject = mongoTemplate.save(newVariation, newVariation.getCollectionName());
+      ProductVariationModel savedObject = mongoTemplate.insert(newVariation, newVariation.getCollectionName());
       
       return ResponseEntity.ok(savedObject);
     // }
@@ -95,24 +92,65 @@ public class ProductVariationService {
   //   }
   // }
 
-  public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
-    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductParentModel.class);
+  // public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
+  //   Map<String, ProductVariationModel> validatedArrayMapById = validatedArray.stream()
+  //   .collect(Collectors.toMap(ProductVariationModel::getId, entity -> entity));
 
-    Map<String, CheckoutCreateSessionClientRequestDto> cartMap = cart.stream()
-    .collect(Collectors.toMap(CheckoutCreateSessionClientRequestDto::productId, entity -> entity));
+  //   Map<String, List<CheckoutCreateSessionClientRequestDto>> cartMapByCollName = cart.stream()
+  //   .collect(Collectors.groupingBy(CheckoutCreateSessionClientRequestDto::collectionName));
 
-    validatedArray.forEach(entity -> {
-      Query query = Query.query(Criteria.where("_id").is(entity.getId()));
+  //   cartMapByCollName.forEach((collectionName, items) -> {
+  //     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, collectionName);
 
-      Update update = new Update();
-      update.set(stockAmountAvailableKey, entity.getStockInfo().getStockAmountAvailable() - cartMap.get(entity.getId()).quantity());
-      update.set(stockAmountReservedKey, entity.getStockInfo().getStockAmountReserved() + cartMap.get(entity.getId()).quantity());
+  //     items.forEach(entity -> {
+  //       ProductVariationModel variationEntity = validatedArrayMapById.get(entity.productId());
+  //       Query query = Query.query(Criteria.where("_id").is(entity.productId()));
+  
+  //       Update update = new Update();
+  //       update.set(stockAmountAvailableKey, variationEntity.getStockInfo().getStockAmountAvailable() - entity.quantity());
+  //       update.set(stockAmountReservedKey, variationEntity.getStockInfo().getStockAmountReserved() + entity.quantity());
+  
+  //       bulkOps.updateOne(query, update);
+  //     });
 
-      bulkOps.updateOne(query, update);
+  //     BulkWriteResult result = bulkOps.execute();
+
+  //     logger.info("The result of collection " + collectionName + ": " + result);
+  //   });
+    
+  //   return;
+  // }
+
+
+    public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
+    // Map<String, ProductVariationModel> validatedArrayMapById = validatedArray.stream()
+    // .collect(Collectors.toMap(ProductVariationModel::getId, entity -> entity));
+
+    Map<String, List<CheckoutCreateSessionClientRequestDto>> cartMapByCollName = cart.stream()
+    .collect(Collectors.groupingBy(CheckoutCreateSessionClientRequestDto::collectionName));
+
+    cartMapByCollName.forEach((collectionName, items) -> {
+      BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, collectionName);
+
+      items.forEach(entity -> {
+        // ProductVariationModel variationEntity = validatedArrayMapById.get(entity.productId());
+        Query query = Query.query(Criteria.where("_id").is(entity.productId()));
+  
+        Update update = new Update();
+        update.inc("stockInfo.stockAmountAvailable", -entity.quantity());
+        update.inc("stockInfo.stockAmountReserved", entity.quantity());
+  
+        bulkOps.updateOne(query, update);
+      });
+
+      BulkWriteResult result = bulkOps.execute();
+
+      logger.info("The result of collection " + collectionName + ": " + result);
     });
-
-    bulkOps.execute();
+    
+    return;
   }
+
 
   public ResponseEntity<Object> deteleManyById(DeleteManyById body){
     // String parentCollectionName = body.getCollectionName().substring(variationCollectionNameHead.length());

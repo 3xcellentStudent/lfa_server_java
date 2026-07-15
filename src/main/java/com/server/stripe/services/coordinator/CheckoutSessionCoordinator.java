@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,17 +16,15 @@ import com.server.databases.mongodb.models.orders.MainOrderModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.orders.OrdersService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.webhook.completed.object.CheckoutSessionObjectModel;
+import com.server.stripe.dto.checkout.expired.StripeCheckoutExpiredDto;
+import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 import com.server.stripe.services.checkout.create.StripeCreateCheckoutSessionService;
 import com.server.stripe.services.checkout.expired.StripeExpireCheckoutSessionService;
 import com.server.stripe.services.coordinator.helper.MongoDbCartValidator;
 
 @Service
-@Transactional
 public class CheckoutSessionCoordinator {
-
-  private final String clientSecretKey = "clientSecret";
-
+  
   @Autowired
   private StripeCreateCheckoutSessionService createSessionService;
   @Autowired
@@ -37,13 +36,14 @@ public class CheckoutSessionCoordinator {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Transactional
   public ResponseEntity<Object> createSession(List<CheckoutCreateSessionClientRequestDto> cart){
-    List<ProductVariationModel> validatedArray = cartValidatorService.validate(cart);
+    List<ProductVariationModel> validatedArray = cartValidatorService.validator(cart);
 
     try {
       ResponseEntity<Object> response = createSessionService.create(cart, validatedArray);
   
-      CheckoutSessionObjectModel checkoutSessionModel = objectMapper.readValue(response.getBody().toString(), CheckoutSessionObjectModel.class);
+      StripeCheckoutCompletedDto checkoutSessionModel = objectMapper.readValue(response.getBody().toString(), StripeCheckoutCompletedDto.class);
   
       MainOrderModel orderDataDto = new MainOrderModel(checkoutSessionModel, cart);
       
@@ -51,7 +51,7 @@ public class CheckoutSessionCoordinator {
       ordersService.create(orderDataDto);
   
       Map<String, String> data = new HashMap<>();
-      data.put(clientSecretKey, checkoutSessionModel.clientSecret());
+      data.put("clientSecret", checkoutSessionModel.clientSecret());
       
       return ResponseEntity.ok(data);
     } catch(JsonProcessingException ex){
@@ -59,9 +59,22 @@ public class CheckoutSessionCoordinator {
     }
   }
 
-  public ResponseEntity<Object> updateExpiredSession(String invoiceId){
-    expireSessionService.sendRequest(invoiceId);
+  public ResponseEntity<Object> updateExpiredSession(StripeCheckoutExpiredDto object){
+    // MainOrderModel foundDoc = ordersService.getOneById(object.id());
+    
+    // if(foundDoc == null){
+    //   String message = "Document with ID: " + object.id() + " was not found !";
+    //   return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    // }
+    
+    ResponseEntity<Object> stripeResponse = expireSessionService.sendRequestSync(object.id());
 
+    if(!stripeResponse.getStatusCode().equals(HttpStatus.OK)){
+      return stripeResponse;
+    }
+
+    
+    
     return ResponseEntity.ok(null);
   }
 }
