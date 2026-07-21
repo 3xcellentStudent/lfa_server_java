@@ -122,7 +122,7 @@ public class ProductVariationService {
   // }
 
 
-    public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
+  public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
     // Map<String, ProductVariationModel> validatedArrayMapById = validatedArray.stream()
     // .collect(Collectors.toMap(ProductVariationModel::getId, entity -> entity));
 

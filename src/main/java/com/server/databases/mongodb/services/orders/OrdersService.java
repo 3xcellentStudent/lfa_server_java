@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,8 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.server.databases.mongodb.dto.orders.request.OrdersFindOneAndModifyDto;
+import com.mongodb.bulk.BulkWriteResult;
+import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
+import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
+import com.server.stripe.dto.checkout.expired.StripeCheckoutExpiredDto;
 
 @Service
 @Transactional
@@ -54,7 +59,25 @@ public class OrdersService {
       String message = "Document with ID: " + body.checkoutId() + " was not found !";
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
+  }
 
+  @Transactional
+  public ResponseEntity<Object> bulkUpdate(List<StripeCheckoutExpiredDto> sessionsList){
+    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, MainOrderModel.class, collectionName);
+    
+    sessionsList.forEach(entity -> {
+      // ProductVariationModel variationEntity = validatedArrayMapById.get(entity.productId());
+      Query query = Query.query(Criteria.where("_id").is(entity.id()));
+      
+      Update update = new Update();
+      update.set("status", entity.status());
+      
+      bulkOps.updateOne(query, update);
+    });
+    
+    BulkWriteResult result = bulkOps.execute();
+
+    return ResponseEntity.ok(result.getMatchedCount());
   }
 
   @Transactional

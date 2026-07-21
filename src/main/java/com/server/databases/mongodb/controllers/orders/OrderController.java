@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.databases.mongodb.dto.orders.request.OrdersFindOneAndModifyDto;
+import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
 import com.server.databases.mongodb.models.orders.types.OrderStatusTypes;
 import com.server.databases.mongodb.services.orders.OrdersService;

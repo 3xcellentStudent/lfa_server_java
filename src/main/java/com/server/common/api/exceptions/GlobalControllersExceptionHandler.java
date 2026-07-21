@@ -135,5 +135,4 @@ public class GlobalControllersExceptionHandler {
     return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex, ex.getConflicts());
   }
 
-
 }
