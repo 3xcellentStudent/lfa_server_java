@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.dto.main.DeleteManyById;
 import com.server.databases.mongodb.dto.main.GetManyById;
+import com.server.databases.mongodb.dto.main.GetManyByNullableId;
 import com.server.databases.mongodb.dto.main.GetOneById;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.CreateNewProduct;
@@ -51,15 +52,15 @@ public class ProductController {
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAll(@Valid @ModelAttribute GetManyById body){
-    if(body.getId() == null || body.getId().isEmpty()){
+  public ResponseEntity<Object> findAll(@Valid @ModelAttribute GetManyByNullableId body){
+    if(body.id() == null || body.id().isEmpty()){
       ResponseEntity<Object> response = mainService
-      .findAll(ProductParentModel.class, body.getCollectionName());
+      .findAll(ProductParentModel.class, body.collectionName());
 
       return response;
     } else {
       List<ProductParentModel> foundProducts = mainService
-      .findManyById("id", body.getId(), ProductParentModel.class, body.getCollectionName());
+      .findManyById("id", body.id(), ProductParentModel.class, body.collectionName());
 
       return ResponseEntity.ok().body(foundProducts);
     }
@@ -67,12 +68,12 @@ public class ProductController {
 
   @GetMapping("/get/recursive")
   public ResponseEntity<Object> findOneByIdRecursive(@Valid @ModelAttribute GetOneById body){
-    return productService.findRecursiveById(body.getId(), body.getCollectionName());
+    return productService.findRecursiveById(body.id(), body.collectionName());
   }
 
   @GetMapping("/get/recursive/many")
   public ResponseEntity<Object> findManyByIdRecursive(@Valid @ModelAttribute GetManyById body){
-    return productService.findManyRecursiveById(body.getId(), body.getCollectionName());
+    return productService.findManyRecursiveById(body.id(), body.collectionName());
   }
 
   @DeleteMapping("/delete")

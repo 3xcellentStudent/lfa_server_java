@@ -28,7 +28,7 @@ import com.server.stripe.services.coordinator.helper.MongoDbCartValidator;
 
 @Service
 public class CheckoutSessionCoordinator {
-  
+
   @Autowired
   private StripeCreateCheckoutSessionService createSessionService;
   @Autowired
@@ -49,15 +49,22 @@ public class CheckoutSessionCoordinator {
     try {
       ResponseEntity<Object> response = createSessionService.create(cart, validatedArray);
   
-      StripeCheckoutCompletedDto checkoutSessionModel = objectMapper.readValue(response.getBody().toString(), StripeCheckoutCompletedDto.class);
+      StripeCheckoutCompletedDto sessionDto = objectMapper.readValue(response.getBody().toString(), StripeCheckoutCompletedDto.class);
   
-      MainOrderModel orderDataDto = new MainOrderModel(checkoutSessionModel, cart);
+      MainOrderModel orderDataDto = new MainOrderModel(
+        sessionDto.id(), 
+        sessionDto.invoice(), 
+        sessionDto.status(), 
+        OrdersProcessingType.CREATED.name(), 
+        cart, 
+        sessionDto.expiresAt(), 
+        sessionDto.created()
+      );
       
-      // Create new order in db
       ordersService.create(orderDataDto);
   
       Map<String, String> data = new HashMap<>();
-      data.put("clientSecret", checkoutSessionModel.clientSecret());
+      data.put("clientSecret", sessionDto.clientSecret());
       
       return ResponseEntity.ok(data);
     } catch(JsonProcessingException ex){
@@ -85,8 +92,9 @@ public class CheckoutSessionCoordinator {
     System.out.println("ORDERS:" + matchedOrders.size());
 
     if(matchedOrders.size() == 0){
+      return;
     }
-    List<StripeCheckoutExpiredDto> sessionsList = expireCheckoutService.getMulti(matchedOrders.stream().map(order -> order.getCheckoutId()).toList());
+    List<StripeCheckoutExpiredDto> sessionsList = expireCheckoutService.getMulti(matchedOrders.stream().map(order -> order.checkoutId()).toList());
 
     ordersService.bulkUpdate(sessionsList);
   }

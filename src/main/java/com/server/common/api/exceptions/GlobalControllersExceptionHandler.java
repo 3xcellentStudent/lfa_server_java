@@ -21,8 +21,10 @@ import org.springframework.web.client.ResourceAccessException;
 
 import com.mongodb.MongoException;
 import com.server.common.api.exceptions.api.data.json.runtime.ExternalApiResponseMappingException;
+import com.server.common.api.exceptions.mongo.ResourceNotFoundException;
 import com.server.common.api.exceptions.validation.cart.CartValidationException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
@@ -58,9 +60,9 @@ public class GlobalControllersExceptionHandler {
     return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error while working with MongoDB database !", ex, null);
   }
 
-    // =========================================================================
-    // 2. PARAMETERS AND VALIDATION OF INCOMING DATA IN REST CONTROLLERS
-    // =========================================================================
+  // =========================================================================
+  // 2. PARAMETERS AND VALIDATION OF INCOMING DATA IN REST CONTROLLERS
+  // =========================================================================
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
   public ResponseEntity<Map<String, Object>> handleMissingParams(MissingServletRequestParameterException ex){
@@ -121,18 +123,32 @@ public class GlobalControllersExceptionHandler {
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), ex, null);
   }
 
-    // =========================================================================
-    // 4. FINAL BACKUP CATCH (Catch-All)
-    // =========================================================================
+  // =========================================================================
+  // 4. CART VALIDATION
+  // =========================================================================
+
+  @ExceptionHandler(CartValidationException.class)
+  public ResponseEntity<?> cartValidationException(CartValidationException ex){
+    return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, "cart validation.", ex, ex.getConflicts());
+  }
+
+  // =========================================================================
+  // 5. NULL OR NOT FOUND
+  // =========================================================================
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex){
+    return buildResponse(HttpStatus.NOT_FOUND, "resource not found.", ex, null);
+  }
     
+  // =========================================================================
+  // 6. FINAL BACKUP CATCH (Catch-All)
+  // =========================================================================
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<?> handleAllUncaughtExceptions(Exception ex) {
     return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected internal server error occurred !", ex, null);
   }
 
-  @ExceptionHandler(CartValidationException.class)
-  public ResponseEntity<?> cartValidationException(CartValidationException ex){
-    return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), ex, ex.getConflicts());
-  }
 
 }

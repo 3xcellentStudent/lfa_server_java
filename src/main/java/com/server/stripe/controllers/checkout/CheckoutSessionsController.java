@@ -51,10 +51,6 @@ public class CheckoutSessionsController {
 
   @PostMapping("/webhook/expired")
   public ResponseEntity<Object> expired(@Valid @RequestBody StripeCheckoutExpiredEvent body){
-    System.out.println("EXPIRED===================================================");
-    System.out.println(body.data().object().id());
-    System.out.println(body.data().object().status());
-
     return checkoutSessionCoordinator.updateExpiredSession(body.data().object());
   }
 

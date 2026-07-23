@@ -20,7 +20,6 @@ import com.server.databases.mongodb.dto.main.DeleteManyById;
 import com.server.databases.mongodb.dto.main.GetManyById;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
-import com.server.databases.mongodb.dto.product.variation.UpdateVariationById;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.variation.ProductVariationService;
@@ -48,7 +47,7 @@ public class ProductVariationController {
   @GetMapping("/get/parent-id")
   public ResponseEntity<Object> getByParentId(
     @RequestParam(required = true) @NotBlank String id, 
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*_.*", message = "collectionName must contain \"_\"") String collectionName
   ){
     List<ProductVariationModel> productVariation = mainService
     .findManyById("parentId", id, ProductVariationModel.class, collectionName);
@@ -59,7 +58,7 @@ public class ProductVariationController {
   @GetMapping("/get/id")
   public ResponseEntity<Object> getManyById(@Valid @ModelAttribute GetManyById body){
     List<ProductVariationModel> productVariation = mainService
-    .findManyById("_id", body.getId(), ProductVariationModel.class, body.getCollectionName());
+    .findManyById("_id", body.id(), ProductVariationModel.class, body.collectionName());
 
     return ResponseEntity.ok(productVariation);
   }

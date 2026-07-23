@@ -60,7 +60,7 @@ public class MongoConfig {
 
   @Bean
   public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
-      return new MongoTransactionManager(dbFactory);
+    return new MongoTransactionManager(dbFactory);
   }
 
 }

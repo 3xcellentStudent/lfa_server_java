@@ -2,6 +2,8 @@ package com.server.databases.mongodb.services.orders;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -18,9 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mongodb.bulk.BulkWriteResult;
+import com.server.common.api.exceptions.mongo.ResourceNotFoundException;
 import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
+import com.server.common.types.stripe.orders.OrdersStatusesType;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
-import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.stripe.dto.checkout.expired.StripeCheckoutExpiredDto;
 
 @Service
@@ -29,6 +32,8 @@ public class OrdersService {
 
   @Value("${databases.mongodb.collections.orders}")
   private String collectionName;
+
+  private Logger logger = LoggerFactory.getLogger(OrdersService.class); 
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -41,7 +46,7 @@ public class OrdersService {
 
   @Transactional
   public ResponseEntity<Object> updateOneById(OrdersFindOneAndModifyDto body, String status){
-    Criteria criteria = Criteria.where("checkoutId").is(body.checkoutId()).and("status").is(status.toLowerCase());
+    Criteria criteria = Criteria.where("checkoutId").is(body.checkoutId()).and("status").is(OrdersStatusesType.valueOf(status).name());
     Query query = Query.query(criteria);
 
     Update update = new Update();
@@ -54,10 +59,11 @@ public class OrdersService {
     .findAndModify(query, update, options, MainOrderModel.class, collectionName);
 
     if(updatedDoc != null){
+      logger.info("Expired document ID: " + body.checkoutId() + " was successfully updated !");
       return ResponseEntity.ok(updatedDoc);
     } else {
-      String message = "Document with ID: " + body.checkoutId() + " was not found !";
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+      String message = "Document ID: " + body.checkoutId() + " was not found !";
+      throw new ResourceNotFoundException(message);
     }
   }
 
@@ -66,11 +72,11 @@ public class OrdersService {
     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, MainOrderModel.class, collectionName);
     
     sessionsList.forEach(entity -> {
-      // ProductVariationModel variationEntity = validatedArrayMapById.get(entity.productId());
       Query query = Query.query(Criteria.where("_id").is(entity.id()));
       
       Update update = new Update();
-      update.set("status", entity.status());
+      update.set("status", OrdersStatusesType.valueOf(entity.status()).name());
+      update.set("status", OrdersStatusesType.valueOf(entity.status()).name());
       
       bulkOps.updateOne(query, update);
     });
