@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -18,8 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import com.server.databases.mongodb.dto.main.DeleteManyById;
-import com.server.databases.mongodb.dto.main.DeleteManyFromArray;
+import com.server.databases.mongodb.dto.main.DeleteManyFromArrayDto;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.helpers.queries.QueriesHelper;
 
@@ -29,21 +26,21 @@ public class MongoDbMainService {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  public <T> ResponseEntity<Object> updateOneById(UpdateOneByIdDto body, Class<T> someClass){
+  public <T> ResponseEntity<Object> updateOneById(UpdateOneByIdDto body, Class<T> someClass, String collection){
     long timestamp = System.currentTimeMillis();
     
-    Query query = Query.query(Criteria.where("_id").is(body.getId()));
+    Query query = Query.query(Criteria.where("_id").is(body.id()));
     
     Update update = new Update();
-    update.set(body.getField(), body.getNewData());
+    update.set(body.field(), body.newData());
     update.set("updatedAt", timestamp);
     
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
-    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, body.getCollectionName());
+    T modifiedProduct = mongoTemplate.findAndModify(query, update, options, someClass, collection);
 
     if(modifiedProduct == null){
-      String message = "Document with ID: \"" + body.getId() + "\" was not found";
+      String message = "Document with ID: \"" + body.id() + "\" was not found";
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     } else {
       return ResponseEntity.ok(modifiedProduct);
@@ -68,8 +65,8 @@ public class MongoDbMainService {
   public <T> ResponseEntity<Object> pushNewOneToArrayById(UpdateOneByIdDto body, Class<T> someClass, String collectionName){
     long timestamp = System.currentTimeMillis();
 
-    Query query = Query.query(Criteria.where("id").is(body.getId()));
-    Update update = QueriesHelper.getUpdateForArray(body.getField(), body.getNewData());
+    Query query = Query.query(Criteria.where("id").is(body.id()));
+    Update update = QueriesHelper.getUpdateForArray(body.field(), body.newData());
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
     update.set("updatedAt", timestamp);
@@ -79,39 +76,27 @@ public class MongoDbMainService {
     return ResponseEntity.ok(modifiedProduct);
   }
 
-  public <T> ResponseEntity<Object> deleteManyFromArrayById(DeleteManyFromArray body, Class<T> someClass, String collectionName) {
-    List<Integer> indexes = body.getIndexes();
-    String selector = body.getSelector();
-    String id = body.getId();
-
-    Update update = QueriesHelper.doUnsetForArray(indexes, selector);
-    Query query = Query.query(Criteria.where("id").is(id));
+  public <T> ResponseEntity<Object> deleteManyFromArrayById(DeleteManyFromArrayDto body, Class<T> someClass, String collectionName) {
+    Update update = QueriesHelper.doUnsetForArray(body.indexes(), body.selector());
+    Query query = Query.query(Criteria.where("id").is(body.id()));
     mongoTemplate.updateMulti(query, update, someClass, collectionName);
 
-    update = new Update().pull(selector, null);
+    update = new Update().pull(body.selector(), null);
     UpdateResult updatedObject = mongoTemplate.updateMulti(query, update, someClass, collectionName);
 
     return ResponseEntity.ok(updatedObject);
   }
 
-  public <T> ResponseEntity<Object> deleteManyById(DeleteManyById body, Class<T> someClass){
-    Query query = Query.query(Criteria.where("id").in(body.getId()));
+  public <T> ResponseEntity<Object> deleteManyById(List<String> ids, Class<T> someClass, String collection){
+    Query query = Query.query(Criteria.where("id").in(ids));
 
-    List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, body.getCollectionName());
+    List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collection);
 
     return ResponseEntity.ok(removedObjects);
   }
 
-  // public <T> ResponseEntity<Object> deleteManyById(List<String> id, Class<T> someClass, String collectionName){
-  //   Query query = Query.query(Criteria.where("id").in(id));
-
-  //   List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collectionName);
-
-  //   return ResponseEntity.ok(removedObjects);
-  // }
-
-  public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collectionName){
-    List<T> foundDocs = mongoTemplate.findAll(someClass, collectionName).stream()
+  public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collection){
+    List<T> foundDocs = mongoTemplate.findAll(someClass, collection).stream()
     .filter(Objects::nonNull).toList();
 
     if(foundDocs.isEmpty()){

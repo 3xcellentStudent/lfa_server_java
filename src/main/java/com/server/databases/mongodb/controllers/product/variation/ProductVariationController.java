@@ -3,12 +3,12 @@ package com.server.databases.mongodb.controllers.product.variation;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.databases.mongodb.dto.main.DeleteManyById;
-import com.server.databases.mongodb.dto.main.GetManyById;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.variation.CreateVariationByParentId;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
@@ -26,7 +24,7 @@ import com.server.databases.mongodb.services.product.variation.ProductVariationS
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotEmpty;
 
 @RestController
 @RequestMapping("/api/mongodb/product/variation")
@@ -34,6 +32,9 @@ import jakarta.validation.constraints.Pattern;
 @Validated
 public class ProductVariationController {
   
+  @Value("${databases.mongodb.collections.product.variation}")
+  private String collection;
+
   @Autowired
   private MongoDbMainService mainService;
   @Autowired
@@ -46,38 +47,38 @@ public class ProductVariationController {
 
   @GetMapping("/get/parent-id")
   public ResponseEntity<Object> getByParentId(
-    @RequestParam(required = true) @NotBlank String id, 
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*_.*", message = "collectionName must contain \"_\"") String collectionName
+    @RequestParam @NotBlank String id
+    // @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*_.*", message = "collectionName must contain \"_\"") String collectionName
   ){
     List<ProductVariationModel> productVariation = mainService
-    .findManyById("parentId", id, ProductVariationModel.class, collectionName);
+    .findManyById("parentId", id, ProductVariationModel.class, collection);
 
     return ResponseEntity.ok(productVariation);
   }
 
   @GetMapping("/get/id")
-  public ResponseEntity<Object> getManyById(@Valid @ModelAttribute GetManyById body){
+  public ResponseEntity<Object> getManyById(@RequestParam @NotEmpty List<String> id){
     List<ProductVariationModel> productVariation = mainService
-    .findManyById("_id", body.id(), ProductVariationModel.class, body.collectionName());
+    .findManyById("_id", id, ProductVariationModel.class, collection);
 
     return ResponseEntity.ok(productVariation);
   }
 
   @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateOneById(body, ProductVariationModel.class);
+    return mainService.updateOneById(body, ProductVariationModel.class, collection);
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteById(@Valid @RequestBody DeleteManyById body){
-    return productVariationService.deteleManyById(body);
+  public ResponseEntity<Object> deleteById(@RequestBody @NotEmpty List<String> ids){
+    return productVariationService.deteleManyById(ids);
   }
   
   @DeleteMapping("/clear")
   public ResponseEntity<Object> clearCollection(
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
+    // @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
   ){
-    return mainService.clearCollection(ProductVariationModel.class, collectionName);
+    return mainService.clearCollection(ProductVariationModel.class, collection);
   }
 
 }

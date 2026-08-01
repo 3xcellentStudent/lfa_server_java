@@ -21,6 +21,8 @@ import com.server.databases.mongodb.models.orders.types.OrderStatusTypes;
 import com.server.databases.mongodb.services.orders.OrdersService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 @RestController
 @CrossOrigin("*")
@@ -32,7 +34,7 @@ public class OrderController {
   private OrdersService ordersService;
   
   @GetMapping("/get/id")
-  public ResponseEntity<Object> getById(@Valid @RequestParam String id){
+  public ResponseEntity<Object> getById(@RequestParam @NotBlank String id){
     MainOrderModel foundDoc = ordersService.getOneById(id);
 
      if(foundDoc == null){
@@ -49,7 +51,7 @@ public class OrderController {
   }
 
   @GetMapping("/get/by/selector")
-  public ResponseEntity<Object> getAllBySelector(@RequestParam String selector, @RequestParam List<String> status){
+  public ResponseEntity<Object> getAllBySelector(@RequestParam @NotBlank String selector, @RequestParam @NotEmpty List<String> status){
     return ResponseEntity.ok(ordersService.getAllBySelector(selector, status));
   }
 
@@ -59,8 +61,8 @@ public class OrderController {
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> findAllByIdAndRemove(@Valid @RequestBody List<String> body){
-    return ordersService.findAllByIdAndRemove(body);
+  public ResponseEntity<Object> findAllByIdAndRemove(@RequestBody @NotEmpty List<String> id){
+    return ordersService.findAllByIdAndRemove(id);
   }
 
 }

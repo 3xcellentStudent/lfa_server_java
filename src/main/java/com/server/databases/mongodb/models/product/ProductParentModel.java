@@ -1,71 +1,111 @@
 package com.server.databases.mongodb.models.product;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.stereotype.Component;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.server.databases.mongodb.dto.product.CreateNewProduct;
+import com.server.databases.mongodb.dto.product.CreateNewProductDto;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Component
+@CompoundIndexes({
+  @CompoundIndex(name = "category_rating_idx", def = "{'category': 1, 'rating': -1}"),
+  @CompoundIndex(name = "category_created_idx", def = "{'category': 1, 'createdAt': -1}")
+})
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Document
 public class ProductParentModel {
 
-  @Id @JsonProperty private String id;
-  // @JsonProperty private ArrayList<String> reviewsIds = new ArrayList<>();
-  // @JsonProperty private ArrayList<String> variationEntitiesId;
-  @JsonProperty private Integer rating;
-  @JsonProperty @NotBlank private String productName;
-  @JsonProperty @NotBlank private Descriptions descriptions;
-  @JsonProperty private ArrayList<ProductVariationModel> variationEntities;
-  @JsonProperty private Specifications specifications;
-  @JsonProperty private ArrayList<MediaContent> mediaContent;
-  @JsonProperty private ReviewsSnapshot reviewsSnapshot;
-  @JsonProperty @NotBlank private String collectionName;
-  @JsonProperty private long createdAt;
-  @JsonProperty private long updatedAt;
+  @Id private String id;
+  private Integer rating;
+  
+  
+  @TextIndexed 
+  @NotBlank 
+  private String productName;
+  @NotBlank private Descriptions descriptions;
+  private List<ProductVariationModel> variations;
+  private Specifications specifications;
+  private List<MediaContent> mediaContent;
+  private ReviewsSnapshot reviewsSnapshot;
+  
+  
+  @Indexed 
+  @NotBlank 
+  private String category;
+  private Long createdAt;
+  private Long updatedAt;
 
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Descriptions {
     public String summary;
     public String[] presentable;
   }
 
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class MediaContent {
     public boolean isImage;
     public ArrayList<MediaObject> mediaArray;
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MediaObject {
       public String media;
       public String src;
     }
   }
 
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class Specifications {
     public ArrayList<String> titles;
     public ArrayList<Properties> properties;
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Properties {
       public String name;
       public ArrayList<PropertiesArrayObject> array;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PropertiesArrayObject {
       public String name;
       public String value;
     }
   }
 
-  public void setId(String id){
-    this.id = id;
-  }
+  // public void setId(String id){
+  //   this.id = id;
+  // }
 
-  public String getId(){
-    return this.id;
-  }
+  // public String getId(){
+  //   return this.id;
+  // }
 
   // public void setReviewsId(ArrayList<String> reviewsId){
   //   this.reviewsIds = reviewsId;
@@ -75,41 +115,42 @@ public class ProductParentModel {
   //   return this.reviewsIds;
   // }
 
-  public long getCreatedAt(){
-    return this.createdAt;
-  }
+  // public Long getCreatedAt(){
+  //   return this.createdAt;
+  // }
 
-  public void setCreatedAt(long newTime){
-    this.createdAt = newTime;
-  }
+  // public void setCreatedAt(Long newTime){
+  // public void setCreatedAt(Long newTime){
+  //   this.createdAt = newTime;
+  // }
 
-  public long getUpdatedAt(){
-    return this.updatedAt;
-  }
+  // public Long getUpdatedAt(){
+  //   return this.updatedAt;
+  // }
 
-  public void setUpdatedAt(long newTime){
-    this.updatedAt = newTime;
-  }
+  // public void setUpdatedAt(Long newTime){
+  //   this.updatedAt = newTime;
+  // }
 
-  public void setReviewsSnapshot(ReviewsSnapshot reviewsSnapshot){
-    this.reviewsSnapshot = reviewsSnapshot;
-  }
+  // public void setReviewsSnapshot(ReviewsSnapshot reviewsSnapshot){
+  //   this.reviewsSnapshot = reviewsSnapshot;
+  // }
 
-  public void setReviewsSnapshot(){
-    this.reviewsSnapshot = new ReviewsSnapshot();
-  }
+  // public void setReviewsSnapshot(){
+  //   this.reviewsSnapshot = new ReviewsSnapshot();
+  // }
 
-  public ArrayList<MediaContent> getMediaContent(){
-    return this.mediaContent;
-  }
+  // public ArrayList<MediaContent> getMediaContent(){
+  //   return this.mediaContent;
+  // }
 
-  public void setMediaContent(ArrayList<MediaContent> mediaContent){
-    this.mediaContent = mediaContent;
-  }
+  // public void setMediaContent(ArrayList<MediaContent> mediaContent){
+  //   this.mediaContent = mediaContent;
+  // }
 
-  public String getProductName(){
-    return this.productName;
-  }
+  // public String getProductName(){
+  //   return this.productName;
+  // }
 
   // public void setVariationEntitiesId(ArrayList<String> variationEntitiesId){
   //   this.variationEntitiesId = variationEntitiesId;
@@ -119,13 +160,13 @@ public class ProductParentModel {
   //   return this.variationEntitiesId;
   // }
 
-  public ArrayList<ProductVariationModel> getVariationEntities(){
-    return this.variationEntities;
-  }
+  // public List<ProductVariationModel> getVariationEntities(){
+  //   return this.variationEntities;
+  // }
 
-  public void setVariationEntities(ArrayList<ProductVariationModel> variationEntities){
-    this.variationEntities = variationEntities;
-  }
+  // public void setVariationEntities(List<ProductVariationModel> variationEntities){
+  //   this.variationEntities = variationEntities;
+  // }
 
   // public void pushProductVariation(ProductVariationModel productVariation){
   //   this.variationEntities.add(productVariation);
@@ -142,38 +183,38 @@ public class ProductParentModel {
     }
   }
 
-  public ReviewsSnapshot getReviewsSnapshot(){
-    return this.reviewsSnapshot;
-  }
+  // public ReviewsSnapshot getReviewsSnapshot(){
+  //   return this.reviewsSnapshot;
+  // }
 
-  public Integer getRating(){
-    return this.rating;
-  }
+  // public Integer getRating(){
+  //   return this.rating;
+  // }
 
-  public Descriptions getDescriptions(){
-    return this.descriptions;
-  }
+  // public Descriptions getDescriptions(){
+  //   return this.descriptions;
+  // }
 
-  public Specifications getSpecifications(){
-    return this.specifications;
-  }
+  // public Specifications getSpecifications(){
+  //   return this.specifications;
+  // }
 
-  public String getCollectionName(){
-    return this.collectionName;
-  }
+  // public String getCategory(){
+  //   return this.category;
+  // }
 
-  public ProductParentModel(){}
+  // public ProductParentModel(){}
 
-  public ProductParentModel(CreateNewProduct data){
+  public ProductParentModel(CreateNewProductDto data){
     // this.reviewsIds = new ArrayList<>();
     this.rating = 0;
-    this.productName = data.getProductName();
-    this.descriptions = data.getDescriptions();
+    this.productName = data.productName();
+    this.descriptions = data.descriptions();
     // this.variationEntitiesId = new ArrayList<>();
-    this.variationEntities =  new ArrayList<>();
-    this.specifications = data.getSpecifications();
-    this.mediaContent = data.getMediaContent();
-    this.collectionName = data.getCollectionName();
+    this.variations =  List.of();
+    this.specifications = data.specifications();
+    this.mediaContent = data.mediaContent();
+    this.category = data.category();
     this.reviewsSnapshot = new ReviewsSnapshot();
   }
 

@@ -3,17 +3,16 @@ package com.server.databases.mongodb.models.reviews;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.stereotype.Component;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 
-@Component
+@Document
 public class ReviewsModel {
 
-  @Id
-  @JsonProperty private String id;
+  @Id @JsonProperty private String id;
   @JsonProperty @NotBlank private String parentId;
   @JsonProperty @NotBlank private String content;
   @JsonProperty @NotBlank private String firstName;
@@ -23,7 +22,7 @@ public class ReviewsModel {
   @JsonProperty private List<String> attachments;
   @JsonProperty private long createdAt;
   @JsonProperty private long updatedAt;
-  @JsonProperty private String collectionName;
+  @JsonProperty private String collection;
 
   public ReviewsModel(){}
   
@@ -36,7 +35,7 @@ public class ReviewsModel {
     this.attachments = dataModel.attachments;
     this.createdAt = dataModel.createdAt;
     this.updatedAt = dataModel.updatedAt;
-    this.collectionName = dataModel.collectionName;
+    this.collection = dataModel.collection;
     this.parentId = dataModel.parentId;
     this.id = dataModel.id;
   }
@@ -143,11 +142,11 @@ public class ReviewsModel {
   // }
 
   public String getCollectionName() {
-    return collectionName;
+    return this.collection;
   }
 
-  public void setCollectionName(String collectionName) {
-    this.collectionName = collectionName;
+  public void setCollectionName(String collection) {
+    this.collection = collection;
   }
 
 }

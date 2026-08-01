@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -28,8 +29,10 @@ import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
@@ -37,7 +40,10 @@ import jakarta.validation.constraints.Pattern;
 @CrossOrigin("*")
 @Validated
 public class ReviewController {
-  
+
+  @Value("${databases.mongodb.collections.reviews}")
+  private String collection;
+
   @Autowired
   private ReviewsService reviewsService;
   @Autowired
@@ -52,38 +58,35 @@ public class ReviewController {
 
   @PatchMapping("/update")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateOneById(body, ReviewsModel.class);
+    return mainService.updateOneById(body, ReviewsModel.class, collection);
   }
   
   @GetMapping("/get")
-  public ResponseEntity<Object> findManyById(
-    @RequestParam(required = false) @NotBlank List<String> id,
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
-  ){
+  public ResponseEntity<Object> findManyById(@RequestParam(required = false) @Nullable List<String> id){
     if(id == null || id.isEmpty()){
-      ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collectionName);
+      ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collection);
 
       return response;
     } else {
-      List<ReviewsModel> foundReviews = mainService.findManyById("id", id, ReviewsModel.class, collectionName);
+      List<ReviewsModel> foundReviews = mainService.findManyById("id", id, ReviewsModel.class, collection);
 
       return ResponseEntity.ok(foundReviews);
     }
   }
 
   @DeleteMapping("/delete")
-  public ResponseEntity<Object> deleteManyById(@Valid @RequestBody DeleteManyById body){
-    return mainService.deleteManyById(body, ReviewsModel.class);
+  public ResponseEntity<Object> deleteManyById(@RequestBody @NotEmpty List<String> ids){
+    return mainService.deleteManyById(ids, ReviewsModel.class, collection);
   }
 
   @DeleteMapping("/delete/recursive")
   public ResponseEntity<Object> deleteManyByIdRecursive(@Valid @RequestBody DeleteManyById body){
     CompletableFuture<ResponseEntity<Object>> completableFuture = CompletableFuture.supplyAsync(() -> {
-      ResponseEntity<Object> response = mainService.deleteManyById(body, ReviewsModel.class);
+      ResponseEntity<Object> response = mainService.deleteManyById(body.ids(), ReviewsModel.class, collection);
 
-      Update update = new Update().pullAll("reviewsId", body.getId().toArray(new String[0]));
+      Update update = new Update().pullAll("reviewsId", body.ids().toArray(new String[0]));
       mongoTemplate.updateMulti(new Query(Criteria.where("id")
-      .is(body.getParentId())), update, ProductParentModel.class, body.getCollectionName());
+      .is(body.parentId())), update, ProductParentModel.class, collection);
 
       return response;
     });
