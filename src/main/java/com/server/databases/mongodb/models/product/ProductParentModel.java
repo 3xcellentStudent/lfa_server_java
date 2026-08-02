@@ -15,6 +15,7 @@ import com.server.databases.mongodb.models.product.variation.ProductVariationMod
 import com.server.databases.mongodb.models.reviews.components.ReviewsSnapshot;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,23 +32,15 @@ import lombok.NoArgsConstructor;
 @Document
 public class ProductParentModel {
 
-  @Id private String id;
+  private @Id String id;
   private Integer rating;
-  
-  
-  @TextIndexed 
-  @NotBlank 
-  private String productName;
-  @NotBlank private Descriptions descriptions;
-  private List<ProductVariationModel> variations;
-  private Specifications specifications;
+  private @NotBlank @TextIndexed String productName;
+  private @NotEmpty Descriptions descriptions;
+  private @Builder.Default List<ProductVariationModel> variations = List.of();
+  private @NotEmpty Specifications specifications;
   private List<MediaContent> mediaContent;
   private ReviewsSnapshot reviewsSnapshot;
-  
-  
-  @Indexed 
-  @NotBlank 
-  private String category;
+  private @Indexed @NotBlank String category;
   private Long createdAt;
   private Long updatedAt;
 
@@ -55,8 +48,8 @@ public class ProductParentModel {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Descriptions {
-    public String summary;
-    public String[] presentable;
+    public @NotBlank String summary;
+    public @NotEmpty List<String> presentable;
   }
 
   @Data

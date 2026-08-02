@@ -1,6 +1,5 @@
 package com.server.databases.mongodb.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +31,7 @@ public class MongoDbMainService {
     Query query = Query.query(Criteria.where("_id").is(body.id()));
     
     Update update = new Update();
-    update.set(body.field(), body.newData());
+    update.set(body.path(), body.data());
     update.set("updatedAt", timestamp);
     
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
@@ -66,7 +65,7 @@ public class MongoDbMainService {
     long timestamp = System.currentTimeMillis();
 
     Query query = Query.query(Criteria.where("id").is(body.id()));
-    Update update = QueriesHelper.getUpdateForArray(body.field(), body.newData());
+    Update update = QueriesHelper.getUpdateForArray(body.path(), body.data());
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
     update.set("updatedAt", timestamp);
@@ -95,23 +94,20 @@ public class MongoDbMainService {
     return ResponseEntity.ok(removedObjects);
   }
 
-  public <T> ResponseEntity<Object> findAll(Class<T> someClass, String collection){
-    List<T> foundDocs = mongoTemplate.findAll(someClass, collection).stream()
+  public <T> List<T> findAll(Class<T> someClass, String collection){
+    List<T> documents = mongoTemplate.findAll(someClass, collection).stream()
     .filter(Objects::nonNull).toList();
 
-    if(foundDocs.isEmpty()){
-      return ResponseEntity.status(404).body(new ArrayList<>());
-    } else {
-      return ResponseEntity.ok(foundDocs);
-    }
+    return documents;
   }
 
-  public <T> List<T> findManyById(String selector, List<String> id, Class<T> someClass, String collectionName){
+  public <T> List<T> findManyById(String selector, List<String> id, Class<T> someClass, String collection){
     Query query = Query.query(Criteria.where(selector).in(id));
-    List<T> foundDocsList = mongoTemplate.find(query, someClass, collectionName)
+    
+    List<T> documents = mongoTemplate.find(query, someClass, collection)
     .stream().filter(Objects::nonNull).toList();
 
-    return foundDocsList;
+    return documents;
   }
 
   public <T> List<T> findManyById(String selector, String id, Class<T> someClass, String collectionName){

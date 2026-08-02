@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -50,18 +51,25 @@ public class ProductVariationController {
     @RequestParam @NotBlank String id
     // @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*_.*", message = "collectionName must contain \"_\"") String collectionName
   ){
-    List<ProductVariationModel> productVariation = mainService
+    List<ProductVariationModel> variations = mainService
     .findManyById("parentId", id, ProductVariationModel.class, collection);
 
-    return ResponseEntity.ok(productVariation);
+    if(variations.isEmpty()){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(variations);
+    }
+    return ResponseEntity.ok(variations);
   }
 
   @GetMapping("/get/id")
   public ResponseEntity<Object> getManyById(@RequestParam @NotEmpty List<String> id){
-    List<ProductVariationModel> productVariation = mainService
-    .findManyById("_id", id, ProductVariationModel.class, collection);
+    List<ProductVariationModel> variations = mainService
+    .findManyById("id", id, ProductVariationModel.class, collection);
 
-    return ResponseEntity.ok(productVariation);
+    if(variations.isEmpty()){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(variations);
+    }
+
+    return ResponseEntity.ok(variations);
   }
 
   @PatchMapping("/update/id")

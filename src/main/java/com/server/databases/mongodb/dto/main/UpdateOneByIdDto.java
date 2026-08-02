@@ -1,11 +1,9 @@
 package com.server.databases.mongodb.dto.main;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
-public record UpdateOneByIdDto(@NotBlank String id, @NotBlank String field, Object newData){
+public record UpdateOneByIdDto(@NotBlank String id, @NotBlank String path, Object data){
   
   // @JsonProperty @NotBlank private String id;
   // @JsonProperty @NotBlank private String field;

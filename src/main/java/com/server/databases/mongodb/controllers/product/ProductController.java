@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -53,15 +54,22 @@ public class ProductController {
   @GetMapping("/get")
   public ResponseEntity<Object> findAll(@RequestParam(required = false)  List<String> ids){
     if(ids == null || ids.isEmpty()){
-      ResponseEntity<Object> response = mainService
+      List<ProductParentModel> documents = mainService
       .findAll(ProductParentModel.class, collection);
 
-      return response;
+      if(documents.isEmpty()){
+        return ResponseEntity.status(404).body(documents);
+      } else {
+        return ResponseEntity.ok(documents);
+      }
     } else {
-      List<ProductParentModel> foundProducts = mainService
+      List<ProductParentModel> documents = mainService
       .findManyById("id", ids, ProductParentModel.class, collection);
 
-      return ResponseEntity.ok().body(foundProducts);
+      if(documents.isEmpty()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(documents);
+      }
+      return ResponseEntity.ok(documents);
     }
   }
 
