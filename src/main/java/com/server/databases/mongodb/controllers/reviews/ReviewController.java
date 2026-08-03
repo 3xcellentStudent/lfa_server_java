@@ -1,14 +1,14 @@
 package com.server.databases.mongodb.controllers.reviews;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mongodb.client.result.DeleteResult;
-import com.server.databases.mongodb.dto.main.DeleteManyById;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
-import com.server.databases.mongodb.models.product.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
@@ -33,7 +31,6 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping("/api/mongodb/review")
@@ -56,50 +53,58 @@ public class ReviewController {
     return reviewsService.createOne(body);
   }
 
-  @PatchMapping("/update")
+  @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateOneById(body, ReviewsModel.class, collection);
+    ReviewsModel mofidiedDoc = mainService.updateOneById(body, ReviewsModel.class, collection);
+
+    if(mofidiedDoc == null){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mofidiedDoc);
+    }
+    return ResponseEntity.ok(mofidiedDoc);
   }
   
   @GetMapping("/get")
   public ResponseEntity<Object> findManyById(@RequestParam(required = false) @Nullable List<String> id){
-    if(id == null || id.isEmpty()){
-      ResponseEntity<Object> response = mainService.findAll(ReviewsModel.class, collection);
+    List<ReviewsModel> docsList = id == null || id.isEmpty() 
+    ? mainService.findAll(ReviewsModel.class, collection) 
+    : mainService.findManyById("id", id, ReviewsModel.class, collection);
 
-      return response;
-    } else {
-      List<ReviewsModel> foundReviews = mainService.findManyById("id", id, ReviewsModel.class, collection);
-
-      return ResponseEntity.ok(foundReviews);
+    if(docsList.isEmpty()){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(docsList);
     }
+    return ResponseEntity.ok(docsList);
   }
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteManyById(@RequestBody @NotEmpty List<String> ids){
-    return mainService.deleteManyById(ids, ReviewsModel.class, collection);
+    List<ReviewsModel> docsList = mainService.deleteManyById(ids, ReviewsModel.class, collection);
+
+    if(docsList.isEmpty()){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(docsList);
+    }
+
+    return ResponseEntity.ok(docsList);
   }
 
-  @DeleteMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteManyByIdRecursive(@Valid @RequestBody DeleteManyById body){
-    CompletableFuture<ResponseEntity<Object>> completableFuture = CompletableFuture.supplyAsync(() -> {
-      ResponseEntity<Object> response = mainService.deleteManyById(body.ids(), ReviewsModel.class, collection);
+  @DeleteMapping("/delete/id")
+  public ResponseEntity<Object> deleteOneById(@RequestBody @NotBlank String id){
+    Query query = Query.query(Criteria.where("id").is(id));
+    DeleteResult result = mongoTemplate.remove(query, collection);
 
-      Update update = new Update().pullAll("reviewsId", body.ids().toArray(new String[0]));
-      mongoTemplate.updateMulti(new Query(Criteria.where("id")
-      .is(body.parentId())), update, ProductParentModel.class, collection);
+    return ResponseEntity.ok(new HashMap<>().put("count", result.getDeletedCount()));
+  }
 
-      return response;
-    });
+  @DeleteMapping("/delete/parent-id")
+  public ResponseEntity<Object> deletemanyByParentId(@RequestBody @NotEmpty List<String> id){
+    Query query = Query.query(Criteria.where("id").in(id));
+    DeleteResult result = mongoTemplate.remove(query, collection);
 
-    return completableFuture.join();
+    return ResponseEntity.ok(new HashMap<>().put("count", result.getDeletedCount()));
   }
 
   @DeleteMapping("/clear-col")
-  public ResponseEntity<Object> clearCollection
-  (
-    @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
-  ){
-    DeleteResult result = mongoTemplate.remove(new Query(), ReviewsModel.class, collectionName);
+  public ResponseEntity<Object> clearCollection(){
+    Long result = mainService.clearCollection(ReviewsModel.class, collection);
 
     return ResponseEntity.ok(result);
   }

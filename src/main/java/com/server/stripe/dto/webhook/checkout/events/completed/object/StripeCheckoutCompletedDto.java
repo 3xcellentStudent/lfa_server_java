@@ -1,5 +1,7 @@
 package com.server.stripe.dto.webhook.checkout.events.completed.object;
 
+import java.time.Instant;
+
 import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -7,7 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 // @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-public record StripeCheckoutCompletedDto(@Id String id, String clientSecret, Long created, Long expiresAt, String invoice, String status) {
+public record StripeCheckoutCompletedDto(@Id String id, String clientSecret, Instant created, Instant expiresAt, String invoice, String status) {
 
   // @Id public String id;
 

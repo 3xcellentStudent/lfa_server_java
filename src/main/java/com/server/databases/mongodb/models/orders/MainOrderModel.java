@@ -1,69 +1,31 @@
 package com.server.databases.mongodb.models.orders;
 
+import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Document
-public record MainOrderModel(
-  @Id String checkoutId,
-  String invoiceId,
-  String status,
-  String processingStatus,
-  List<CheckoutCreateSessionClientRequestDto> productList,
-  Long expiresAt,
-  Long created
-){
- 
-  // @Id private String checkoutId;
-  // private String invoiceId;
-  // private String status;
-  // private String processingStatus;
-  // private List<CheckoutCreateSessionClientRequestDto> productList;
-  // private Long expiresAt;
-  // private Long created;
-
-  // public String getCheckoutId(){
-  //   return this.checkoutId;
-  // }
-
-  // public String getInvoiceId(){
-  //   return this.invoiceId;
-  // }
-
-  // public String getStatus(){
-  //   return this.status;
-  // }
-
-  // public Long getExpiresAt(){
-  //   return this.expiresAt;
-  // }
-
-  // public Long getCreated(){
-  //   return this.created;
-  // }
-
-  // public List<CheckoutCreateSessionClientRequestDto> getProductList(){
-  //   return this.productList;
-  // }
-
-  // public List<CheckoutCreateSessionClientRequestDto> setProductList(List<CheckoutCreateSessionClientRequestDto> newProductList){
-  //   return this.productList = newProductList;
-  // }
-
-  // public MainOrderModel(StripeCheckoutCompletedDto data, List<CheckoutCreateSessionClientRequestDto> productList){
-  //   this.checkoutId = data.id();
-  //   this.invoiceId = data.invoice();
-  //   this.status = data.status();
-  //   this.productList = productList;
-  //   this.expiresAt = data.expiresAt();
-  //   this.created = data.created();
-  // }
-
-  // public MainOrderModel(){}
-  
+public class MainOrderModel{
+  private @Id String checkoutId;
+  private String invoiceId;
+  private String status;
+  private String processingStatus;
+  private List<CheckoutCreateSessionClientRequestDto> productList;
+  private @CreatedDate Instant expiresAt;
+  private @LastModifiedDate Instant created;
 }

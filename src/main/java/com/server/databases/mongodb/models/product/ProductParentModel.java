@@ -1,9 +1,12 @@
 package com.server.databases.mongodb.models.product;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -41,8 +44,8 @@ public class ProductParentModel {
   private List<MediaContent> mediaContent;
   private ReviewsSnapshot reviewsSnapshot;
   private @Indexed @NotBlank String category;
-  private Long createdAt;
-  private Long updatedAt;
+  private @CreatedDate Instant createdAt;
+  private @LastModifiedDate Instant updatedAt;
 
   @Data
   @NoArgsConstructor

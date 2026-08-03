@@ -74,7 +74,14 @@ public class ProductVariationController {
 
   @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    return mainService.updateOneById(body, ProductVariationModel.class, collection);
+    ProductVariationModel modifiedDoc = mainService.updateOneById(body, ProductVariationModel.class, collection);
+
+    if(modifiedDoc == null){
+      String message = "Document with ID: \"" + body.id() + "\" was not found";
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    } else {
+      return ResponseEntity.ok(modifiedDoc);
+    }
   }
 
   @DeleteMapping("/delete")
@@ -83,10 +90,8 @@ public class ProductVariationController {
   }
   
   @DeleteMapping("/clear")
-  public ResponseEntity<Object> clearCollection(
-    // @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*-.*", message = "collectionName must contain \"-\"") String collectionName
-  ){
-    return mainService.clearCollection(ProductVariationModel.class, collection);
+  public ResponseEntity<Object> clearCollection(){
+    return ResponseEntity.ok(mainService.clearCollection(ProductVariationModel.class, collection));
   }
 
 }

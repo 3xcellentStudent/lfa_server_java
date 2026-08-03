@@ -1,31 +1,38 @@
 package com.server.databases.mongodb.models.reviews;
 
+import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Document
 public class ReviewsModel {
 
-  @Id @JsonProperty private String id;
-  @JsonProperty @NotBlank private String parentId;
-  @JsonProperty @NotBlank private String content;
-  @JsonProperty @NotBlank private String firstName;
-  @JsonProperty @NotBlank private String lastName;
-  @JsonProperty @NotBlank private String title;
-  @JsonProperty private int rating;
-  @JsonProperty private List<String> attachments;
-  @JsonProperty private long createdAt;
-  @JsonProperty private long updatedAt;
-  @JsonProperty private String collection;
+  private @Id String id;
+  private @NotBlank String parentId;
+  private @NotBlank String content;
+  private @NotBlank String firstName;
+  private @NotBlank String lastName;
+  private @NotBlank String title;
+  private Integer rating;
+  private List<String> attachments;
+  private @CreatedDate Instant createdAt;
+  private @LastModifiedDate Instant updatedAt;
+  private String category;
 
-  public ReviewsModel(){}
-  
   public ReviewsModel(ReviewsModel dataModel){
     this.content = dataModel.content;
     this.firstName = dataModel.firstName;
@@ -35,7 +42,7 @@ public class ReviewsModel {
     this.attachments = dataModel.attachments;
     this.createdAt = dataModel.createdAt;
     this.updatedAt = dataModel.updatedAt;
-    this.collection = dataModel.collection;
+    this.category = dataModel.category;
     this.parentId = dataModel.parentId;
     this.id = dataModel.id;
   }
@@ -57,96 +64,68 @@ public class ReviewsModel {
   //   public List<String> attachments;
   // }
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getParentId() {
-    return parentId;
-  }
-
-  public void setParentId(String parentId) {
-    this.parentId = parentId;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  // public void setContent(String content) {
-  //   this.content = content;
+  // public String getId() {
+  //   return id;
   // }
 
-  public String getFirstName() {
-    return firstName;
-  }
-
-  // public void setFirstName(String firstName) {
-  //   this.firstName = firstName;
+  // public void setId(String id) {
+  //   this.id = id;
   // }
 
-  public String getLastName() {
-    return lastName;
-  }
-
-  // public void setLastName(String lastName) {
-  //   this.lastName = lastName;
+  // public String getParentId() {
+  //   return parentId;
   // }
 
-  public String getTitle() {
-    return title;
-  }
-
-  // public void setTitle(String title) {
-  //   this.title = title;
+  // public void setParentId(String parentId) {
+  //   this.parentId = parentId;
   // }
 
-  public int getRating() {
-    return rating;
-  }
-
-  // public void setRating(int rating) {
-  //   this.rating = rating;
+  // public String getContent() {
+  //   return content;
   // }
 
-  public List<String> getAttachments() {
-    return attachments;
-  }
-
-  // public void setAttachments(List<String> attachments) {
-  //   this.attachments = attachments;
+  // public String getFirstName() {
+  //   return firstName;
   // }
 
-  public long getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt() {
-    this.createdAt = System.currentTimeMillis();
-  }
-
-  public long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt() {
-    this.updatedAt = System.currentTimeMillis();
-  }
-
-  // public void setReviewsSnapshot(ReviewsSnapshot reviewsSnapshot) {
-  //   this.reviewsSnapshot = reviewsSnapshot;
+  // public String getLastName() {
+  //   return lastName;
   // }
 
-  public String getCollectionName() {
-    return this.collection;
-  }
+  // public String getTitle() {
+  //   return title;
+  // }
 
-  public void setCollectionName(String collection) {
-    this.collection = collection;
-  }
+  // public int getRating() {
+  //   return rating;
+  // }
+
+  // public List<String> getAttachments() {
+  //   return attachments;
+  // }
+
+  // public long getCreatedAt() {
+  //   return createdAt;
+  // }
+
+  // public void setCreatedAt() {
+  //   this.createdAt = System.currentTimeMillis();
+  // }
+
+  // public long getUpdatedAt() {
+  //   return updatedAt;
+  // }
+
+  // public void setUpdatedAt() {
+  //   this.updatedAt = System.currentTimeMillis();
+  // }
+
+  // public String getCollectionName() {
+  //   return this.collection;
+  // }
+
+  // public void setCollectionName(String collection) {
+  //   this.collection = collection;
+  // }
 
 }

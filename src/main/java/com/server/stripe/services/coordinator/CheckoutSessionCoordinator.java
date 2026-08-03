@@ -94,7 +94,9 @@ public class CheckoutSessionCoordinator {
     if(matchedOrders.size() == 0){
       return;
     }
-    List<StripeCheckoutExpiredDto> sessionsList = expireCheckoutService.getMulti(matchedOrders.stream().map(order -> order.checkoutId()).toList());
+
+    List<StripeCheckoutExpiredDto> sessionsList = expireCheckoutService
+    .getMulti(matchedOrders.stream().map(entity -> entity.getCheckoutId()).toList());
 
     ordersService.bulkUpdate(sessionsList);
   }

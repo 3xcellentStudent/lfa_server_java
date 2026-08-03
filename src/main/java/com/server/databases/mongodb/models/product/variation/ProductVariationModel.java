@@ -1,10 +1,13 @@
 package com.server.databases.mongodb.models.product.variation;
 
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -39,8 +42,8 @@ public class ProductVariationModel {
   private List<Image> image;
   // @Pattern(regexp = "^variation-.*$", message = "\"collection\" must contain \"variation\" and \"-\" !") 
   private String category;
-  private Long createdAt;
-  private Long updatedAt;
+  private @CreatedDate Instant createdAt;
+  private @LastModifiedDate Instant updatedAt;
 
   @Data
   @NoArgsConstructor
@@ -198,8 +201,8 @@ public class ProductVariationModel {
     this.variationName = body.variationName();
     this.image = new ArrayList<Image>();
     this.category = category;
-    this.createdAt = 0L;
-    this.updatedAt = 0L;
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
   }
 
   public ProductVariationModel(ProductVariationModel body, String category){

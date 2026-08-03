@@ -32,43 +32,12 @@ public class ProductVariationService {
   private MongoTemplate mongoTemplate;
   
   public ResponseEntity<Object> createByParentId(CreateVariationByParentId body){
-    long timestamp = System.currentTimeMillis();
-
     ProductVariationModel model = new ProductVariationModel(body, collection);
-  
-    model.setCreatedAt(timestamp);
-    model.setUpdatedAt(timestamp);
 
     ProductVariationModel insertedDocument = mongoTemplate.insert(model, collection);
     
     return ResponseEntity.ok(insertedDocument);
   }
-
-  // public void bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
-  //   Map<String, List<CheckoutCreateSessionClientRequestDto>> cartMapByCollName = cart.stream()
-  //   .collect(Collectors.groupingBy(CheckoutCreateSessionClientRequestDto::collectionName));
-
-  //   cartMapByCollName.forEach((collectionName, items) -> {
-  //     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, collectionName);
-
-  //     items.forEach(entity -> {
-  //       // ProductVariationModel variationEntity = validatedArrayMapById.get(entity.productId());
-  //       Query query = Query.query(Criteria.where("_id").is(entity.productId()));
-  
-  //       Update update = new Update();
-  //       update.inc("stockInfo.stockAmountAvailable", -entity.quantity());
-  //       update.inc("stockInfo.stockAmountReserved", entity.quantity());
-  
-  //       bulkOps.updateOne(query, update);
-  //     });
-
-  //     BulkWriteResult result = bulkOps.execute();
-
-  //     logger.info("The result of collection " + collectionName + ": " + result);
-  //   });
-    
-  //   return;
-  // }
 
   public Integer bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, collection);

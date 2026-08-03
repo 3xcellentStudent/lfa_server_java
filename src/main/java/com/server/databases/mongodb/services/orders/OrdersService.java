@@ -31,7 +31,7 @@ import com.server.stripe.dto.checkout.expired.StripeCheckoutExpiredDto;
 public class OrdersService {
 
   @Value("${databases.mongodb.collections.orders}")
-  private String collectionName;
+  private String collection;
 
   private Logger logger = LoggerFactory.getLogger(OrdersService.class); 
 
@@ -39,7 +39,7 @@ public class OrdersService {
   private MongoTemplate mongoTemplate;
 
   public ResponseEntity<Object> create(MainOrderModel body){
-    MainOrderModel createdDocument = mongoTemplate.insert(body, collectionName);
+    MainOrderModel createdDocument = mongoTemplate.insert(body, collection);
 
     return ResponseEntity.ok(createdDocument);
   }
@@ -56,7 +56,7 @@ public class OrdersService {
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
     MainOrderModel updatedDoc = mongoTemplate
-    .findAndModify(query, update, options, MainOrderModel.class, collectionName);
+    .findAndModify(query, update, options, MainOrderModel.class, collection);
 
     if(updatedDoc != null){
       logger.info("Expired document ID: " + body.checkoutId() + " was successfully updated !");
@@ -69,7 +69,7 @@ public class OrdersService {
 
   @Transactional
   public ResponseEntity<Object> bulkUpdate(List<StripeCheckoutExpiredDto> sessionsList){
-    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, MainOrderModel.class, collectionName);
+    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, MainOrderModel.class, collection);
     
     sessionsList.forEach(entity -> {
       Query query = Query.query(Criteria.where("_id").is(entity.id()));
@@ -90,7 +90,7 @@ public class OrdersService {
   public ResponseEntity<Object> findAllByIdAndRemove(List<String> id){
     try {
       Query query = Query.query(Criteria.where("_id").in(id));
-      List<MainOrderModel> removedDocument = mongoTemplate.findAllAndRemove(query, MainOrderModel.class, collectionName);
+      List<MainOrderModel> removedDocument = mongoTemplate.findAllAndRemove(query, MainOrderModel.class, collection);
 
       System.out.println(removedDocument.size());
       return ResponseEntity.ok(removedDocument);
@@ -101,13 +101,13 @@ public class OrdersService {
   }
 
   public MainOrderModel getOneById(String id){
-    MainOrderModel foundDoc = mongoTemplate.findById(id, MainOrderModel.class, collectionName);
+    MainOrderModel foundDoc = mongoTemplate.findById(id, MainOrderModel.class, collection);
 
     return foundDoc;
   }
 
   public List<MainOrderModel> getAll(){
-    List<MainOrderModel> docList = mongoTemplate.findAll(MainOrderModel.class, collectionName);
+    List<MainOrderModel> docList = mongoTemplate.findAll(MainOrderModel.class, collection);
 
     return docList;
   }
@@ -115,7 +115,7 @@ public class OrdersService {
   public List<MainOrderModel> getAllBySelector(String selector, List<String> status){
     Query query = Query.query(Criteria.where(selector).in(status));
 
-    List<MainOrderModel> foundDocs = mongoTemplate.find(query, MainOrderModel.class, collectionName);
+    List<MainOrderModel> foundDocs = mongoTemplate.find(query, MainOrderModel.class, collection);
 
     return foundDocs;
   }

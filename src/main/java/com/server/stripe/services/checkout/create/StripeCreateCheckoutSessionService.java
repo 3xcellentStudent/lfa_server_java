@@ -1,9 +1,7 @@
 package com.server.stripe.services.checkout.create;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -16,16 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
-import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
-import com.server.stripe.dto.checkout.create.request.StripeCreateCheckoutSessionDto;
 
 @Service
 public class StripeCreateCheckoutSessionService {
@@ -46,50 +41,21 @@ public class StripeCreateCheckoutSessionService {
   private Logger logger = LoggerFactory.getLogger(StripeCreateCheckoutSessionService.class);
   private HttpClient httpClient = HttpClient.newHttpClient();
   
-  private final String encodingType = "UTF-8";
+  // private final String encodingType = "UTF-8";
 
-  // public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> body){
   @Transactional
   public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
-    try {
-      String returnUrl = URLEncoder.encode(stripeCheckoutReturnUrl, encodingType);
-      // List<StripeCreateCheckoutSessionDto> afterDtoArray = body.stream()
-      // .map(entity -> {
-      //   ProductVariationModel variation = mongoDbMainService
-      //   .findById(entity.productId(), ProductVariationModel.class, entity.collectionName());
+    String stringRequestBody = createRequest(validatedArray);
 
-      //   if(variation == null){
-      //     return null;
-      //   } else {
-      //     logger.info("Product variation document with ID: " + entity.productId() + " was found !");
-  
-          // Integer stockAmountAvailable = variation.getStockInfo().getStockAmountAvailable() - entity.quantity();
-          // Integer stockAmountReserved = variation.getStockInfo().getStockAmountReserved() + entity.quantity();
-  
-      //     // Updating database inventory.
-      //     updateDatabase(variation.getId(), variation.getCollectionName(), stockAmountAvailable, stockAmountReserved);
-  
-      //     return new StripeCreateCheckoutSessionDto(entity, variation);
-      //   }
-      // })
-      // .filter(entity -> entity != null).toList();
+    productVariationService.bulkOpsInventoryUpdate(cart);
+    
+    ResponseEntity<Object> response = sendRequest(stringRequestBody);
 
-      String stringRequestBody = createRequest(validatedArray, returnUrl);
-
-      productVariationService.bulkOpsInventoryUpdate(cart);
-      
-      ResponseEntity<Object> response = sendRequest(stringRequestBody);
-
-      return response;
-    } catch(UnsupportedEncodingException ex){
-      String message = "The named encoding type " + "\"" + encodingType + "\"" + " is not supported !";
-      logger.error(message, ex);
-      throw new RuntimeException(message, ex);
-    }
+    return response;
   }
 
   // private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
-  private String createRequest(List<ProductVariationModel> validatedArray, String returnUrl){
+  private String createRequest(List<ProductVariationModel> validatedArray){
     
     StringBuilder requestBody = new StringBuilder();
     
@@ -100,7 +66,7 @@ public class StripeCreateCheckoutSessionService {
     requestBody.append("&ui_mode=embedded");
     requestBody.append("&invoice_creation[enabled]=true");
     requestBody.append("&shipping_address_collection[allowed_countries][]=CA");
-    requestBody.append("&return_url=").append(returnUrl);
+    requestBody.append("&return_url=").append(URI.create(stripeCheckoutReturnUrl));
     requestBody.append("&expires_at=").append(expireTime.getEpochSecond());
     
     for(int i = 0; i < validatedArray.size(); i++){
@@ -127,9 +93,7 @@ public class StripeCreateCheckoutSessionService {
 
       CompletableFuture<HttpResponse<String>> httpResponse = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
-      String response = httpResponse.thenApply(HttpResponse::body).join();
-
-      // System.out.println("Response: " + response);
+      String response = httpResponse.thenApply(then -> then.body()).join();
 
       return ResponseEntity.ok(response);
     } catch (URISyntaxException error) {
@@ -138,14 +102,6 @@ public class StripeCreateCheckoutSessionService {
       return ResponseEntity.badRequest().body(message);
     }
   }
-
-  // private ResponseEntity<Object> updateDatabase(String id,  String collectionName, Integer stockAmountAvailable, Integer stockAmountReserved){
-  //   Update update = new Update();
-  //   update.set(stockAmountAvailableKey, stockAmountAvailable);
-  //   update.set(stockAmountReservedKey, stockAmountReserved);
-
-  //   return mongoDbMainService.updateOneById(id, collectionName, update, ProductVariationModel.class);
-  // }
 
   public StripeCreateCheckoutSessionService(){}
 

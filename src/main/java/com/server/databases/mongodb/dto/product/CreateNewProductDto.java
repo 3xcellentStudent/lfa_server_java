@@ -7,13 +7,12 @@ import com.server.databases.mongodb.models.product.ProductParentModel.MediaConte
 import com.server.databases.mongodb.models.product.ProductParentModel.Specifications;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record CreateNewProductDto(
   @NotBlank String productName,
-  @NotNull Descriptions descriptions,
-  @NotNull Specifications specifications,
-  @NotNull List<MediaContent> mediaContent,
+  Descriptions descriptions,
+  Specifications specifications,
+  List<MediaContent> mediaContent,
   @NotBlank String category
 ){
   // @JsonProperty private @NotBlank String productName;

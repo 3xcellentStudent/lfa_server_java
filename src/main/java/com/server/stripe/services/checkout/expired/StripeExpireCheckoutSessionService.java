@@ -56,16 +56,6 @@ public class StripeExpireCheckoutSessionService {
     }
   }
 
-  // @Scheduled(fixedRate = 1800000)
-  // public void getAllOpenOrder(){
-  //   List<MainOrderModel> matchedOrders = ordersService.getAllBySelector("status", List.of("open"));
-  //   System.out.println("ORDERS:" + matchedOrders.size());
-
-  //   if(matchedOrders.size() > 0){
-  //     getMulti(matchedOrders.stream().map(order -> order.getCheckoutId()).toList());
-  //   }
-  // }
-
   public StripeCheckoutExpiredDto getOne(String id){
     try {
       HttpRequest request = createRequest(id);
