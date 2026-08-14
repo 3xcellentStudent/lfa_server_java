@@ -24,7 +24,6 @@ import com.server.common.api.exceptions.api.data.json.runtime.ExternalApiRespons
 import com.server.common.api.exceptions.mongo.ResourceNotFoundException;
 import com.server.common.api.exceptions.validation.cart.CartValidationException;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 

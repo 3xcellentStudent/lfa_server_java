@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,9 +36,13 @@ import jakarta.validation.constraints.NotEmpty;
 @Validated
 public class ProductVariationController {
   
-  @Value("${databases.mongodb.collections.product.variation}")
-  private String collection;
+  @Value("${databases.mongodb.collections.products.variations}")
+  private String variationCollection;
+  @Value("${databases.mongodb.collections.products.main}")
+  private String productCollection;
 
+  @Autowired
+  private MongoTemplate mongoTemplate;
   @Autowired
   private MongoDbMainService mainService;
   @Autowired
@@ -47,34 +54,26 @@ public class ProductVariationController {
   }
 
   @GetMapping("/get/parent-id")
-  public ResponseEntity<Object> getByParentId(
-    @RequestParam @NotBlank String id
-    // @RequestParam(required = true) @NotBlank @Pattern(regexp = ".*_.*", message = "collectionName must contain \"_\"") String collectionName
-  ){
-    List<ProductVariationModel> variations = mainService
-    .findManyById("parentId", id, ProductVariationModel.class, collection);
-
-    if(variations.isEmpty()){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(variations);
+  public ResponseEntity<Object> getByParentId(@RequestParam @NotBlank String parentId){
+    Query existQuery = Query.query(Criteria.where("_id").is(parentId));
+    boolean isExists = mongoTemplate.exists(existQuery, ProductVariationModel.class, productCollection);
+    
+    if(!isExists){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document with ID: \"" + parentId + "\" was not found");
     }
+    List<ProductVariationModel> variations = mainService.findManyById("parentId", parentId, ProductVariationModel.class, variationCollection);
     return ResponseEntity.ok(variations);
   }
 
   @GetMapping("/get/id")
-  public ResponseEntity<Object> getManyById(@RequestParam @NotEmpty List<String> id){
-    List<ProductVariationModel> variations = mainService
-    .findManyById("id", id, ProductVariationModel.class, collection);
-
-    if(variations.isEmpty()){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(variations);
-    }
-
+  public ResponseEntity<Object> getManyById(@RequestParam @NotEmpty List<String> ids){
+    List<ProductVariationModel> variations = mainService.findManyById("id", ids, ProductVariationModel.class, variationCollection);
     return ResponseEntity.ok(variations);
   }
 
   @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
-    ProductVariationModel modifiedDoc = mainService.updateOneById(body, ProductVariationModel.class, collection);
+    ProductVariationModel modifiedDoc = mainService.updateOneById(body, ProductVariationModel.class, variationCollection);
 
     if(modifiedDoc == null){
       String message = "Document with ID: \"" + body.id() + "\" was not found";
@@ -91,7 +90,7 @@ public class ProductVariationController {
   
   @DeleteMapping("/clear")
   public ResponseEntity<Object> clearCollection(){
-    return ResponseEntity.ok(mainService.clearCollection(ProductVariationModel.class, collection));
+    return ResponseEntity.ok(mainService.clearCollection(ProductVariationModel.class, variationCollection));
   }
 
 }

@@ -11,20 +11,19 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
 import com.server.common.types.stripe.orders.OrdersProcessingType;
 import com.server.common.types.stripe.orders.OrdersStatusesType;
 import com.server.databases.mongodb.models.orders.MainOrderModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.orders.OrdersService;
+import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 import com.server.stripe.dto.checkout.expired.StripeCheckoutExpiredDto;
 import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 import com.server.stripe.services.checkout.create.StripeCreateCheckoutSessionService;
 import com.server.stripe.services.checkout.expired.StripeExpireCheckoutSessionService;
-import com.server.stripe.services.coordinator.helper.MongoDbCartValidator;
+import com.server.stripe.services.coordinator.validator.MongoDbCartValidator;
 
 @Service
 public class CheckoutSessionCoordinator {
@@ -38,57 +37,69 @@ public class CheckoutSessionCoordinator {
   @Autowired
   private OrdersService ordersService;
   @Autowired
-  private ObjectMapper objectMapper;
-  @Autowired
   private StripeExpireCheckoutSessionService expireCheckoutService;
+  @Autowired
+  private ProductVariationService productVariationService;
 
   @Transactional
   public ResponseEntity<Object> createSession(List<CheckoutCreateSessionClientRequestDto> cart){
     List<ProductVariationModel> validatedArray = cartValidatorService.validator(cart);
 
-    try {
-      ResponseEntity<Object> response = createSessionService.create(cart, validatedArray);
-  
-      StripeCheckoutCompletedDto sessionDto = objectMapper.readValue(response.getBody().toString(), StripeCheckoutCompletedDto.class);
-  
-      MainOrderModel orderDataDto = new MainOrderModel(
-        sessionDto.id(), 
-        sessionDto.invoice(), 
-        sessionDto.status(), 
-        OrdersProcessingType.CREATED.name(), 
-        cart, 
-        sessionDto.expiresAt(), 
-        sessionDto.created()
-      );
-      
-      ordersService.create(orderDataDto);
-  
-      Map<String, String> data = new HashMap<>();
-      data.put("clientSecret", sessionDto.clientSecret());
-      
-      return ResponseEntity.ok(data);
-    } catch(JsonProcessingException ex){
-      throw new RuntimeException("Stripe JSON parsing failed !", ex);
+    ResponseEntity<StripeCheckoutCompletedDto> stripeResponse = createSessionService.create(cart, validatedArray);
+
+    if(!stripeResponse.getStatusCode().is2xxSuccessful()){
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error occurred while sending request to Stripe !");
     }
+    
+    productVariationService.bulkOpsInventoryUpdate(cart);
+    
+    StripeCheckoutCompletedDto sessionDto = stripeResponse.getBody();
+    
+    // MainOrderModel orderDataDto = new MainOrderModel(
+      //   sessionDto.id(), 
+      //   sessionDto.invoice(), 
+      //   sessionDto.status(), 
+      //   OrdersProcessingType.CREATED.name(), 
+      //   cart, 
+      //   sessionDto.expiresAt(), 
+      //   sessionDto.created()
+      // );
+    MainOrderModel orderDataDto = new MainOrderModel();
+    orderDataDto.setCheckoutId(sessionDto.id());
+    orderDataDto.setInvoiceId(sessionDto.invoice());
+    orderDataDto.setStatus(OrdersStatusesType.valueOf(sessionDto.status().toUpperCase()).name());
+    orderDataDto.setProcessingStatus(OrdersProcessingType.CREATED.name());
+    orderDataDto.setProductList(cart);
+    orderDataDto.setCreated(sessionDto.created());
+    orderDataDto.setExpiresAt(sessionDto.expiresAt());
+      
+    ordersService.create(orderDataDto);
+
+    Map<String, String> data = new HashMap<>();
+    data.put("clientSecret", sessionDto.clientSecret());
+    
+    return ResponseEntity.ok(data);
   }
 
   public ResponseEntity<Object> updateExpiredSession(StripeCheckoutExpiredDto object){
-    StripeCheckoutExpiredDto stripeResponse = expireSessionService.getOne(object.id());
+    ResponseEntity<StripeCheckoutExpiredDto> stripeResponse = expireSessionService.getOne(object.id());
+
+    System.out.println(stripeResponse.getStatusCode());
 
     if(stripeResponse == null){
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong while processing Stripe retrieve expired session !");
     }
 
     OrdersFindOneAndModifyDto dto = new OrdersFindOneAndModifyDto(
-      object.id(), null, OrdersStatusesType.valueOf(object.status()).name(), OrdersProcessingType.CANCELLED.name()
+      object.id(), null, OrdersStatusesType.valueOf(object.status().toUpperCase()).name(), OrdersProcessingType.CANCELLED.name()
     );
 
-    return ordersService.updateOneById(dto, OrdersStatusesType.valueOf(object.status()).name());
+    return ordersService.updateOneById(dto, OrdersStatusesType.valueOf(object.status().toUpperCase()).name());
   }
 
   @Scheduled(fixedRate = 1800000)
   public void scheduledUpdate(){
-    List<MainOrderModel> matchedOrders = ordersService.getAllBySelector("status", List.of("open"));
+    List<MainOrderModel> matchedOrders = ordersService.getAllBySelector("status", List.of(OrdersStatusesType.OPEN.name()));
     System.out.println("ORDERS:" + matchedOrders.size());
 
     if(matchedOrders.size() == 0){

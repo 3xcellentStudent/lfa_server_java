@@ -1,5 +1,6 @@
 package com.server.databases.mongodb.services;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,13 +22,11 @@ public class MongoDbMainService {
   private MongoTemplate mongoTemplate;
 
   public <T> T updateOneById(UpdateOneByIdDto body, Class<T> someClass, String collection){
-    long timestamp = System.currentTimeMillis();
-    
-    Query query = Query.query(Criteria.where("id").is(body.id()));
+    Query query = Query.query(Criteria.where("_id").is(body.id()));
     
     Update update = new Update();
     update.set(body.path(), body.data());
-    update.set("updatedAt", timestamp);
+    update.set("updatedAt", Instant.now());
     
     FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true);
 
@@ -47,7 +46,7 @@ public class MongoDbMainService {
   }
 
   public <T> List<T> deleteManyById(List<String> ids, Class<T> someClass, String collection){
-    Query query = Query.query(Criteria.where("id").in(ids));
+    Query query = Query.query(Criteria.where("_id").in(ids));
 
     List<T> removedObjects = mongoTemplate.findAllAndRemove(query, someClass, collection);
 

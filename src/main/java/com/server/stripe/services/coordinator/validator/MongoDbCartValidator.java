@@ -1,4 +1,4 @@
-package com.server.stripe.services.coordinator.helper;
+package com.server.stripe.services.coordinator.validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,41 +21,12 @@ import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientR
 @Service
 public class MongoDbCartValidator {
 
-  @Value("${databases.mongodb.collections.product.variation}")
-  private String variationCollection;
+  @Value("${databases.mongodb.collections.products.variations}")
+  private String collection;
 
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  // public List<ProductVariationModel> validator(List<CheckoutCreateSessionClientRequestDto> cart){
-  //   ArrayList<CartValidationErrorEntityDto> errorsArray = new ArrayList<>();
-  //   ArrayList<ProductVariationModel> allFoundProductsArray = new ArrayList<>();
-
-  //   Map<String, List<CheckoutCreateSessionClientRequestDto>> cartMapByCollectionName = cart.stream()
-  //   .collect(Collectors.groupingBy(entity -> entity.collectionName()));
-
-  //   cartMapByCollectionName.forEach((collectionName, items) -> {
-  //     List<String> ids = items.stream().map(entity -> entity.productId()).toList();
-
-  //     Query query = Query.query(Criteria.where("_id").in(ids));
-
-  //     List<ProductVariationModel> foundProducts = mongoTemplate.find(query, ProductVariationModel.class, collectionName);
-
-  //     allFoundProductsArray.addAll(foundProducts);
-  //   });
-    
-  //   Map<String, ProductVariationModel> allFoundProductsMap = allFoundProductsArray.stream()
-  //   .collect(Collectors.toMap(ProductVariationModel::getId, product -> product));
-
-  //   cartValidation(cart, allFoundProductsMap, errorsArray);
-
-  //   if(errorsArray.size() > 0){
-  //     throw new CartValidationException(errorsArray);
-  //   } else {
-  //     return allFoundProductsArray;
-  //   }
-  // }
-
   public List<ProductVariationModel> validator(List<CheckoutCreateSessionClientRequestDto> cart){
     ArrayList<CartValidationErrorEntityDto> errorsArray = new ArrayList<>();
 
@@ -63,7 +34,7 @@ public class MongoDbCartValidator {
 
     Query query = Query.query(Criteria.where("_id").in(ids));
 
-    List<ProductVariationModel> foundProducts = mongoTemplate.find(query, ProductVariationModel.class, variationCollection);
+    List<ProductVariationModel> foundProducts = mongoTemplate.find(query, ProductVariationModel.class, collection);
 
     Map<String, ProductVariationModel> mapProducts = foundProducts.stream()
     .collect(Collectors.toMap(product -> product.getId(), product -> product));

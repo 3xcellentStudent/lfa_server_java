@@ -1,6 +1,5 @@
 package com.server.databases.mongodb.controllers.reviews;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mongodb.client.result.DeleteResult;
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
+import com.server.databases.mongodb.models.product.parent.ProductParentModel;
 import com.server.databases.mongodb.models.reviews.ReviewsModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.reviews.ReviewsService;
 
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -40,6 +38,8 @@ public class ReviewController {
 
   @Value("${databases.mongodb.collections.reviews}")
   private String collection;
+    @Value("${databases.mongodb.collections.products.main}")
+  private String productCollection;
 
   @Autowired
   private ReviewsService reviewsService;
@@ -58,55 +58,60 @@ public class ReviewController {
     ReviewsModel mofidiedDoc = mainService.updateOneById(body, ReviewsModel.class, collection);
 
     if(mofidiedDoc == null){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mofidiedDoc);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document with ID \" " + body.id() + " \" was not found !");
     }
     return ResponseEntity.ok(mofidiedDoc);
   }
   
-  @GetMapping("/get")
-  public ResponseEntity<Object> findManyById(@RequestParam(required = false) @Nullable List<String> id){
-    List<ReviewsModel> docsList = id == null || id.isEmpty() 
-    ? mainService.findAll(ReviewsModel.class, collection) 
-    : mainService.findManyById("id", id, ReviewsModel.class, collection);
-
-    if(docsList.isEmpty()){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(docsList);
-    }
+  @GetMapping("/get/id")
+  public ResponseEntity<Object> findManyById(@RequestParam @NotEmpty List<String> ids){
+    List<ReviewsModel> docsList = mainService.findManyById("_id", ids, ReviewsModel.class, collection);
     return ResponseEntity.ok(docsList);
+  }
+
+  @GetMapping("/get/parent-id")
+  public ResponseEntity<Object> findManyByParentId(@RequestParam @NotBlank String parentId){
+    Query query = Query.query(Criteria.where("_id").is(parentId));
+    boolean isExists = mongoTemplate.exists(query, ProductParentModel.class, productCollection);
+    if(!isExists){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Document with ID \"" + parentId + "\" does not exist !");
+    }
+    List<ReviewsModel> docslist =  mainService.findManyById("parentId", parentId, ReviewsModel.class, collection);
+
+    return ResponseEntity.ok(docslist);
   }
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteManyById(@RequestBody @NotEmpty List<String> ids){
-    List<ReviewsModel> docsList = mainService.deleteManyById(ids, ReviewsModel.class, collection);
+    List<ReviewsModel> removedDocList = mainService.deleteManyById(ids, ReviewsModel.class, collection);
+    // if(docsList.isEmpty()){
+    //   return ResponseEntity.status(HttpStatus.NOT_FOUND).body(docsList);
+    // }
 
-    if(docsList.isEmpty()){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(docsList);
-    }
-
-    return ResponseEntity.ok(docsList);
+    return ResponseEntity.ok(removedDocList);
   }
 
   @DeleteMapping("/delete/id")
   public ResponseEntity<Object> deleteOneById(@RequestBody @NotBlank String id){
-    Query query = Query.query(Criteria.where("id").is(id));
-    DeleteResult result = mongoTemplate.remove(query, collection);
+    Query query = Query.query(Criteria.where("_id").is(id));
+    ReviewsModel removedDoc = mongoTemplate.findAndRemove(query, ReviewsModel.class, collection);
 
-    return ResponseEntity.ok(new HashMap<>().put("count", result.getDeletedCount()));
+    return ResponseEntity.ok(removedDoc);
   }
 
   @DeleteMapping("/delete/parent-id")
-  public ResponseEntity<Object> deletemanyByParentId(@RequestBody @NotEmpty List<String> id){
-    Query query = Query.query(Criteria.where("id").in(id));
-    DeleteResult result = mongoTemplate.remove(query, collection);
+  public ResponseEntity<Object> deletemanyByParentId(@RequestBody @NotBlank String parentId){
+    Query query = Query.query(Criteria.where("parentId").is(parentId));
+    List<ReviewsModel> removedDocList = mongoTemplate.findAllAndRemove(query, ReviewsModel.class, collection);
 
-    return ResponseEntity.ok(new HashMap<>().put("count", result.getDeletedCount()));
+    return ResponseEntity.ok(removedDocList);
   }
 
   @DeleteMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(){
-    Long result = mainService.clearCollection(ReviewsModel.class, collection);
+    Long deletedCount = mainService.clearCollection(ReviewsModel.class, collection);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(deletedCount);
   }
 
 }

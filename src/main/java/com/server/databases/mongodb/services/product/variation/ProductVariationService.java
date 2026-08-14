@@ -25,22 +25,22 @@ public class ProductVariationService {
 
   private Logger logger = LoggerFactory.getLogger(ProductVariationService.class);
 
-  @Value("${databases.mongodb.collections.product.variation}")
-  private String collection;
+  @Value("${databases.mongodb.collections.products.variations}")
+  private String variationsCollection;
 
   @Autowired
   private MongoTemplate mongoTemplate;
   
   public ResponseEntity<Object> createByParentId(CreateVariationByParentId body){
-    ProductVariationModel model = new ProductVariationModel(body, collection);
+    ProductVariationModel model = new ProductVariationModel(body);
 
-    ProductVariationModel insertedDocument = mongoTemplate.insert(model, collection);
+    ProductVariationModel insertedDocument = mongoTemplate.insert(model, variationsCollection);
     
     return ResponseEntity.ok(insertedDocument);
   }
 
   public Integer bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
-    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, collection);
+    BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, variationsCollection);
     
     cart.forEach(entity -> {
       Query query = Query.query(Criteria.where("_id").is(entity.productId()));
@@ -53,7 +53,7 @@ public class ProductVariationService {
     });
 
     BulkWriteResult result = bulkOps.execute();
-    logger.info("The result of collection " + collection + ": " + result);
+    logger.info("The result of collection " + variationsCollection + ": " + result);
     
     return result.getModifiedCount();
   }
@@ -62,7 +62,7 @@ public class ProductVariationService {
     Query deletedVariationsQuery = Query.query(Criteria.where("id").in(ids));
 
     List<ProductVariationModel> deletedVariationsEntities = mongoTemplate
-    .findAllAndRemove(deletedVariationsQuery, ProductVariationModel.class, collection);
+    .findAllAndRemove(deletedVariationsQuery, ProductVariationModel.class, variationsCollection);
 
     return ResponseEntity.ok(deletedVariationsEntities);
   }

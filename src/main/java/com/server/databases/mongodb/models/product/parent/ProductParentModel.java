@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.models.product;
+package com.server.databases.mongodb.models.product.parent;
 
 import java.time.Instant;
 import java.util.ArrayList;

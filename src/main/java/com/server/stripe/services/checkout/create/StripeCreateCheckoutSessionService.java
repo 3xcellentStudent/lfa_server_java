@@ -1,26 +1,24 @@
 package com.server.stripe.services.checkout.create;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
-import com.server.databases.mongodb.services.product.variation.ProductVariationService;
+// import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
+import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 
 @Service
 public class StripeCreateCheckoutSessionService {
@@ -35,23 +33,37 @@ public class StripeCreateCheckoutSessionService {
 
   // @Autowired
   // private MongoDbMainService mongoDbMainService;
-  @Autowired
-  private ProductVariationService productVariationService;
+  // @Autowired
+  // private ProductVariationService productVariationService;
 
-  private Logger logger = LoggerFactory.getLogger(StripeCreateCheckoutSessionService.class);
-  private HttpClient httpClient = HttpClient.newHttpClient();
+  private final RestClient restClient;
+
+  public StripeCreateCheckoutSessionService(){
+    HttpClient httpClient = HttpClient.newBuilder()
+    .connectTimeout(Duration.ofSeconds(2))
+    .build();
+
+    JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+    requestFactory.setReadTimeout(Duration.ofSeconds(5));
+
+    this.restClient = RestClient.builder()
+    .requestFactory(requestFactory)
+    .build();
+  }
   
   // private final String encodingType = "UTF-8";
 
   @Transactional
-  public ResponseEntity<Object> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
+  public ResponseEntity<StripeCheckoutCompletedDto> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
     String stringRequestBody = createRequest(validatedArray);
 
-    productVariationService.bulkOpsInventoryUpdate(cart);
+    // productVariationService.bulkOpsInventoryUpdate(cart);
     
-    ResponseEntity<Object> response = sendRequest(stringRequestBody);
+    ResponseEntity<StripeCheckoutCompletedDto> response = sendRequest(stringRequestBody);
 
     return response;
+
+    // StripeCheckoutCompletedDto sessionDto = objectMapper.readValue(response, StripeCheckoutCompletedDto.class);
   }
 
   // private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
@@ -81,28 +93,29 @@ public class StripeCreateCheckoutSessionService {
     return requestBody.toString();
   }
 
-  private ResponseEntity<Object> sendRequest(String stringRequestBody){
-    try {
-      HttpRequest request = HttpRequest.newBuilder()
-      .uri(new URI(stripeCreateCheckoutEndpoint))
-      .header("Authorization", "Bearer " + tokenSecret)
-      .header("Stripe-Version", stripeApiVersion)
-      .header("Content-Type", "application/x-www-form-urlencoded")
-      .POST(HttpRequest.BodyPublishers.ofString(stringRequestBody))
-      .build();
+  private ResponseEntity<StripeCheckoutCompletedDto> sendRequest(String body){
+    return restClient.post()
+    .uri(stripeCreateCheckoutEndpoint)
+    .header("Authorization", "Bearer " + tokenSecret)
+    .header("Stripe-Version", stripeApiVersion)
+    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+    .body(body)
+    .retrieve()
+    .toEntity(StripeCheckoutCompletedDto.class);
 
-      CompletableFuture<HttpResponse<String>> httpResponse = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+      // HttpRequest request = HttpRequest.newBuilder()
+      // .uri(URI.create(stripeCreateCheckoutEndpoint))
+      // .header("Authorization", "Bearer " + tokenSecret)
+      // .header("Stripe-Version", stripeApiVersion)
+      // .header("Content-Type", "application/x-www-form-urlencoded")
+      // .POST(HttpRequest.BodyPublishers.ofString(stringRequestBody))
+      // .build();
 
-      String response = httpResponse.thenApply(then -> then.body()).join();
+      // CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
 
-      return ResponseEntity.ok(response);
-    } catch (URISyntaxException error) {
-      String message = "Given string could not be parsed as a URI reference !";
-      logger.error(message, error);
-      return ResponseEntity.badRequest().body(message);
-    }
+      // String response = future.thenApply(data -> data.body()).join();
+
+      // return response;
   }
-
-  public StripeCreateCheckoutSessionService(){}
 
 }

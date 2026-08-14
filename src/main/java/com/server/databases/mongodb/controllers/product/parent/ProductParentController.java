@@ -1,4 +1,4 @@
-package com.server.databases.mongodb.controllers.product;
+package com.server.databases.mongodb.controllers.product.parent;
 
 import java.util.List;
 
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.databases.mongodb.dto.main.UpdateOneByIdDto;
 import com.server.databases.mongodb.dto.product.CreateNewProductDto;
-import com.server.databases.mongodb.models.product.ProductParentModel;
+import com.server.databases.mongodb.models.product.parent.ProductParentModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.MongoDbMainService;
-import com.server.databases.mongodb.services.product.ProductService;
+import com.server.databases.mongodb.services.product.parent.ProductParentService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,17 +34,17 @@ import jakarta.validation.constraints.NotEmpty;
 @RequestMapping("/api/mongodb/product")
 @CrossOrigin("*")
 @Validated
-public class ProductController {
+public class ProductParentController {
 
-  @Value("${databases.mongodb.collections.product.main}")
+  @Value("${databases.mongodb.collections.products.main}")
   private String collection;
-  @Value("${databases.mongodb.collections.product.variation}")
+  @Value("${databases.mongodb.collections.products.variations}")
   private String variationCollection;
 
-  private final Logger logger = LoggerFactory.getLogger(ProductController.class);
+  private final Logger logger = LoggerFactory.getLogger(ProductParentController.class);
 
   @Autowired
-  private ProductService productService;
+  private ProductParentService productService;
   @Autowired
   private MongoDbMainService mainService;
 
@@ -66,29 +66,19 @@ public class ProductController {
   }
 
   @GetMapping("/get")
-  public ResponseEntity<Object> findAll(@RequestParam(required = false)  List<String> ids){
-    if(ids == null || ids.isEmpty()){
-      List<ProductParentModel> documents = mainService
-      .findAll(ProductParentModel.class, collection);
-
-      if(documents.isEmpty()){
-        return ResponseEntity.status(404).body(documents);
-      } else {
-        return ResponseEntity.ok(documents);
-      }
-    } else {
-      List<ProductParentModel> documents = mainService
-      .findManyById("id", ids, ProductParentModel.class, collection);
-
-      if(documents.isEmpty()){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(documents);
-      }
-      return ResponseEntity.ok(documents);
-    }
+  public ResponseEntity<Object> findAll(){
+    List<ProductParentModel> documents = mainService.findAll(ProductParentModel.class, collection);
+    return ResponseEntity.ok(documents);
   }
 
-  @GetMapping("/get/recursive")
-  public ResponseEntity<Object> findOneByIdRecursive(@RequestParam @NotBlank String id){
+  @GetMapping("/get/id")
+  public ResponseEntity<Object> findManyById(@RequestParam @NotEmpty List<String> ids){
+    List<ProductParentModel> documentsList = mainService.findManyById("id", ids, ProductParentModel.class, collection);
+    return ResponseEntity.ok(documentsList);
+  }
+
+  @GetMapping("/get/cascade/id")
+  public ResponseEntity<Object> findOneByIdCascade(@RequestParam @NotBlank String id){
     ProductParentModel parentDoc = mainService.findById(id, ProductParentModel.class, collection);
 
     if(parentDoc == null){
@@ -105,9 +95,9 @@ public class ProductController {
     }
   }
 
-  @GetMapping("/get/recursive/many")
-  public ResponseEntity<Object> findManyByIdRecursive(@RequestParam @NotEmpty List<String> id){
-    List<ProductParentModel> nonNullDocsList = productService.findManyRecursiveById(id);
+  @GetMapping("/get/cascade/many")
+  public ResponseEntity<Object> findManyByIdCascade(@RequestParam @NotEmpty List<String> ids){
+    List<ProductParentModel> nonNullDocsList = productService.findManyCascadeById(ids);
 
     if(nonNullDocsList.isEmpty()){
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(nonNullDocsList);
@@ -119,17 +109,13 @@ public class ProductController {
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteAllById(@RequestBody @NotEmpty List<String> ids){
     List<ProductParentModel> removedDocs = mainService.deleteManyById(ids, ProductParentModel.class, collection);
-
-    if(removedDocs.isEmpty()){
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(removedDocs);
-    }
     return ResponseEntity.ok(removedDocs);
   }
 
-  @DeleteMapping("/delete/recursive")
-  public ResponseEntity<Object> deleteAllByIdRecursive(@RequestBody @NotEmpty List<String> ids){
-    return productService.deleteRecursiveById(ids, collection);
-  }
+  // @DeleteMapping("/delete/cascade")
+  // public ResponseEntity<Object> deleteAllByIdCascade(@RequestBody @NotEmpty List<String> ids){
+  //   return productService.deleteCascadeById(ids, collection);
+  // }
 
   @DeleteMapping("/clear-col")
   public ResponseEntity<Object> clearCollection(){
