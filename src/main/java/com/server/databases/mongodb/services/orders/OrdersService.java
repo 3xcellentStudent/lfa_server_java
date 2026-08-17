@@ -56,7 +56,7 @@ public class OrdersService {
     .findAndModify(query, update, options, MainOrderModel.class, ordersCollection);
 
     if(updatedDoc != null){
-      logger.info("Expired document ID \"" + body.checkoutId() + "\" was successfully updated !");
+      logger.info("Document ID \"" + body.checkoutId() + "\" was successfully updated !");
       return ResponseEntity.ok(updatedDoc);
     } else {
       String message = "Document ID: " + body.checkoutId() + " was not found !";

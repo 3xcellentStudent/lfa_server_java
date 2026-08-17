@@ -87,7 +87,7 @@ public class StripeCreateCheckoutSessionService {
       requestBody.append("&line_items[" + i + "][price_data][currency]=" + entity.getStockInfo().getCurrency());
       requestBody.append("&line_items[" + i + "][price_data][product_data][name]=" + entity.getVariationName());
       requestBody.append("&line_items[" + i + "][price_data][unit_amount]=" + entity.getStockInfo().getPriceInCents());
-      requestBody.append("&line_items[" + i + "][quantity]=" + entity.getStockInfo().getStockAmountAvailable());
+      requestBody.append("&line_items[" + i + "][quantity]=" + entity.getStockInfo().getAmountAvailable());
     }
 
     return requestBody.toString();

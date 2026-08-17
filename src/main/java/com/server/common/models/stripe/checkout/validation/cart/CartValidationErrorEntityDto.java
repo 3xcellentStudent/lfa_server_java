@@ -5,5 +5,5 @@ import org.springframework.data.annotation.Id;
 import com.server.common.types.stripe.checkout.validation.cart.CartValidationErrorType;
 
 public record CartValidationErrorEntityDto(
-  @Id String productId, int requestedQuantity, int availableQuantity, CartValidationErrorType errorType
+  @Id String id, int requestedQuantity, int availableQuantity, CartValidationErrorType errorType
 ){}

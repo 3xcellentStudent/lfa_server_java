@@ -63,9 +63,9 @@ public class ProductVariationModel {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class StockInfo {
-    private @Min(0) Integer stockAmountMax = 0;
-    private @Min(0) Integer stockAmountAvailable = 0;
-    private @Min(0) Integer stockAmountReserved = 0;
+    private @Min(0) Integer amountMax = 0;
+    private @Min(0) Integer amountAvailable = 0;
+    private @Min(0) Integer amountReserved = 0;
     private @Min(0) @NotNull Long priceInCents = 0L;
     private @NotBlank(message = "Cannot be blank") String currency = "CAD";
   }

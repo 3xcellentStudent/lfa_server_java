@@ -55,15 +55,6 @@ public class CheckoutSessionCoordinator {
     
     StripeCheckoutCompletedDto sessionDto = stripeResponse.getBody();
     
-    // MainOrderModel orderDataDto = new MainOrderModel(
-      //   sessionDto.id(), 
-      //   sessionDto.invoice(), 
-      //   sessionDto.status(), 
-      //   OrdersProcessingType.CREATED.name(), 
-      //   cart, 
-      //   sessionDto.expiresAt(), 
-      //   sessionDto.created()
-      // );
     MainOrderModel orderDataDto = new MainOrderModel();
     orderDataDto.setCheckoutId(sessionDto.id());
     orderDataDto.setInvoiceId(sessionDto.invoice());
@@ -84,9 +75,7 @@ public class CheckoutSessionCoordinator {
   public ResponseEntity<Object> updateExpiredSession(StripeCheckoutExpiredDto object){
     ResponseEntity<StripeCheckoutExpiredDto> stripeResponse = expireSessionService.getOne(object.id());
 
-    System.out.println(stripeResponse.getStatusCode());
-
-    if(stripeResponse == null){
+    if(!stripeResponse.getStatusCode().is2xxSuccessful()){
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong while processing Stripe retrieve expired session !");
     }
 

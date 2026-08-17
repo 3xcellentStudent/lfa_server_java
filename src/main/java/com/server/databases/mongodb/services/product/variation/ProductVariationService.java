@@ -43,7 +43,7 @@ public class ProductVariationService {
     BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, ProductVariationModel.class, variationsCollection);
     
     cart.forEach(entity -> {
-      Query query = Query.query(Criteria.where("_id").is(entity.productId()));
+      Query query = Query.query(Criteria.where("_id").is(entity.id()));
 
       Update update = new Update();
       update.inc("stockInfo.stockAmountAvailable", -entity.quantity());

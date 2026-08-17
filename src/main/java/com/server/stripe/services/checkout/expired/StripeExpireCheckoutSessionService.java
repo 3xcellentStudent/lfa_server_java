@@ -21,8 +21,8 @@ public class StripeExpireCheckoutSessionService {
 
   // private Logger logger = LoggerFactory.getLogger(StripeExpireCheckoutSessionService.class);
 
-  @Value("${stripe.routes.invoices.retrieve}")
-  private String stripeRetrieveInvoiceEndpoint;
+  @Value("${stripe.routes.checkout.retrieve}")
+  private String stripeRetrieveCkeckoutEndpoint;
   @Value("${stripe.token.secret}")
   private String tokenSecret;
   @Value("${stripe.api.version}")
@@ -67,7 +67,7 @@ public class StripeExpireCheckoutSessionService {
   public ResponseEntity<StripeCheckoutExpiredDto> getOne(String id){
     // try {
       ResponseEntity<StripeCheckoutExpiredDto> httpResponse = restClient.get()
-    .uri(URI.create(stripeRetrieveInvoiceEndpoint + "/" + id))
+    .uri(URI.create(stripeRetrieveCkeckoutEndpoint + "/" + id))
     .header("Authorization", "Bearer " + tokenSecret)
     .header("Stripe-Version", stripeApiVersion)
     .retrieve()
