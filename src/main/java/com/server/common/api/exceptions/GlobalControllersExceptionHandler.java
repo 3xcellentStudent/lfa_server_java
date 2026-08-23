@@ -24,7 +24,6 @@ import com.server.common.api.exceptions.api.data.json.runtime.ExternalApiRespons
 import com.server.common.api.exceptions.mongo.ResourceNotFoundException;
 import com.server.common.api.exceptions.validation.cart.CartValidationException;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
@@ -71,7 +70,7 @@ public class GlobalControllersExceptionHandler {
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex){
     String details = ex.getConstraintViolations().stream()
-    .map(ConstraintViolation::getMessage)
+    .map(err -> err.getMessage())
     .collect(Collectors.joining("; "));
 
     return buildResponse(HttpStatus.BAD_REQUEST, details, ex, null);

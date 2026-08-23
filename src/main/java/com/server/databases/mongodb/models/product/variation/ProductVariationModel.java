@@ -28,15 +28,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @Document
 public class ProductVariationModel {
-
-  @Id 
-  private String id;
-  
-  @Indexed 
-  @NotBlank 
-  private String parentId;
-  @Valid private StockInfo stockInfo;
-  @NotBlank private String variationName;
+ 
+  private @Id String id;
+  private @Indexed @NotBlank String parentId;
+  private @Valid  StockInfo stockInfo;
+  private @NotBlank String variationName;
   private VariationOptions variationOptions;
   private List<Image> image;
   private @CreatedDate Instant createdAt;

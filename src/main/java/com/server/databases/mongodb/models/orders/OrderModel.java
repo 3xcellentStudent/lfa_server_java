@@ -20,12 +20,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Document
-public class MainOrderModel{
+public class OrderModel{
   private @Id String checkoutId;
   private String invoiceId;
   private String status;
   private String processingStatus;
   private List<CheckoutCreateSessionClientRequestDto> productList;
   private @CreatedDate Instant expiresAt;
-  private @LastModifiedDate Instant created;
+  private @LastModifiedDate Instant createdAt;
 }

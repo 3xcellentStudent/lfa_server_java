@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -53,11 +58,15 @@ public class MongoDbMainService {
     return removedObjects;
   }
 
-  public <T> List<T> findAll(Class<T> someClass, String collection){
-    List<T> documents = mongoTemplate.findAll(someClass, collection).stream()
-    .filter(Objects::nonNull).toList();
+  public <T> Page<T> findByPage(int page, int validatedSize, String selector, Class<T> someClass, String collection){
+    Pageable pageable = PageRequest.of(page, validatedSize);
+    
+    Query query = new Query().with(pageable).with(Sort.by(Sort.Direction.DESC, selector));
 
-    return documents;
+    List<T> list = mongoTemplate.find(query, someClass, collection);
+    long total = mongoTemplate.count(new Query(), someClass, collection);
+
+    return new PageImpl<>(list, pageable, total);
   }
 
   public <T> List<T> findManyById(String selector, List<String> id, Class<T> someClass, String collection){
@@ -86,11 +95,6 @@ public class MongoDbMainService {
     DeleteResult result = mongoTemplate.remove(new Query(), someClass, collectionName);
 
     return result.getDeletedCount();
-  }
-
-  public boolean entityExistingInDatabase(String selector, Object entity, String collectionName){
-    Query query = Query.query(Criteria.where(selector).is(entity));
-    return mongoTemplate.exists(query, collectionName);
   }
 
 }

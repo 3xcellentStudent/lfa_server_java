@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.server.common.api.exceptions.validation.cart.CartValidationException;
 import com.server.common.models.stripe.checkout.validation.cart.CartValidationErrorEntityDto;
@@ -50,7 +49,6 @@ public class MongoDbCartValidator {
   //   }
   // }
 
-  @Transactional
   public List<ProductVariationModel> validator(List<CheckoutCreateSessionClientRequestDto> cart){
     ArrayList<CartValidationErrorEntityDto> errorsArray = new ArrayList<>();
 
@@ -83,23 +81,11 @@ public class MongoDbCartValidator {
     }).filter(Objects::nonNull).toList();
 
 
-  if(!errorsArray.isEmpty()){
-    throw new CartValidationException(errorsArray);
-  } else {
-    return correctProducts;
-  }
-
-
-    // Map<String, ProductVariationModel> mapProducts = foundProducts.stream()
-    // .collect(Collectors.toMap(product -> product.getId(), product -> product));
-
-    // cartValidation(cart, mapProducts, errorsArray);
-
-    // if(errorsArray.size() > 0){
-    //   throw new CartValidationException(errorsArray);
-    // } else {
-    //   return foundProducts;
-    // }
+    if(!errorsArray.isEmpty()){
+      throw new CartValidationException(errorsArray);
+    } else {
+      return correctProducts;
+    }
   }
 
   // private void cartValidation(

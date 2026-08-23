@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
 import com.server.common.types.stripe.orders.OrdersProcessingType;
 import com.server.common.types.stripe.orders.OrdersStatusesType;
-import com.server.databases.mongodb.models.orders.MainOrderModel;
+import com.server.databases.mongodb.models.orders.OrderModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
 import com.server.databases.mongodb.services.orders.OrdersService;
 import com.server.databases.mongodb.services.product.variation.ProductVariationService;
@@ -55,20 +55,22 @@ public class CheckoutSessionCoordinator {
     
     StripeCheckoutCompletedDto sessionDto = stripeResponse.getBody();
     
-    MainOrderModel orderDataDto = new MainOrderModel();
+    OrderModel orderDataDto = new OrderModel();
     orderDataDto.setCheckoutId(sessionDto.id());
     orderDataDto.setInvoiceId(sessionDto.invoice());
     orderDataDto.setStatus(OrdersStatusesType.valueOf(sessionDto.status().toUpperCase()).name());
     orderDataDto.setProcessingStatus(OrdersProcessingType.CREATED.name());
     orderDataDto.setProductList(cart);
-    orderDataDto.setCreated(sessionDto.created());
+    orderDataDto.setCreatedAt(sessionDto.created());
     orderDataDto.setExpiresAt(sessionDto.expiresAt());
       
-    ordersService.create(orderDataDto);
+    OrderModel orderRes = ordersService.create(orderDataDto);
+
+    System.out.println(orderRes.getCheckoutId());
 
     Map<String, String> data = new HashMap<>();
     data.put("clientSecret", sessionDto.clientSecret());
-    
+    // 
     return ResponseEntity.ok(data);
   }
 
@@ -83,12 +85,14 @@ public class CheckoutSessionCoordinator {
       object.id(), null, OrdersStatusesType.valueOf(object.status().toUpperCase()).name(), OrdersProcessingType.CANCELLED.name()
     );
 
-    return ordersService.updateOneById(dto, OrdersStatusesType.valueOf(object.status().toUpperCase()).name());
+    OrderModel updatedDoc = ordersService.updateOneById(dto, OrdersStatusesType.valueOf(object.status().toUpperCase()).name());
+
+    return ResponseEntity.ok(updatedDoc);
   }
 
   @Scheduled(fixedRate = 1800000)
   public void scheduledUpdate(){
-    List<MainOrderModel> matchedOrders = ordersService.getAllBySelector("status", List.of(OrdersStatusesType.OPEN.name()));
+    List<OrderModel> matchedOrders = ordersService.getOpenOrders("status", List.of(OrdersStatusesType.OPEN.name()));
     System.out.println("ORDERS:" + matchedOrders.size());
 
     if(matchedOrders.size() == 0){

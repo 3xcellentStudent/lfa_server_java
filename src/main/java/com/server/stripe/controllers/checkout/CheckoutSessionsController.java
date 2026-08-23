@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.common.dto.stripe.orders.OrdersFindOneAndModifyDto;
 import com.server.common.types.stripe.orders.OrdersProcessingType;
+import com.server.databases.mongodb.models.orders.OrderModel;
 import com.server.databases.mongodb.services.orders.OrdersService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 import com.server.stripe.dto.webhook.checkout.events.completed.StripeCheckoutEventDto;
@@ -45,8 +46,8 @@ public class CheckoutSessionsController {
       sessionModel.id(), sessionModel.invoice(), sessionModel.status(), OrdersProcessingType.CREATED.name()
     );
 
-    ResponseEntity<Object> response = ordersService.updateOneById(updateDto, OrderStatusTypes.OPEN.name());
-    return response;
+    OrderModel updatedDoc = ordersService.updateOneById(updateDto, OrderStatusTypes.OPEN.name());
+    return ResponseEntity.ok(updatedDoc);
   }
 
   @PostMapping("/webhook/expired")

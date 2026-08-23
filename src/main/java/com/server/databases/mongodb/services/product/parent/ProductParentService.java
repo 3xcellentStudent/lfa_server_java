@@ -1,8 +1,6 @@
 package com.server.databases.mongodb.services.product.parent;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.server.databases.mongodb.dto.product.CreateNewProductDto;
 import com.server.databases.mongodb.models.product.parent.ProductParentModel;
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
-import com.server.databases.mongodb.models.reviews.ReviewsModel;
 
 @Service
 public class ProductParentService {

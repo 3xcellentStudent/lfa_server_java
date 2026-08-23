@@ -12,11 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-
 import com.server.databases.mongodb.models.product.variation.ProductVariationModel;
-// import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 import com.server.stripe.dto.checkout.create.client.CheckoutCreateSessionClientRequestDto;
 import com.server.stripe.dto.webhook.checkout.events.completed.object.StripeCheckoutCompletedDto;
 
@@ -30,11 +27,6 @@ public class StripeCreateCheckoutSessionService {
   private String tokenSecret;
   @Value("${stripe.api.version}")
   private String stripeApiVersion;
-
-  // @Autowired
-  // private MongoDbMainService mongoDbMainService;
-  // @Autowired
-  // private ProductVariationService productVariationService;
 
   private final RestClient restClient;
 
@@ -51,22 +43,14 @@ public class StripeCreateCheckoutSessionService {
     .build();
   }
   
-  // private final String encodingType = "UTF-8";
-
-  @Transactional
   public ResponseEntity<StripeCheckoutCompletedDto> create(List<CheckoutCreateSessionClientRequestDto> cart, List<ProductVariationModel> validatedArray){
     String stringRequestBody = createRequest(validatedArray);
 
-    // productVariationService.bulkOpsInventoryUpdate(cart);
-    
     ResponseEntity<StripeCheckoutCompletedDto> response = sendRequest(stringRequestBody);
 
     return response;
-
-    // StripeCheckoutCompletedDto sessionDto = objectMapper.readValue(response, StripeCheckoutCompletedDto.class);
   }
 
-  // private String createRequest(List<StripeCreateCheckoutSessionDto>dataArray, String returnUrl){
   private String createRequest(List<ProductVariationModel> validatedArray){
     
     StringBuilder requestBody = new StringBuilder();
@@ -102,20 +86,6 @@ public class StripeCreateCheckoutSessionService {
     .body(body)
     .retrieve()
     .toEntity(StripeCheckoutCompletedDto.class);
-
-      // HttpRequest request = HttpRequest.newBuilder()
-      // .uri(URI.create(stripeCreateCheckoutEndpoint))
-      // .header("Authorization", "Bearer " + tokenSecret)
-      // .header("Stripe-Version", stripeApiVersion)
-      // .header("Content-Type", "application/x-www-form-urlencoded")
-      // .POST(HttpRequest.BodyPublishers.ofString(stringRequestBody))
-      // .build();
-
-      // CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-
-      // String response = future.thenApply(data -> data.body()).join();
-
-      // return response;
   }
 
 }

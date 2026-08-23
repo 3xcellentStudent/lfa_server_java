@@ -14,30 +14,4 @@ public record CreateNewProductDto(
   Specifications specifications,
   List<MediaContent> mediaContent,
   @NotBlank String category
-){
-  // @JsonProperty private @NotBlank String productName;
-  // @JsonProperty private @Valid @NotNull Descriptions descriptions;
-  // @JsonProperty private @Valid @NotNull Specifications specifications;
-  // @JsonProperty private @Valid @NotNull ArrayList<MediaContent> mediaContent;
-
-  // public String getProductName(){
-  //   return this.productName;
-  // }
-
-  // public Descriptions getDescriptions(){
-  //   return this.descriptions;
-  // }
-
-  // public Specifications getSpecifications(){
-  //   return this.specifications;
-  // }
-
-  // public ArrayList<MediaContent> getMediaContent(){
-  //   return this.mediaContent;
-  // }
-
-  // public String getCollectionName(){
-  //   return this.collectionName;
-  // }
-  
-}
+){}

@@ -18,9 +18,10 @@ import com.mongodb.event.ClusterListener;
 
 @Configuration
 public class MongoConfig {
+  
   private int exceptionIndex = 0;
   private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
-  // private final String databaseUrl = "mongodb://localhost:27017/test";
+
   @Value("${databases.mongodb.uri}")
   private String databaseUrl;
 

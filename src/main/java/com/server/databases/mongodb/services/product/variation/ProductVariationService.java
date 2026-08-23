@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.bulk.BulkWriteResult;
@@ -27,16 +26,22 @@ public class ProductVariationService {
 
   @Value("${databases.mongodb.collections.products.variations}")
   private String variationsCollection;
+  @Value("${databases.mongodb.collections.products.main}")
+  private String parentCollection;
 
   @Autowired
   private MongoTemplate mongoTemplate;
   
-  public ResponseEntity<Object> createByParentId(CreateVariationByParentId body){
+  public ProductVariationModel createByParentId(CreateVariationByParentId body){
+    if(!mongoTemplate.exists(Query.query(Criteria.where("_id").is(body.parentId())), parentCollection)){
+      return null;
+    }
+
     ProductVariationModel model = new ProductVariationModel(body);
 
     ProductVariationModel insertedDocument = mongoTemplate.insert(model, variationsCollection);
     
-    return ResponseEntity.ok(insertedDocument);
+    return insertedDocument;
   }
 
   public Integer bulkOpsInventoryUpdate(List<CheckoutCreateSessionClientRequestDto> cart){
@@ -58,13 +63,13 @@ public class ProductVariationService {
     return result.getModifiedCount();
   }
 
-  public ResponseEntity<Object> deteleManyById(List<String> ids){
-    Query deletedVariationsQuery = Query.query(Criteria.where("id").in(ids));
+  public List<ProductVariationModel> deteleManyById(List<String> ids){
+    Query deletedVariationsQuery = Query.query(Criteria.where("_id").in(ids));
 
     List<ProductVariationModel> deletedVariationsEntities = mongoTemplate
     .findAllAndRemove(deletedVariationsQuery, ProductVariationModel.class, variationsCollection);
 
-    return ResponseEntity.ok(deletedVariationsEntities);
+    return deletedVariationsEntities;
   }
 
 }

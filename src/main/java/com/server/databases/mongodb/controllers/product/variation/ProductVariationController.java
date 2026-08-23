@@ -1,9 +1,11 @@
 package com.server.databases.mongodb.controllers.product.variation;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -27,6 +29,7 @@ import com.server.databases.mongodb.services.MongoDbMainService;
 import com.server.databases.mongodb.services.product.variation.ProductVariationService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -35,6 +38,13 @@ import jakarta.validation.constraints.NotEmpty;
 @CrossOrigin("*")
 @Validated
 public class ProductVariationController {
+
+  private static final Set<String> PAGINATION_FIELDS = Set.of(
+    "_id", 
+    "parentId", 
+    "createdAt"
+  );
+
   
   @Value("${databases.mongodb.collections.products.variations}")
   private String variationCollection;
@@ -50,7 +60,13 @@ public class ProductVariationController {
 
   @PostMapping("/create/parent-id")
   public ResponseEntity<Object> createByParentId(@Valid @RequestBody CreateVariationByParentId body){
-    return productVariationService.createByParentId(body);
+    ProductVariationModel insertedDoc = productVariationService.createByParentId(body);
+
+    if(insertedDoc == null){
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parent with ID " + body.parentId() + " was not found !");
+    }
+
+    return ResponseEntity.ok(insertedDoc);
   }
 
   @GetMapping("/get/parent-id")
@@ -71,6 +87,23 @@ public class ProductVariationController {
     return ResponseEntity.ok(variations);
   }
 
+  @GetMapping("/get")
+  public ResponseEntity<Object> findByPage(
+    @RequestParam(defaultValue = "0") @Min(0) int page, 
+    @RequestParam(defaultValue = "20") @Min(1) int size, 
+    @RequestParam(defaultValue = "_id") String selector
+  ){
+    if(!PAGINATION_FIELDS.contains(selector)){
+      String message = "\"Selector\" must be same as: " + String.join(", ", PAGINATION_FIELDS);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+    int validatedSize = Math.min(size, 50);
+
+    Page<ProductVariationModel> variations = mainService.findByPage(page, validatedSize, selector, ProductVariationModel.class, variationCollection);
+
+    return ResponseEntity.ok(variations);
+  }
+
   @PatchMapping("/update/id")
   public ResponseEntity<Object> updateOneById(@Valid @RequestBody UpdateOneByIdDto body){
     ProductVariationModel modifiedDoc = mainService.updateOneById(body, ProductVariationModel.class, variationCollection);
@@ -85,7 +118,9 @@ public class ProductVariationController {
 
   @DeleteMapping("/delete")
   public ResponseEntity<Object> deleteById(@RequestBody @NotEmpty List<String> ids){
-    return productVariationService.deteleManyById(ids);
+    List<ProductVariationModel> deletedVariations = productVariationService.deteleManyById(ids);
+
+    return ResponseEntity.ok(deletedVariations);
   }
   
   @DeleteMapping("/clear")

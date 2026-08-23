@@ -95,79 +95,6 @@ public class ProductParentModel {
     }
   }
 
-  // public void setId(String id){
-  //   this.id = id;
-  // }
-
-  // public String getId(){
-  //   return this.id;
-  // }
-
-  // public void setReviewsId(ArrayList<String> reviewsId){
-  //   this.reviewsIds = reviewsId;
-  // }
-
-  // public ArrayList<String> getReviewsId(){
-  //   return this.reviewsIds;
-  // }
-
-  // public Long getCreatedAt(){
-  //   return this.createdAt;
-  // }
-
-  // public void setCreatedAt(Long newTime){
-  // public void setCreatedAt(Long newTime){
-  //   this.createdAt = newTime;
-  // }
-
-  // public Long getUpdatedAt(){
-  //   return this.updatedAt;
-  // }
-
-  // public void setUpdatedAt(Long newTime){
-  //   this.updatedAt = newTime;
-  // }
-
-  // public void setReviewsSnapshot(ReviewsSnapshot reviewsSnapshot){
-  //   this.reviewsSnapshot = reviewsSnapshot;
-  // }
-
-  // public void setReviewsSnapshot(){
-  //   this.reviewsSnapshot = new ReviewsSnapshot();
-  // }
-
-  // public ArrayList<MediaContent> getMediaContent(){
-  //   return this.mediaContent;
-  // }
-
-  // public void setMediaContent(ArrayList<MediaContent> mediaContent){
-  //   this.mediaContent = mediaContent;
-  // }
-
-  // public String getProductName(){
-  //   return this.productName;
-  // }
-
-  // public void setVariationEntitiesId(ArrayList<String> variationEntitiesId){
-  //   this.variationEntitiesId = variationEntitiesId;
-  // }
-
-  // public ArrayList<String> getVariationEntitiesId(){
-  //   return this.variationEntitiesId;
-  // }
-
-  // public List<ProductVariationModel> getVariationEntities(){
-  //   return this.variationEntities;
-  // }
-
-  // public void setVariationEntities(List<ProductVariationModel> variationEntities){
-  //   this.variationEntities = variationEntities;
-  // }
-
-  // public void pushProductVariation(ProductVariationModel productVariation){
-  //   this.variationEntities.add(productVariation);
-  // }
-
   public int getReviewsSnapshotByFieldName(String field){
     switch(field){
       case "five": return this.reviewsSnapshot.five;
@@ -179,55 +106,15 @@ public class ProductParentModel {
     }
   }
 
-  // public ReviewsSnapshot getReviewsSnapshot(){
-  //   return this.reviewsSnapshot;
-  // }
-
-  // public Integer getRating(){
-  //   return this.rating;
-  // }
-
-  // public Descriptions getDescriptions(){
-  //   return this.descriptions;
-  // }
-
-  // public Specifications getSpecifications(){
-  //   return this.specifications;
-  // }
-
-  // public String getCategory(){
-  //   return this.category;
-  // }
-
-  // public ProductParentModel(){}
-
   public ProductParentModel(CreateNewProductDto data){
-    // this.reviewsIds = new ArrayList<>();
     this.rating = 0;
     this.productName = data.productName();
     this.descriptions = data.descriptions();
-    // this.variationEntitiesId = new ArrayList<>();
     this.variations =  List.of();
     this.specifications = data.specifications();
     this.mediaContent = data.mediaContent();
     this.category = data.category();
     this.reviewsSnapshot = new ReviewsSnapshot();
   }
-
-  // public ProductModel(ProductModel data){
-    // this.id = data.getId();
-    // this.reviewsId = data.getReviewsId();
-    // this.rating = data.getRating();
-    // this.mainName = data.getMainName();
-    // this.descriptions = data.getDescriptions();
-    // this.variationEntitiesId = data.getVariationEntitiesId();
-    // this.variationEntities = data.getVariationEntities();
-    // this.specifications = data.getSpecifications();
-    // this.mediaContent = data.getMediaContent();
-    // this.collectionName = data.getCollectionName();
-    // this.reviewsSnapshot = data.getReviewsSnapshot();
-    // this.createdAt = data.getCreatedAt();
-    // this.updatedAt = data.getUpdatedAt();
-  // }
 
 }
